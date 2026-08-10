@@ -1,0 +1,21 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+
+# Local env files
+.env
+.env.local
+
+# Uploaded files (dev)
+uploads
+
+# Testing
+coverage
+
+# Logs
+npm-debug.log*
+
+# IDE
+.DS_Store

@@ -1,0 +1,33 @@
+{
+	"name": "@repo/api",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"generate": "kubb generate"
+	},
+	"exports": {
+		"./client": "./base/client.ts",
+		"./client-handlers": "./base/client-handlers.ts",
+		"./hooks": "./base/codegen/hooks/index.ts",
+		"./types": "./base/codegen/types/index.ts",
+		"./zod": "./base/codegen/zod/index.ts",
+		"./schemas": "./base/codegen/schemas/index.ts"
+	},
+	"devDependencies": {
+		"@kubb/cli": "4.39.2",
+		"@kubb/core": "4.39.2",
+		"@kubb/plugin-client": "4.39.2",
+		"@kubb/plugin-oas": "4.39.2",
+		"@kubb/plugin-react-query": "4.39.2",
+		"@kubb/plugin-ts": "4.39.2",
+		"@kubb/plugin-zod": "4.39.2",
+		"@repo/typescript-config": "*",
+		"typescript": "^7.0.2"
+	},
+	"dependencies": {
+		"@repo/logger": "*",
+		"@tanstack/react-query": "^5.101.4",
+		"axios": "^1.19.0",
+		"zod": "^4.4.3"
+	}
+}

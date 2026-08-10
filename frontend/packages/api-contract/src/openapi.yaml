@@ -1,0 +1,1151 @@
+openapi: 3.1.0
+info:
+  title: GasDashboard API
+  version: '1.0'
+  description: >
+    Контракт согласования корректировок (перенос с Django). Единый источник
+    истины для NestJS-бэкенда и Kubb-кодогенерации на фронте.
+servers:
+  - url: /api
+tags:
+  - name: Auth
+  - name: Org
+  - name: Users
+  - name: Corrections
+  - name: Notifications
+
+security:
+  - cookieAuth: []
+
+paths:
+  # ------------------------------------------------------------------ Auth
+  /auth/login:
+    post:
+      operationId: login
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Успешный вход, устанавливает httpOnly cookie с токенами
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthUser' }
+        '401':
+          description: Неверный логин/пароль или заблокированная учётная запись
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [Auth]
+      responses:
+        '204':
+          description: Куки очищены
+  /auth/refresh:
+    post:
+      operationId: refresh
+      tags: [Auth]
+      security: []
+      responses:
+        '200':
+          description: Токены обновлены
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthUser' }
+        '401':
+          description: Refresh-токен недействителен
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [Auth]
+      responses:
+        '200':
+          description: Текущий пользователь
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthUser' }
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  # ------------------------------------------------------------------- Org
+  /org/filials:
+    get:
+      operationId: getFilials
+      tags: [Org]
+      parameters:
+        - { name: isActive, in: query, schema: { type: boolean } }
+      responses:
+        '200':
+          description: Список филиалов
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Filial' } }
+    post:
+      operationId: createFilial
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FilialInput' }
+      responses:
+        '201':
+          description: Филиал создан
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Filial' }
+  /org/filials/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    patch:
+      operationId: updateFilial
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FilialInput' }
+      responses:
+        '200':
+          description: Филиал обновлён
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Filial' }
+    delete:
+      operationId: deleteFilial
+      tags: [Org]
+      responses:
+        '204': { description: Удалено }
+
+  /org/cfos:
+    get:
+      operationId: getCfos
+      tags: [Org]
+      parameters:
+        - { name: isActive, in: query, schema: { type: boolean } }
+        - name: linkedToFilialId
+          in: query
+          description: Вернуть только ЦФО, привязанные к филиалу (для формы отправки на проверку)
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Список ЦФО
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Cfo' } }
+    post:
+      operationId: createCfo
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CfoInput' }
+      responses:
+        '201':
+          description: ЦФО создан
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cfo' }
+  /org/cfos/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    patch:
+      operationId: updateCfo
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CfoInput' }
+      responses:
+        '200':
+          description: ЦФО обновлён
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cfo' }
+    delete:
+      operationId: deleteCfo
+      tags: [Org]
+      responses:
+        '204': { description: Удалено }
+
+  /org/filial-cfo-links:
+    get:
+      operationId: getFilialCfoLinks
+      tags: [Org]
+      parameters:
+        - { name: filialId, in: query, schema: { type: integer } }
+        - { name: cfoId, in: query, schema: { type: integer } }
+      responses:
+        '200':
+          description: Связи Филиал <-> ЦФО
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/FilialCfoLink' } }
+    post:
+      operationId: createFilialCfoLink
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FilialCfoLinkInput' }
+      responses:
+        '201':
+          description: Связь создана
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FilialCfoLink' }
+  /org/filial-cfo-links/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    patch:
+      operationId: updateFilialCfoLink
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FilialCfoLinkInput' }
+      responses:
+        '200':
+          description: Связь обновлена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FilialCfoLink' }
+    delete:
+      operationId: deleteFilialCfoLink
+      tags: [Org]
+      responses:
+        '204': { description: Удалено }
+
+  /org/correction-types:
+    get:
+      operationId: getCorrectionTypes
+      tags: [Org]
+      parameters:
+        - { name: isActive, in: query, schema: { type: boolean } }
+      responses:
+        '200':
+          description: Типы корректировок
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/CorrectionType' } }
+    post:
+      operationId: createCorrectionType
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CorrectionTypeInput' }
+      responses:
+        '201':
+          description: Тип создан
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionType' }
+  /org/correction-types/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: getCorrectionType
+      tags: [Org]
+      responses:
+        '200':
+          description: Тип корректировки с требованиями пакета
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionTypeDetail' }
+    patch:
+      operationId: updateCorrectionType
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CorrectionTypeInput' }
+      responses:
+        '200':
+          description: Тип обновлён
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionType' }
+    delete:
+      operationId: deleteCorrectionType
+      tags: [Org]
+      responses:
+        '204': { description: Удалено }
+  /org/correction-types/{id}/requirements:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: createPackageRequirement
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PackageRequirementInput' }
+      responses:
+        '201':
+          description: Требование добавлено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PackageRequirement' }
+  /org/requirements/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    patch:
+      operationId: updatePackageRequirement
+      tags: [Org]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PackageRequirementInput' }
+      responses:
+        '200':
+          description: Требование обновлено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PackageRequirement' }
+    delete:
+      operationId: deletePackageRequirement
+      tags: [Org]
+      responses:
+        '204': { description: Удалено }
+
+  # ----------------------------------------------------------------- Users
+  /users:
+    get:
+      operationId: getUsers
+      tags: [Users]
+      parameters:
+        - { name: role, in: query, schema: { $ref: '#/components/schemas/Role' } }
+        - { name: filialId, in: query, schema: { type: integer } }
+        - { name: cfoId, in: query, schema: { type: integer } }
+        - { name: q, in: query, description: Поиск по логину/ФИО, schema: { type: string } }
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/User' } }
+    post:
+      operationId: createUser
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserCreateInput' }
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+  /users/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    patch:
+      operationId: updateUser
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserUpdateInput' }
+      responses:
+        '200':
+          description: Пользователь обновлён
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+    delete:
+      operationId: deleteUser
+      tags: [Users]
+      responses:
+        '204': { description: Удалено }
+
+  # ----------------------------------------------------------- Corrections
+  /corrections:
+    get:
+      operationId: getCorrections
+      tags: [Corrections]
+      description: >
+        Список автоматически ограничен ролью: FILIAL видит свои, CFO — направленные
+        его ЦФО, DTOE/ADMIN — все.
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/CorrectionStatus' } }
+        - { name: filialId, in: query, schema: { type: integer } }
+        - { name: cfoId, in: query, schema: { type: integer } }
+        - { name: correctionTypeId, in: query, schema: { type: integer } }
+        - { name: q, in: query, description: Поиск по ID корректировки, schema: { type: string } }
+        - { name: onlyWithRemarks, in: query, schema: { type: boolean } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, default: 20 } }
+      responses:
+        '200':
+          description: Страница корректировок
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginatedCorrections' }
+    post:
+      operationId: createCorrection
+      tags: [Corrections]
+      description: Доступно только роли FILIAL. Создаёт корректировку и ячейки пакета по типу.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CorrectionCreateInput' }
+      responses:
+        '201':
+          description: Корректировка создана
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/stats:
+    get:
+      operationId: getCorrectionStats
+      tags: [Corrections]
+      responses:
+        '200':
+          description: Агрегированные счётчики для карточек дашборда (в рамках видимости роли)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionStats' }
+  /corrections/{humanId}:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string }, example: COR-000123 }
+    get:
+      operationId: getCorrection
+      tags: [Corrections]
+      responses:
+        '200':
+          description: Детальная карточка корректировки
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+        '403':
+          description: Нет доступа к этой корректировке
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: Не найдено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /corrections/{humanId}/slots/{slotId}/files:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+      - { name: slotId, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: uploadFileVersion
+      tags: [Corrections]
+      description: Доступно только автору-владельцу (роль FILIAL, свой филиал).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                note: { type: string }
+                remarkId: { type: integer, description: 'Если файл загружен в ответ на замечание' }
+      responses:
+        '201':
+          description: Новая версия файла добавлена в ячейку
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FileVersion' }
+  /corrections/{humanId}/send:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: sendCorrection
+      tags: [Corrections]
+      description: Филиал направляет укомплектованный пакет выбранным ЦФО.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CfoSelectionInput' }
+      responses:
+        '200':
+          description: Направлено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+        '400':
+          description: Пакет не укомплектован либо ЦФО не выбраны/не привязаны
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /corrections/{humanId}/resubmit:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: resubmitCorrection
+      tags: [Corrections]
+      description: Повторное направление только тем ЦФО, которые вернули замечания.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CfoSelectionInput' }
+      responses:
+        '200':
+          description: Повторно направлено
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/{humanId}/send-to-dtoe:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: sendCorrectionToDtoe
+      tags: [Corrections]
+      description: Доступно, когда все обязательные ЦФО согласовали (canSendToDtoe).
+      responses:
+        '200':
+          description: Отправлено в ДТОиР
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+        '400':
+          description: Не все обязательные ЦФО согласовали пакет
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /corrections/{humanId}/resubmit-to-dtoe:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: resubmitCorrectionToDtoe
+      tags: [Corrections]
+      description: После исправления замечаний ДТОиР — направление напрямую, минуя ЦФО.
+      responses:
+        '200':
+          description: Повторно направлено в ДТОиР
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/{humanId}/cfo-approve:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: approveCorrectionByCfo
+      tags: [Corrections]
+      description: Роль CFO, только для назначенного ЦФО. Закрывает открытые замечания своего ЦФО.
+      responses:
+        '200':
+          description: Согласовано
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/{humanId}/cfo-return:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: returnCorrectionByCfo
+      tags: [Corrections]
+      description: Роль CFO. Создаёт замечание и возвращает пакет на доработку.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RemarkCreateInput' }
+      responses:
+        '200':
+          description: Возвращено на доработку, замечание создано
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/{humanId}/dtoe-approve:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: approveCorrectionByDtoe
+      tags: [Corrections]
+      description: Роль DTOE. Финальное согласование.
+      responses:
+        '200':
+          description: Согласовано ДТОиР
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/{humanId}/dtoe-return:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: returnCorrectionByDtoe
+      tags: [Corrections]
+      description: Роль DTOE. Создаёт замечание (cfo=null) и возвращает на доработку.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RemarkCreateInput' }
+      responses:
+        '200':
+          description: Возвращено ДТОиР на доработку
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CorrectionDetail' }
+  /corrections/{humanId}/remarks/{remarkId}/fix:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+      - { name: remarkId, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: markRemarkFixed
+      tags: [Corrections]
+      description: Роль FILIAL (владелец). Отмечает замечание исправленным, не закрывает его.
+      responses:
+        '200':
+          description: Отмечено исправленным
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Remark' }
+  /corrections/{humanId}/remarks/{remarkId}/reopen:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+      - { name: remarkId, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: reopenRemark
+      tags: [Corrections]
+      description: Роль CFO (владелец замечания). Исправление не принято — переоткрыть.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RemarkReopenInput' }
+      responses:
+        '200':
+          description: Замечание переоткрыто
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Remark' }
+  /corrections/{humanId}/remarks/{remarkId}:
+    parameters:
+      - { name: humanId, in: path, required: true, schema: { type: string } }
+      - { name: remarkId, in: path, required: true, schema: { type: integer } }
+    delete:
+      operationId: deleteRemark
+      tags: [Corrections]
+      description: Только автор замечания и только пока оно в статусе OPEN.
+      responses:
+        '204': { description: Замечание удалено }
+
+  /files/{id}/download:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: downloadFileVersion
+      tags: [Corrections]
+      responses:
+        '200':
+          description: Бинарное содержимое файла
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        '403':
+          description: Нет доступа
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  # -------------------------------------------------------------- Notifications
+  /notifications:
+    get:
+      operationId: getNotifications
+      tags: [Notifications]
+      responses:
+        '200':
+          description: Уведомления текущего пользователя
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Notification' } }
+  /notifications/{id}/open:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: openNotification
+      tags: [Notifications]
+      description: Помечает прочитанным и возвращает ссылку на корректировку.
+      responses:
+        '200':
+          description: Уведомление прочитано
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Notification' }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+
+  schemas:
+    # --------------------------------------------------------------- enums
+    Role:
+      type: string
+      enum: [FILIAL, CFO, DTOE, ADMIN]
+      description: >
+        FILIAL/CFO/DTOE — из Django (accounts.Role). ADMIN — эквивалент
+        is_staff/is_superuser Django (управление справочниками и пользователями).
+    CorrectionStatus:
+      type: string
+      enum:
+        - DRAFT
+        - UNDER_CFO_REVIEW
+        - PARTIALLY_APPROVED
+        - RETURNED_FOR_REVISION
+        - RESUBMITTED
+        - ALL_CFO_APPROVED
+        - SENT_TO_DTOE
+        - UNDER_DTOE_REVIEW
+        - RETURNED_BY_DTOE
+        - APPROVED_BY_DTOE
+    CfoStatusValue:
+      type: string
+      enum: [PENDING, APPROVED, RETURNED]
+    RemarkStatus:
+      type: string
+      enum: [OPEN, FIXED_BY_FILIAL, REOPENED, CLOSED]
+    PackageRequirementKind:
+      type: string
+      enum: [MAIN_EXCEL, EXCEL_SHEET, DOCUMENT]
+
+    ErrorResponse:
+      type: object
+      required: [statusCode, message]
+      properties:
+        statusCode: { type: integer }
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        error: { type: string }
+
+    # -------------------------------------------------------------- auth
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+    AuthUser:
+      type: object
+      required: [id, username, fullName, role, isLocked]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string }
+        fullName: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        filialId: { type: [integer, 'null'] }
+        cfoId: { type: [integer, 'null'] }
+        position: { type: string }
+        phone: { type: string }
+        isLocked: { type: boolean }
+
+    # --------------------------------------------------------------- org
+    Filial:
+      type: object
+      required: [id, code, name, isActive]
+      properties:
+        id: { type: integer }
+        code: { type: string, description: Краткое наименование }
+        name: { type: string, description: Полное наименование }
+        isActive: { type: boolean }
+    FilialInput:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        isActive: { type: boolean, default: true }
+
+    Cfo:
+      type: object
+      required: [id, code, name, isActive]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        isActive: { type: boolean }
+    CfoInput:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        isActive: { type: boolean, default: true }
+
+    FilialCfoLink:
+      type: object
+      required: [id, filialId, cfoId, isActive]
+      properties:
+        id: { type: integer }
+        filialId: { type: integer }
+        cfoId: { type: integer }
+        isActive: { type: boolean }
+    FilialCfoLinkInput:
+      type: object
+      required: [filialId, cfoId]
+      properties:
+        filialId: { type: integer }
+        cfoId: { type: integer }
+        isActive: { type: boolean, default: true }
+
+    CorrectionType:
+      type: object
+      required: [id, code, name, isActive]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        description: { type: string }
+        isActive: { type: boolean }
+    CorrectionTypeInput:
+      type: object
+      required: [code, name]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        description: { type: string }
+        isActive: { type: boolean, default: true }
+    CorrectionTypeDetail:
+      allOf:
+        - $ref: '#/components/schemas/CorrectionType'
+        - type: object
+          properties:
+            requirements:
+              type: array
+              items: { $ref: '#/components/schemas/PackageRequirement' }
+
+    PackageRequirement:
+      type: object
+      required: [id, correctionTypeId, kind, name, isRequired, order]
+      properties:
+        id: { type: integer }
+        correctionTypeId: { type: integer }
+        kind: { $ref: '#/components/schemas/PackageRequirementKind' }
+        name: { type: string }
+        isRequired: { type: boolean }
+        responsibleCfoId: { type: [integer, 'null'] }
+        namePattern: { type: string }
+        fileFormat: { type: string }
+        order: { type: integer }
+    PackageRequirementInput:
+      type: object
+      required: [kind, name]
+      properties:
+        kind: { $ref: '#/components/schemas/PackageRequirementKind' }
+        name: { type: string }
+        isRequired: { type: boolean, default: true }
+        responsibleCfoId: { type: [integer, 'null'] }
+        namePattern: { type: string }
+        fileFormat: { type: string }
+        order: { type: integer, default: 0 }
+
+    # ------------------------------------------------------------- users
+    User:
+      type: object
+      required: [id, username, fullName, role, isActive, isLocked]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        fullName: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        filialId: { type: [integer, 'null'] }
+        cfoId: { type: [integer, 'null'] }
+        position: { type: string }
+        phone: { type: string }
+        isActive: { type: boolean }
+        isLocked: { type: boolean }
+        dateJoined: { type: string, format: date-time }
+    UserCreateInput:
+      type: object
+      required: [username, password, role]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password, minLength: 9 }
+        email: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        filialId: { type: [integer, 'null'] }
+        cfoId: { type: [integer, 'null'] }
+        position: { type: string }
+        phone: { type: string }
+    UserUpdateInput:
+      type: object
+      properties:
+        email: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+        filialId: { type: [integer, 'null'] }
+        cfoId: { type: [integer, 'null'] }
+        position: { type: string }
+        phone: { type: string }
+        isActive: { type: boolean }
+        isLocked: { type: boolean }
+        password: { type: string, format: password, minLength: 9 }
+
+    # -------------------------------------------------------- corrections
+    UserSummary:
+      type: object
+      required: [id, username, fullName]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        fullName: { type: string }
+
+    Correction:
+      type: object
+      required:
+        - id, humanId, filialId, correctionTypeId, authorId, status, stageNote,
+          createdAt, updatedAt, canSend, canSendToDtoe, openRemarksCount
+      properties:
+        id: { type: integer }
+        humanId: { type: string, example: COR-000123 }
+        filialId: { type: integer }
+        correctionTypeId: { type: integer }
+        authorId: { type: integer }
+        status: { $ref: '#/components/schemas/CorrectionStatus' }
+        stageNote: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        sentToDtoeAt: { type: [string, 'null'], format: date-time }
+        decidedAt: { type: [string, 'null'], format: date-time }
+        canSend: { type: boolean, description: 'status === DRAFT' }
+        canSendToDtoe: { type: boolean, description: 'status === ALL_CFO_APPROVED' }
+        openRemarksCount: { type: integer }
+    CorrectionListItem:
+      allOf:
+        - $ref: '#/components/schemas/Correction'
+        - type: object
+          required: [filial, correctionType, author]
+          properties:
+            filial: { $ref: '#/components/schemas/Filial' }
+            correctionType: { $ref: '#/components/schemas/CorrectionType' }
+            author: { $ref: '#/components/schemas/UserSummary' }
+            myCfoStatus:
+              oneOf:
+                - $ref: '#/components/schemas/CfoStatusValue'
+                - type: 'null'
+              description: Заполняется только для роли CFO
+    PaginatedCorrections:
+      type: object
+      required: [items, total, page, pageSize]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/CorrectionListItem' }
+        total: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+    CorrectionCreateInput:
+      type: object
+      required: [correctionTypeId]
+      properties:
+        correctionTypeId: { type: integer }
+    CorrectionStats:
+      type: object
+      required: [total, inReview, returned, approved]
+      properties:
+        total: { type: integer }
+        inReview: { type: integer }
+        returned: { type: integer }
+        approved: { type: integer }
+        underReview: { type: integer, description: Только для DTOE/ADMIN }
+        openRemarks: { type: integer, description: Только для DTOE/ADMIN }
+
+    DocumentSlot:
+      type: object
+      required: [id, correctionId, requirementId, label, isFilled]
+      properties:
+        id: { type: integer }
+        correctionId: { type: integer }
+        requirementId:
+          type: [integer, 'null']
+          description: null — основной Excel-файл корректировки
+        label: { type: string }
+        isFilled: { type: boolean }
+        currentVersion:
+          oneOf:
+            - $ref: '#/components/schemas/FileVersion'
+            - type: 'null'
+
+    FileVersion:
+      type: object
+      required: [id, slotId, versionNumber, fileName, fileSize, uploadedById, uploadedAt]
+      properties:
+        id: { type: integer }
+        slotId: { type: integer }
+        versionNumber: { type: integer }
+        fileName: { type: string }
+        fileSize: { type: integer }
+        mimeType: { type: string }
+        uploadedById: { type: integer }
+        uploadedAt: { type: string, format: date-time }
+        remarkId: { type: [integer, 'null'] }
+        note: { type: string }
+
+    CorrectionCfoStatus:
+      type: object
+      required: [id, correctionId, cfoId, status, isRequired]
+      properties:
+        id: { type: integer }
+        correctionId: { type: integer }
+        cfoId: { type: integer }
+        status: { $ref: '#/components/schemas/CfoStatusValue' }
+        isRequired: { type: boolean }
+        decidedById: { type: [integer, 'null'] }
+        decidedAt: { type: [string, 'null'], format: date-time }
+
+    Remark:
+      type: object
+      required:
+        - id, humanId, correctionId, authorId, createdAt, sheetName, rowRef,
+          cellRef, description, requiredAction, status, issuerLabel
+      properties:
+        id: { type: integer }
+        humanId: { type: string, example: REM-000045 }
+        correctionId: { type: integer }
+        cfoId:
+          type: [integer, 'null']
+          description: null — замечание от ДТОиР
+        authorId: { type: integer }
+        createdAt: { type: string, format: date-time }
+        relatedSlotId: { type: [integer, 'null'] }
+        fileVersionId: { type: [integer, 'null'] }
+        sheetName: { type: string }
+        rowRef: { type: string }
+        cellRef: { type: string }
+        description: { type: string }
+        requiredAction: { type: string }
+        status: { $ref: '#/components/schemas/RemarkStatus' }
+        closedById: { type: [integer, 'null'] }
+        closedAt: { type: [string, 'null'], format: date-time }
+        issuerLabel: { type: string, description: "Код ЦФО либо «ДТОиР»" }
+    RemarkCreateInput:
+      type: object
+      required: [description, requiredAction]
+      properties:
+        description: { type: string }
+        requiredAction: { type: string }
+        sheetName: { type: string }
+        rowRef: { type: string }
+        cellRef: { type: string }
+        relatedSlotId: { type: [integer, 'null'] }
+        fileVersionId: { type: [integer, 'null'] }
+    RemarkReopenInput:
+      type: object
+      required: [description, requiredAction]
+      properties:
+        description: { type: string }
+        requiredAction: { type: string }
+
+    CorrectionHistoryEntry:
+      type: object
+      required: [id, correctionId, timestamp, text]
+      properties:
+        id: { type: integer }
+        correctionId: { type: integer }
+        timestamp: { type: string, format: date-time }
+        userId: { type: [integer, 'null'] }
+        text: { type: string }
+
+    CorrectionDetail:
+      allOf:
+        - $ref: '#/components/schemas/Correction'
+        - type: object
+          required:
+            - filial, correctionType, author, slots, cfoStatuses, remarks, history,
+              packageComplete, missingRequirements, isFilialOwner, isCfoReviewer, isDtoe,
+              availableCfos, returnedCfos
+          properties:
+            filial: { $ref: '#/components/schemas/Filial' }
+            correctionType: { $ref: '#/components/schemas/CorrectionType' }
+            author: { $ref: '#/components/schemas/UserSummary' }
+            slots:
+              type: array
+              items: { $ref: '#/components/schemas/DocumentSlot' }
+            cfoStatuses:
+              type: array
+              items: { $ref: '#/components/schemas/CorrectionCfoStatus' }
+            remarks:
+              type: array
+              items: { $ref: '#/components/schemas/Remark' }
+            history:
+              type: array
+              items: { $ref: '#/components/schemas/CorrectionHistoryEntry' }
+            packageComplete: { type: boolean }
+            missingRequirements:
+              type: array
+              items: { type: string }
+            myCfoStatus:
+              oneOf:
+                - $ref: '#/components/schemas/CorrectionCfoStatus'
+                - type: 'null'
+            myOpenRemarksCount: { type: integer }
+            isFilialOwner: { type: boolean }
+            isCfoReviewer: { type: boolean }
+            isDtoe: { type: boolean }
+            availableCfos:
+              type: array
+              description: ЦФО, доступные для отправки (linked_cfos), для формы "Направить"
+              items: { $ref: '#/components/schemas/Cfo' }
+            returnedCfos:
+              type: array
+              description: ЦФО в статусе RETURNED, для формы "Направить повторно"
+              items: { $ref: '#/components/schemas/Cfo' }
+
+    CfoSelectionInput:
+      type: object
+      required: [cfoIds]
+      properties:
+        cfoIds:
+          type: array
+          items: { type: integer }
+          minItems: 1
+
+    # --------------------------------------------------------- notifications
+    Notification:
+      type: object
+      required: [id, userId, correctionId, text, isRead, createdAt]
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        correctionId: { type: integer }
+        correctionHumanId: { type: string }
+        text: { type: string }
+        isRead: { type: boolean }
+        createdAt: { type: string, format: date-time }

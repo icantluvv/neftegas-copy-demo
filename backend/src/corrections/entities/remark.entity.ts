@@ -1,0 +1,98 @@
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Cfo } from '../../org/entities/cfo.entity';
+import { User } from '../../users/entities/user.entity';
+import { Correction } from './correction.entity';
+import { DocumentSlot } from './document-slot.entity';
+import { FileVersion } from './file-version.entity';
+
+export enum RemarkStatus {
+  OPEN = 'OPEN',
+  FIXED_BY_FILIAL = 'FIXED_BY_FILIAL',
+  REOPENED = 'REOPENED',
+  CLOSED = 'CLOSED',
+}
+
+/**
+ * Замечание — создаётся ЦФО или ДТОиР при возврате на доработку.
+ * cfo = null означает, что замечание от ДТОиР.
+ */
+@Entity('remarks')
+export class Remark {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Index({ unique: true })
+  @Column()
+  humanId: string;
+
+  @ManyToOne(() => Correction, (correction) => correction.remarks, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'correctionId' })
+  correction: Correction;
+
+  @Column()
+  correctionId: number;
+
+  @ManyToOne(() => Cfo, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'cfoId' })
+  cfo: Cfo | null;
+
+  @Column({ nullable: true })
+  cfoId: number | null;
+
+  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'authorId' })
+  author: User;
+
+  @Column()
+  authorId: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @ManyToOne(() => DocumentSlot, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'relatedSlotId' })
+  relatedSlot: DocumentSlot | null;
+
+  @Column({ nullable: true })
+  relatedSlotId: number | null;
+
+  @ManyToOne(() => FileVersion, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'fileVersionId' })
+  fileVersion: FileVersion | null;
+
+  @Column({ nullable: true })
+  fileVersionId: number | null;
+
+  @Column({ default: '' })
+  sheetName: string;
+
+  @Column({ default: '' })
+  rowRef: string;
+
+  @Column({ default: '' })
+  cellRef: string;
+
+  @Column({ type: 'text' })
+  description: string;
+
+  @Column({ type: 'text' })
+  requiredAction: string;
+
+  @Column({ type: 'enum', enum: RemarkStatus, default: RemarkStatus.OPEN })
+  status: RemarkStatus;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'closedById' })
+  closedBy: User | null;
+
+  @Column({ nullable: true })
+  closedById: number | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  closedAt: Date | null;
+
+  get issuerLabel(): string {
+    return this.cfo ? this.cfo.code : 'ДТОиР';
+  }
+}
