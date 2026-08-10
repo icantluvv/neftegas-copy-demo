@@ -1,0 +1,43 @@
+openapi: 3.0.2
+
+servers:
+  - url: "https://TODO.example.com"
+
+info:
+  version: 1.0.0
+  title: Gas Dashboard API
+  license:
+    name: Proprietary
+    url: https://TODO.example.com/#license
+
+tags:
+  - name: Registration
+    description: Participant registration operations
+  - name: Me
+    description: Current user contest data
+  - name: Contests
+    description: Public contest catalog
+  - name: Regions
+    description: Public Russian region directory
+  - name: Upload
+    description: File upload operations
+  - name: Unsubscribe
+    description: Public email unsubscribe endpoint (RFC 2369 / RFC 8058)
+  - name: Tasks
+    description: Task catalog for contest participants
+  - name: Catalog
+    description: Stage-aware task catalog for contest participants
+  - name: RegionalTeamTask
+    description: Regional team task operations
+  - name: Ratings
+    description: Contest ratings for participants
+  - name: ExpertTasks
+    description: Task list for experts, moderators and curators
+  - name: Staff
+    description: Staff (moderators, curators, experts) account operations
+  - name: ShowcaseCards
+    description: Public showcase card catalog for the interactive map (list, detail, offline export, direction catalog)
+
+paths:
+
+components:

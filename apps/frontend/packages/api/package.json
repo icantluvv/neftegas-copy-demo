@@ -1,0 +1,24 @@
+{
+	"name": "@repo/api",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"generate": "kubb generate"
+	},
+	"dependencies": {
+		"@faker-js/faker": "10.5.0",
+		"@tanstack/react-query": "^5.101.4",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@kubb/cli": "4.39.2",
+		"@kubb/core": "4.39.2",
+		"@kubb/plugin-client": "4.39.2",
+		"@kubb/plugin-faker": "4.39.2",
+		"@kubb/plugin-oas": "4.39.2",
+		"@kubb/plugin-react-query": "4.39.2",
+		"@kubb/plugin-ts": "4.39.2",
+		"@kubb/plugin-zod": "4.39.2",
+		"vitest": "^4.1.10"
+	}
+}

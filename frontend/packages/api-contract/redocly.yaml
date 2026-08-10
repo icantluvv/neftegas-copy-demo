@@ -1,7 +1,0 @@
-extends:
-  - recommended
-
-apis:
-  gasdashboard@v1:
-    root: ./src/openapi.yaml
-    output: ./dist/openapi.yaml

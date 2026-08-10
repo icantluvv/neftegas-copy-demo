@@ -1,0 +1,72 @@
+#   Refer for explanation to following link:
+#   https://lefthook.dev/configuration/
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: lint and format
+      group:
+        piped: true
+        jobs:
+          - name: lint
+            run: bun run lint --no-warn-ignored {staged_files}
+            root: apps/frontend/
+            glob: '*.{js,mjs,jsx,ts,mts,tsx,md,json,jsonc,yaml,yml,toml}'
+          - name: format
+            run: bun fmt --no-error-on-unmatched-pattern {staged_files}
+            root: apps/frontend/
+            glob: '*.{js,mjs,jsx,ts,mts,tsx,md,json,jsonc,yaml,yml,toml,html,css}'
+            stage_fixed: true
+    - name: typecheck
+      run: bun typecheck
+      root: apps/frontend/
+      glob: '*.{ts,mts,tsx}'
+    - name: test
+      run: bun run test --silent --reporter=minimal
+      root: apps/frontend/
+      glob: '*.{js,mjs,jsx,ts,mts,tsx}'
+    - name: backend-cs
+      glob: 'apps/backend/**/*.php'
+      run: make cs
+    - name: backend-phpstan
+      glob: 'apps/backend/**/*.php'
+      run: make phpstan
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: backend-test
+      glob: 'apps/backend/**/*.php'
+      run: make test
+
+commit-msg:
+  commands:
+    commitlint:
+      skip:
+        - merge
+        - rebase
+      run: apps/frontend/node_modules/.bin/commitlint --config apps/frontend/commitlint.config.mjs --edit {1}
+    no-ai-attribution:
+      skip:
+        - merge
+        - rebase
+      run: |
+        if grep -niE 'co-authored-by:.*(claude|anthropic)|generated with .*claude' {1}; then
+          echo ""
+          echo "✖ Сообщение коммита содержит AI-атрибуцию (Co-Authored-By: Claude / 🤖 Generated with Claude Code)."
+          echo "  Удалите указанные выше строки и повторите коммит."
+          exit 1
+        fi
+
+prepare-commit-msg:
+  commands:
+    commitizen:
+      skip:
+        - merge
+        - rebase
+        - run: '[ -z "$(git diff --cached --name-only -- apps/frontend/)" ]'
+      interactive: true
+      run: bun cz --hook
+      root: apps/frontend/
+      env:
+        LEFTHOOK: '0'

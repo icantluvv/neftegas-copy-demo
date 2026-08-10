@@ -1,0 +1,116 @@
+schema: spec-driven
+
+context: |
+
+  ## Контуры и стеки
+
+  | Контур | Каталог | Стек |
+  |---|---|---|
+  | Backend | `apps/backend/` | Node.js, NestJS 11, TypeORM, PostgreSQL, Jest |
+  | Frontend | `apps/frontend/` | Next.js 16.2, React 19.2, TypeScript 6, Bun 1.3, Tailwind 4, TanStack Query/Form, Kubb |
+  | API-контракт | `api/` | OpenAPI 3.0.2, Redocly; `api/src/openapi.yaml` — source of truth HTTP API |
+
+  Продуктовые домены: вход по email/паролю, дашборд статистики, отправка заявок
+  и файлов. Backend — домены в `apps/backend/src/<domain>/`. Процесс единого FE/BE
+  change и contract-first —
+  `docs/DEVELOPMENT_PROCESS.md`.
+
+  ## Язык
+
+  Все OpenSpec-артефакты, описания задач и тестовые описания — на русском.
+  Служебные маркеры OpenSpec, RFC 2119 и Gherkin остаются на английском (их парсит CLI).
+
+  ## Тестовый подход
+
+  Изменения поведения ведутся через TDD:
+  scenario -> failing test -> минимальная реализация -> green -> refactor -> verification.
+  Каждый MUST/SHALL scenario покрывается автотестом, обоснованной ручной проверкой
+  или явным waiver в `test-plan.md`.
+
+  Frontend — три вида тестов: Unit (`*.unit.test.ts(x)`, Vitest node), Component
+  (`*.component.test.ts(x)`, Vitest Browser Mode + Playwright), E2E (`*.e2e.spec.ts`,
+  Playwright для критических маршрутов). Отдельный frontend integration-уровень,
+  jsdom, RTL и MSW не вводятся. Backend — Jest: HTTP-поведение e2e-тестами
+  (`*.e2e-spec.ts`), бизнес-правила unit/feature-тестами (`*.spec.ts`) по публичному поведению.
+
+  Уровни риска:
+  - P0: E2E happy path и ключевой negative path плюс unit/component для сложной логики.
+  - P1: component и один E2E внутри пользовательского маршрута, если обоснован риском.
+  - P2: unit/component.
+  - P3: статические проверки или обоснованная ручная проверка.
+
+rules:
+  proposal:
+    - "Перед созданием change определить тип: полное продуктовое изменение, краткое техническое изменение или локальная правка без OpenSpec."
+    - "Полное продуктовое изменение требуется для новой функциональности, изменения наблюдаемого поведения, API-контракта, прав, статусов, модели данных или внешней интеграции."
+    - "Краткое техническое изменение допустимо только без изменения продуктовой capability, API-контракта и наблюдаемого поведения; delta specs для него не создавать."
+    - "Мелкие локальные правки без влияния на продукт, контракт и командный процесс выполнять без OpenSpec-change."
+    - "На одну продуктовую задачу создавать OpenSpec-командой один change `<feature>` в kebab-case без префиксов `be-` и `fe-`; отдельные FE- и BE-changes для одной фичи не создавать."
+    - "Legacy-changes не переименовывать и не переформатировать только ради новых правил."
+    - "proposal.md должен описывать фичу целиком: проблему, общую цель, затронутые FE- и BE-домены/модули, API, внешние зависимости, исключения из объёма работ и связанные тикеты. Не ограничивать proposal стороной разработчика, создавшего change."
+    - "Если Backend или Frontend не затрагивается, явно указать это в proposal.md и обосновать отсутствие работ для этой стороны."
+    - "Для полного продуктового изменения добавить Capabilities с новыми и/или изменяемыми возможностями."
+    - "Для краткого технического изменения явно объяснить, почему спецификации требований не нужны."
+    - |
+      Добавить раздел `## Влияние на качество`:
+      - Уровень риска: P0 / P1 / P2 / P3
+      - Затронутые маршруты
+      - Затронутые frontend-компоненты и backend-модули
+      - Затронутые API
+      - TDD-порядок: failing test -> implementation -> green -> refactor
+      - Обязательные уровни проверки: Static, Backend Unit/Feature, Frontend Unit/Component/E2E — только применимые
+      - Ручные проверки или waiver
+      - План отката
+    - "Не добавлять contract, visual regression, accessibility, mutation и feature-flag combination tests как отдельные обязательные направления."
+
+  specs:
+    - "Спеки единого change описывают фичу целиком: продуктовые capabilities и наблюдаемое поведение, общее для API, Backend и Frontend, а не конкретные репозитории, UI-компоненты, классы или слои реализации."
+    - "Использовать стандартные delta-секции OpenSpec: `## ADDED Requirements`, `## MODIFIED Requirements`, `## REMOVED Requirements`, `## RENAMED Requirements`."
+    - "Каждое требование оформлять как `### Requirement: <название на русском>`; текст должен содержать нормативное SHALL или MUST и минимум один сценарий. SHOULD и MAY в формулировке требования не использовать, так как strict validation их не принимает."
+    - "Отрицательное нормативное требование писать строго как `SHALL NOT` или `MUST NOT` (маркер после подлежащего): «X SHALL NOT …». Форма `NOT SHALL`/`NOT MUST` (калька русского «не должен») недопустима — strict validation её не отсекает, но это некорректный RFC 2119."
+    - "Каждый сценарий оформлять строго как `#### Scenario: <название на русском>`."
+    - "Внутри каждого Scenario каждый шаг `GIVEN`, `WHEN`, `THEN` и `AND` размещать на отдельной строке: одна строка — один шаг; не объединять шаги в таблицу, одну строку или перечисление через запятую."
+    - "Служебные заголовки, `Requirement`, `Scenario`, `FROM`, `TO`, `Reason`, `Migration`, RFC 2119 и Gherkin-маркеры оставлять на английском; названия и содержание писать на русском. Английский маркер вставлять в русскую фразу с сохранением английского порядка слов: отрицание — `SHALL NOT`/`MUST NOT`, не `NOT SHALL`."
+    - "Для MODIFIED Requirements переносить полный блок существующего требования из `openspec/specs/<capability>/spec.md` и изменять его целиком."
+    - "Для P0/P1 включать happy path, ключевой negative path и релевантные edge cases."
+    - "При описании HTTP API указывать метод, путь, авторизацию, request, response, error-ответы и затронутые файлы `api/src/**`."
+    - "Каждый MUST/SHALL scenario должен иметь соответствующую строку покрытия в общем `test-plan.md`."
+
+  design:
+    - "Перед design.md изучить релевантные требования, существующий код и документацию в затронутых `apps/**`, `api/**` и `docs/**`; не проектировать по предположениям при наличии действующего паттерна."
+    - "Для backend изучить похожие домены в `apps/backend/src/` и правила `apps/backend/AGENTS.md` / `apps/backend/docs/backend-architecture.md`."
+    - "Для frontend изучить похожие routes/components/hooks и ADR из `docs/adr/`, соблюдая `apps/frontend/AGENTS.md`."
+    - "design.md единого change должен описывать решения обеих сторон. Добавить отдельные разделы `## Backend` и `## Frontend`; если сторона не затрагивается, явно указать это вместо проектирования несуществующей реализации."
+    - "Ссылаться на конкретные файлы полными путями от корня монорепозитория."
+    - "Если меняется HTTP API, добавить `## API Shape`: методы, пути, авторизация, request/response schemas, error-ответы, обратная совместимость и перечень файлов `api/src/**`."
+    - "`api/src/openapi.yaml` и связанные `api/src/**` являются source of truth; Backend, frontend Kubb codegen и интеграция должны следовать последней успешно проверенной версии контракта."
+    - "Добавить Files / Owners для API, Backend и Frontend с полными путями от корня; владельцем первоначальной API-задачи является разработчик, создавший change."
+    - "Readiness Decision устанавливать явно: `blocked`, `ready with conditions` или `ready`. До успешного завершения первой API-задачи зависимая FE/BE-реализация имеет статус `blocked`; формальное согласование контракта второй стороной не является условием готовности."
+    - "Добавить `## Тестовая стратегия` для всей фичи: риск, TDD-порядок по ключевым сценариям, backend unit/feature, frontend unit/component/E2E, моки, typed fixtures, factories, seed data, роли и общие verification gates."
+    - "Не проектировать отдельный frontend integration-уровень: взаимодействие page/route/component/provider проверять component-тестом, критический сквозной маршрут — E2E."
+    - "Высокоприоритетные пункты Validation Focus и все обязательные проверки переносить в конкретные задачи tasks.md и строки общего test-plan.md."
+    - "Учитывать команды окружения: backend-команды выполняются из `apps/backend` (npm), frontend-команды — из `apps/frontend`, API-команды — из `api`."
+
+  tasks:
+    - "tasks.md содержит три обязательные top-level секции в порядке: `## API`, `## Backend`, `## Frontend`. API идёт первой из-за contract-first процесса Gas Dashboard."
+    - "Если для Backend или Frontend нет задач, оставить соответствующую секцию и маркер `_(нет задач)_` без чекбоксов. Секция API обязательна и содержит минимум первую исполняемую задачу."
+    - "Каждая задача должна быть чекбоксом OpenSpec формата `- [ ] X.Y [area] Описание`, где area — `[api]`, `[backend]`, `[frontend]`, `[infra]`, `[openspec]` или `[root]`."
+    - "Нумерация по секциям: API — 1.x, Backend — 2.x, Frontend — 3.x; дополнительные задачи продолжают нумерацию своей секции."
+    - "Первая исполняемая задача всегда `1.1 [api]`: создать или обновить `api/src/**` по API Shape и выполнить проверки контракта. Если API Shape не меняется, задача должна явно подтвердить отсутствие изменений контракта и всё равно выполнить `npm run lint` из `api/`."
+    - "Владелец первоначальной API-задачи — разработчик, создавший change. После успешного `npm run lint` и при необходимости `npm run bundle` контракт фиксируется как source of truth, задача отмечается выполненной; обязательное review или подтверждение второй стороной не требуется."
+    - "Задачи Backend и Frontend, зависящие от API, выполняются только после завершения задачи 1.1."
+    - "Сторона, приступившая позже, может изменить `api/src/**` при выполнении своих задач. После такой правки повторно запустить API-проверки и актуализировать API-задачу либо добавить следующую задачу 1.x, чтобы завершённый статус не ссылался на устаревшую версию контракта."
+    - "Backend-задачи (NestJS, TypeORM, Entity, migration, service, provider, controller, module, Jest) размещать только в `## Backend`."
+    - "Frontend-задачи (Next.js, React, components, routes, hooks, Kubb, TanStack, стили, Vitest, Playwright) размещать только в `## Frontend`."
+    - "Все API-, Backend- и Frontend-задачи одной продуктовой фичи находятся в одном change; не создавать отдельные changes для разных сторон реализации."
+    - "Backend выполнять TDD-инкрементами: failing unit/feature test -> минимальная реализация -> green -> refactor. Entity меняется до генерации TypeORM migration; ручная миграция требует явного обоснования."
+    - "Frontend выполнять TDD-инкрементами: failing unit/component/E2E test по риску -> components/routes/hooks/API integration -> green -> refactor. Отдельные frontend integration-тесты не создавать."
+    - "Test-first задачи располагать перед соответствующими задачами реализации, а не общей тестовой фазой после всего кода."
+    - "При изменении API Frontend-задачи должны включать генерацию Kubb-клиента из последней проверенной спеки; `apps/frontend/packages/api/*/codegen/` вручную не редактировать."
+    - "Для каждого change создавать и совместно поддерживать один `test-plan.md`: риск, TDD workflow, таблица покрытия каждого MUST/SHALL scenario обеими сторонами, тестовые данные, manual/waiver и общие verification gates."
+    - "При `/openspec-apply-change <feature>` Backend выполняет и отмечает только задачи `## Backend`, Frontend — только задачи `## Frontend`; задачи другой стороны не изменять. Исключение — необходимая корректировка общего API-контракта и связанных API-checklist/test-plan пунктов."
+    - "После выполнения каждой задачи сразу обновлять её чекбокс и только относящиеся к ней строки test-plan.md; общие артефакты proposal.md, specs, design.md, API и test-plan.md изменять согласованно."
+    - "Не отмечать задачу выполненной, пока связанный сценарий не покрыт автоматизированным тестом, обоснованной ручной проверкой или явным waiver; для P0/P1 отсутствие покрытия блокирует завершение change."
+    - "Перед backend-тестами читать `apps/backend/AGENTS.md`; перед frontend-тестами — `apps/frontend/AGENTS.md` и релевантные testing-конфиги/ADR."
+    - "Добавить точечные и финальные verification-задачи: OpenSpec `openspec validate <feature> --strict --no-interactive`; API `npm run lint` и при необходимости `npm run bundle`; Backend `npm run test`, `npm run test:e2e`, `npm run lint`; Frontend `bun run typecheck`, `bun run lint`, релевантные тесты и `npm run build` для routes/auth/env/SSR/config."
+    - "Общий change архивировать один раз командой `/openspec-archive-change <feature>` только после завершения API-, Backend- и Frontend-задач, прохождения обязательных проверок и перехода продуктовой задачи в трек «Приемка»."
