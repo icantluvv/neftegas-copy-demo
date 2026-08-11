@@ -1,2 +1,36 @@
+# Secrets and local environment
 .env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.test
+
+# IDE and OS files
+.idea/
+.vscode/
+.zed/
 .DS_Store
+mise.toml
+
+# Dependencies
+**/node_modules/
+
+# Backend runtime and generated files
+apps/backend/dist/
+apps/backend/coverage/
+apps/backend/uploads/
+
+# Frontend build and test output
+apps/frontend/.next/
+apps/frontend/out/
+apps/frontend/dist/
+apps/frontend/coverage/
+
+# API build and test output
+api/dist/
+api/coverage/
+
+# Logs and temporary files
+*.log
+*.tmp

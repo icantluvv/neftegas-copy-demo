@@ -17,15 +17,15 @@ mise.toml
 **/node_modules/
 
 # Backend runtime and generated files
-backend/dist/
-backend/coverage/
-backend/uploads/
+apps/backend/dist/
+apps/backend/coverage/
+apps/backend/uploads/
 
 # Frontend build and test output
-frontend/.next/
-frontend/out/
-frontend/dist/
-frontend/coverage/
+apps/frontend/.next/
+apps/frontend/out/
+apps/frontend/dist/
+apps/frontend/coverage/
 
 # API build and test output
 api/dist/
