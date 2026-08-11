@@ -1,0 +1,1 @@
+{"x-readme-ref-name":"Notification","type":"object","required":["id","userId","correctionId","text","isRead","createdAt"],"properties":{"id":{"type":"integer"},"userId":{"type":"integer"},"correctionId":{"type":"integer"},"correctionHumanId":{"type":"string"},"text":{"type":"string"},"isRead":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"}}}

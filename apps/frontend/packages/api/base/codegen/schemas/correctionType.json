@@ -1,0 +1,1 @@
+{"type":"object","required":["id","code","name","isActive"],"properties":{"id":{"type":"integer"},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string"},"isActive":{"type":"boolean"}},"x-readme-ref-name":"CorrectionType"}

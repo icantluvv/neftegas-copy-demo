@@ -1,0 +1,1 @@
+{"type":"object","required":["description","requiredAction"],"properties":{"description":{"type":"string"},"requiredAction":{"type":"string"},"sheetName":{"type":"string"},"rowRef":{"type":"string"},"cellRef":{"type":"string"},"relatedSlotId":{"type":["integer","null"]},"fileVersionId":{"type":["integer","null"]}},"x-readme-ref-name":"RemarkCreateInput"}

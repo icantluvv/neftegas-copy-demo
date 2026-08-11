@@ -1,0 +1,1 @@
+{"type":"object","required":["id","filialId","cfoId","isActive"],"properties":{"id":{"type":"integer"},"filialId":{"type":"integer"},"cfoId":{"type":"integer"},"isActive":{"type":"boolean"}},"x-readme-ref-name":"FilialCfoLink"}

@@ -1,0 +1,1 @@
+{"type":"object","required":["statusCode","message"],"properties":{"statusCode":{"type":"integer"},"message":{"oneOf":[{"type":"string"},{"type":"array","items":{"type":"string"}}]},"error":{"type":"string"}},"x-readme-ref-name":"error-response"}

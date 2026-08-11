@@ -1,0 +1,1 @@
+{"x-readme-ref-name":"CorrectionHistoryEntry","type":"object","required":["id","correctionId","timestamp","text"],"properties":{"id":{"type":"integer"},"correctionId":{"type":"integer"},"timestamp":{"type":"string","format":"date-time"},"userId":{"type":["integer","null"]},"text":{"type":"string"}}}

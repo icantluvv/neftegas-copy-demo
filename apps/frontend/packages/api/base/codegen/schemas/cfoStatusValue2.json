@@ -1,0 +1,1 @@
+{"type":"string","enum":["PENDING","APPROVED","RETURNED"],"x-readme-ref-name":"cfo-status-value"}

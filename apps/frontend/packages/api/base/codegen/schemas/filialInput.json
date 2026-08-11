@@ -1,0 +1,1 @@
+{"type":"object","required":["code"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"isActive":{"type":"boolean","default":true}},"x-readme-ref-name":"FilialInput"}

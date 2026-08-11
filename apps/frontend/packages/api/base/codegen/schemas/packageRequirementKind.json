@@ -1,0 +1,1 @@
+{"x-readme-ref-name":"PackageRequirementKind","type":"string","enum":["MAIN_EXCEL","EXCEL_SHEET","DOCUMENT"]}

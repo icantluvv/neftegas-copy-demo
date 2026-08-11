@@ -1,0 +1,1 @@
+{"type":"object","required":["id","username","fullName"],"properties":{"id":{"type":"integer"},"username":{"type":"string"},"fullName":{"type":"string"}},"x-readme-ref-name":"UserSummary"}

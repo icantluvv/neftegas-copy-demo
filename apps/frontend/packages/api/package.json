@@ -2,6 +2,9 @@
 	"name": "@repo/api",
 	"private": true,
 	"type": "module",
+	"imports": {
+		"#/*": "../../src/*"
+	},
 	"scripts": {
 		"generate": "kubb generate"
 	},
