@@ -7,6 +7,7 @@ import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
 import {LoginRequest, loginRequestSchema, useLogin} from "@/packages/api/base/codegen";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {toast} from "sonner";
 
 export function LoginForm() {
   const router = useRouter();
@@ -23,6 +24,9 @@ export function LoginForm() {
     mutation: {
       onSuccess: () => {
         router.replace("/dashboard");
+      },
+      onError: () => {
+        toast.error("Неверный логин или пароль");
       },
     },
   });
@@ -68,10 +72,6 @@ export function LoginForm() {
               </p>
           )}
         </div>
-
-        {login.isError && (
-            <p className="text-sm text-destructive">Неверный логин или пароль</p>
-        )}
 
         <Button type="submit" disabled={login.isPending}>
           {login.isPending ? "Входим…" : "Войти"}
