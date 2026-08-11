@@ -15,7 +15,7 @@
 | Backend | `apps/backend/` | Node.js, NestJS 11, TypeORM, PostgreSQL, Jest | `apps/backend/AGENTS.md` |
 | Frontend | `apps/frontend/` | Next.js 16.2 App Router, React 19.2, TypeScript 6, Bun 1.3, Tailwind 4 (`tw:`), TanStack Query/Form, Kubb | `apps/frontend/AGENTS.md` |
 | API-контракт | `api/` | OpenAPI 3.0.2, Redocly; `api/src/openapi.yaml` — source of truth HTTP API | — |
-| Инфраструктура | `infra/`, корневой `Makefile`, `docker-compose.yml` | Docker Compose, локальное окружение и production-конфигурация | — |
+| Инфраструктура | `infra/` (Docker Compose, Makefile) | Docker Compose, локальное окружение и production-конфигурация | — |
 | OpenSpec | `openspec/` | Изменения процесса разработки и живая документация поведения | `openspec/config.yaml` |
 
 Основные продуктовые домены: вход по email/паролю, дашборд статистики, отправка

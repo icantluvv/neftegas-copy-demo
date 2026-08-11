@@ -17,7 +17,7 @@ services:
       retries: 10
 
   backend:
-    build: ./apps/backend
+    build: ../apps/backend
     restart: unless-stopped
     depends_on:
       db:
@@ -41,7 +41,7 @@ services:
 
   frontend:
     build:
-      context: ./apps/frontend
+      context: ../apps/frontend
       args:
         # NEXT_PUBLIC_* встраиваются в клиентский бандл на этапе сборки next
         # build, поэтому нужны здесь как build args, а не только как runtime
