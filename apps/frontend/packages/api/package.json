@@ -14,6 +14,7 @@
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
+		"ajv": "^8.20.0",
 		"@kubb/cli": "4.39.2",
 		"@kubb/core": "4.39.2",
 		"@kubb/plugin-client": "4.39.2",
