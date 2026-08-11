@@ -1,0 +1,56 @@
+User:
+  type: object
+  required: [id, username, fullName, role, isActive, isLocked]
+  properties:
+    id: { type: integer }
+    username: { type: string }
+    email: { type: string }
+    firstName: { type: string }
+    lastName: { type: string }
+    fullName: { type: string }
+    role: { $ref: './role.yaml' }
+    filialId: { type: [integer, 'null'] }
+    cfoId: { type: [integer, 'null'] }
+    position: { type: string }
+    phone: { type: string }
+    isActive: { type: boolean }
+    isLocked: { type: boolean }
+    dateJoined: { type: string, format: date-time }
+
+UserCreateInput:
+  type: object
+  required: [username, password, role]
+  properties:
+    username: { type: string }
+    password: { type: string, format: password, minLength: 9 }
+    email: { type: string }
+    firstName: { type: string }
+    lastName: { type: string }
+    role: { $ref: './role.yaml' }
+    filialId: { type: [integer, 'null'] }
+    cfoId: { type: [integer, 'null'] }
+    position: { type: string }
+    phone: { type: string }
+
+UserUpdateInput:
+  type: object
+  properties:
+    email: { type: string }
+    firstName: { type: string }
+    lastName: { type: string }
+    role: { $ref: './role.yaml' }
+    filialId: { type: [integer, 'null'] }
+    cfoId: { type: [integer, 'null'] }
+    position: { type: string }
+    phone: { type: string }
+    isActive: { type: boolean }
+    isLocked: { type: boolean }
+    password: { type: string, format: password, minLength: 9 }
+
+UserSummary:
+  type: object
+  required: [id, username, fullName]
+  properties:
+    id: { type: integer }
+    username: { type: string }
+    fullName: { type: string }

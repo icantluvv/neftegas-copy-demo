@@ -1,0 +1,29 @@
+get:
+  summary: Список типов корректировок
+  operationId: getCorrectionTypes
+  tags: [Org]
+  parameters:
+    - { name: isActive, in: query, schema: { type: boolean } }
+  responses:
+    '200':
+      description: Типы корректировок
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '../components/schemas/correction-type.yaml#/CorrectionType' }
+post:
+  summary: Создать тип корректировки
+  operationId: createCorrectionType
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/correction-type.yaml#/CorrectionTypeInput' }
+  responses:
+    '201':
+      description: Тип создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-type.yaml#/CorrectionType' }

@@ -1,0 +1,18 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Вернуть на доработку от лица ДТОиР (с замечанием)
+  operationId: returnCorrectionByDtoe
+  tags: [Corrections]
+  description: Роль DTOE. Создаёт замечание (cfo=null) и возвращает на доработку.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/remark.yaml#/RemarkCreateInput' }
+  responses:
+    '200':
+      description: Возвращено ДТОиР на доработку
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }

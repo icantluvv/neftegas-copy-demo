@@ -1,0 +1,18 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Вернуть на доработку от лица ЦФО (с замечанием)
+  operationId: returnCorrectionByCfo
+  tags: [Corrections]
+  description: Роль CFO. Создаёт замечание и возвращает пакет на доработку.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/remark.yaml#/RemarkCreateInput' }
+  responses:
+    '200':
+      description: Возвращено на доработку, замечание создано
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }

@@ -1,0 +1,13 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Повторно направить в ДТОиР после исправления замечаний ДТОиР
+  operationId: resubmitCorrectionToDtoe
+  tags: [Corrections]
+  description: После исправления замечаний ДТОиР — направление напрямую, минуя ЦФО.
+  responses:
+    '200':
+      description: Повторно направлено в ДТОиР
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }

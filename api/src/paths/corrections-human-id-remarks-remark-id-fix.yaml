@@ -1,0 +1,14 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: remarkId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Отметить замечание исправленным
+  operationId: markRemarkFixed
+  tags: [Corrections]
+  description: Роль FILIAL (владелец). Отмечает замечание исправленным, не закрывает его.
+  responses:
+    '200':
+      description: Отмечено исправленным
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/remark.yaml#/Remark' }

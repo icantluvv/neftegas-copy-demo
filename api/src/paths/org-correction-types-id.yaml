@@ -1,0 +1,33 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+get:
+  summary: Тип корректировки с требованиями пакета
+  operationId: getCorrectionType
+  tags: [Org]
+  responses:
+    '200':
+      description: Тип корректировки с требованиями пакета
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-type.yaml#/CorrectionTypeDetail' }
+patch:
+  summary: Обновить тип корректировки
+  operationId: updateCorrectionType
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/correction-type.yaml#/CorrectionTypeInput' }
+  responses:
+    '200':
+      description: Тип обновлён
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-type.yaml#/CorrectionType' }
+delete:
+  summary: Удалить тип корректировки
+  operationId: deleteCorrectionType
+  tags: [Org]
+  responses:
+    '204': { description: Удалено }

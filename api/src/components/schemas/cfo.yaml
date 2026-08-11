@@ -1,0 +1,16 @@
+Cfo:
+  type: object
+  required: [id, code, name, isActive]
+  properties:
+    id: { type: integer }
+    code: { type: string }
+    name: { type: string }
+    isActive: { type: boolean }
+
+CfoInput:
+  type: object
+  required: [code]
+  properties:
+    code: { type: string }
+    name: { type: string }
+    isActive: { type: boolean, default: true }

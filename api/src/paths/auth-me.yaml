@@ -1,0 +1,15 @@
+get:
+  summary: Текущий авторизованный пользователь
+  operationId: getMe
+  tags: [Auth]
+  responses:
+    '200':
+      description: Текущий пользователь
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/auth.yaml#/AuthUser' }
+    '401':
+      description: Не авторизован
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

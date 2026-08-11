@@ -1,0 +1,13 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Финально согласовать корректировку (ДТОиР)
+  operationId: approveCorrectionByDtoe
+  tags: [Corrections]
+  description: Роль DTOE. Финальное согласование.
+  responses:
+    '200':
+      description: Согласовано ДТОиР
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }

@@ -1,0 +1,22 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string }, example: COR-000123 }
+get:
+  summary: Детальная карточка корректировки
+  operationId: getCorrection
+  tags: [Corrections]
+  responses:
+    '200':
+      description: Детальная карточка корректировки
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }
+    '403':
+      description: Нет доступа к этой корректировке
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: Не найдено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

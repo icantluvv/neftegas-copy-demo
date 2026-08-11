@@ -1,0 +1,33 @@
+get:
+  summary: Список ЦФО
+  operationId: getCfos
+  tags: [Org]
+  parameters:
+    - { name: isActive, in: query, schema: { type: boolean } }
+    - name: linkedToFilialId
+      in: query
+      description: Вернуть только ЦФО, привязанные к филиалу (для формы отправки на проверку)
+      schema: { type: integer }
+  responses:
+    '200':
+      description: Список ЦФО
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '../components/schemas/cfo.yaml#/Cfo' }
+post:
+  summary: Создать ЦФО
+  operationId: createCfo
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/cfo.yaml#/CfoInput' }
+  responses:
+    '201':
+      description: ЦФО создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/cfo.yaml#/Cfo' }

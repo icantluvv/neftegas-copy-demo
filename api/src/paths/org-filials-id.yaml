@@ -1,0 +1,23 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+patch:
+  summary: Обновить филиал
+  operationId: updateFilial
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/filial.yaml#/FilialInput' }
+  responses:
+    '200':
+      description: Филиал обновлён
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/filial.yaml#/Filial' }
+delete:
+  summary: Удалить филиал
+  operationId: deleteFilial
+  tags: [Org]
+  responses:
+    '204': { description: Удалено }

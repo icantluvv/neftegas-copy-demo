@@ -1,0 +1,21 @@
+LoginRequest:
+  type: object
+  required: [username, password]
+  properties:
+    username: { type: string }
+    password: { type: string, format: password }
+
+AuthUser:
+  type: object
+  required: [id, username, fullName, role, isLocked]
+  properties:
+    id: { type: integer }
+    username: { type: string }
+    email: { type: string }
+    fullName: { type: string }
+    role: { $ref: './role.yaml' }
+    filialId: { type: [integer, 'null'] }
+    cfoId: { type: [integer, 'null'] }
+    position: { type: string }
+    phone: { type: string }
+    isLocked: { type: boolean }

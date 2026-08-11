@@ -1,0 +1,14 @@
+type: object
+required: [id, correctionId, requirementId, label, isFilled]
+properties:
+  id: { type: integer }
+  correctionId: { type: integer }
+  requirementId:
+    type: [integer, 'null']
+    description: null — основной Excel-файл корректировки
+  label: { type: string }
+  isFilled: { type: boolean }
+  currentVersion:
+    oneOf:
+      - $ref: './file-version.yaml'
+      - type: 'null'

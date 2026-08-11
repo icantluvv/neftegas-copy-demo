@@ -1,0 +1,32 @@
+get:
+  summary: Список пользователей
+  operationId: getUsers
+  tags: [Users]
+  parameters:
+    - { name: role, in: query, schema: { $ref: '../components/schemas/role.yaml' } }
+    - { name: filialId, in: query, schema: { type: integer } }
+    - { name: cfoId, in: query, schema: { type: integer } }
+    - { name: q, in: query, description: Поиск по логину/ФИО, schema: { type: string } }
+  responses:
+    '200':
+      description: Список пользователей
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '../components/schemas/user.yaml#/User' }
+post:
+  summary: Создать пользователя
+  operationId: createUser
+  tags: [Users]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/user.yaml#/UserCreateInput' }
+  responses:
+    '201':
+      description: Пользователь создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/user.yaml#/User' }

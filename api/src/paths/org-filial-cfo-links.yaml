@@ -1,0 +1,30 @@
+get:
+  summary: Список связей филиал-ЦФО
+  operationId: getFilialCfoLinks
+  tags: [Org]
+  parameters:
+    - { name: filialId, in: query, schema: { type: integer } }
+    - { name: cfoId, in: query, schema: { type: integer } }
+  responses:
+    '200':
+      description: Связи Филиал <-> ЦФО
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '../components/schemas/filial-cfo-link.yaml#/FilialCfoLink' }
+post:
+  summary: Создать связь филиал-ЦФО
+  operationId: createFilialCfoLink
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/filial-cfo-link.yaml#/FilialCfoLinkInput' }
+  responses:
+    '201':
+      description: Связь создана
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/filial-cfo-link.yaml#/FilialCfoLink' }

@@ -1,0 +1,13 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Открыть уведомление (пометить прочитанным)
+  operationId: openNotification
+  tags: [Notifications]
+  description: Помечает прочитанным и возвращает ссылку на корректировку.
+  responses:
+    '200':
+      description: Уведомление прочитано
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/notification.yaml' }

@@ -1,43 +1,195 @@
-openapi: 3.0.2
-
-servers:
-  - url: "https://TODO.example.com"
+openapi: 3.1.0
 
 info:
   version: 1.0.0
   title: Gas Dashboard API
+  description: >
+    Контракт согласования корректировок (перенос бизнес-логики с Django-проекта
+    soglasovanie_correction_system). Источник истины для backend (NestJS) и
+    frontend (Kubb-кодоген). Пути — в api/src/paths/, схемы — в
+    api/src/components/schemas/.
   license:
     name: Proprietary
-    url: https://TODO.example.com/#license
+
+servers:
+  - url: /api
 
 tags:
-  - name: Registration
-    description: Participant registration operations
-  - name: Me
-    description: Current user contest data
-  - name: Contests
-    description: Public contest catalog
-  - name: Regions
-    description: Public Russian region directory
-  - name: Upload
-    description: File upload operations
-  - name: Unsubscribe
-    description: Public email unsubscribe endpoint (RFC 2369 / RFC 8058)
-  - name: Tasks
-    description: Task catalog for contest participants
-  - name: Catalog
-    description: Stage-aware task catalog for contest participants
-  - name: RegionalTeamTask
-    description: Regional team task operations
-  - name: Ratings
-    description: Contest ratings for participants
-  - name: ExpertTasks
-    description: Task list for experts, moderators and curators
-  - name: Staff
-    description: Staff (moderators, curators, experts) account operations
-  - name: ShowcaseCards
-    description: Public showcase card catalog for the interactive map (list, detail, offline export, direction catalog)
+  - name: Auth
+    description: Вход, выход, обновление токенов, текущий пользователь
+  - name: Org
+    description: Справочники — филиалы, ЦФО, связи филиал-ЦФО, типы корректировок и требования пакета
+  - name: Users
+    description: Управление пользователями (роль ADMIN)
+  - name: Corrections
+    description: Жизненный цикл корректировок — создание, пакет документов, маршрут согласования, замечания
+  - name: Notifications
+    description: Уведомления пользователя
+
+security:
+  - cookieAuth: []
 
 paths:
+  /auth/login:
+    $ref: './paths/auth-login.yaml'
+  /auth/logout:
+    $ref: './paths/auth-logout.yaml'
+  /auth/refresh:
+    $ref: './paths/auth-refresh.yaml'
+  /auth/me:
+    $ref: './paths/auth-me.yaml'
+
+  /org/filials:
+    $ref: './paths/org-filials.yaml'
+  /org/filials/{id}:
+    $ref: './paths/org-filials-id.yaml'
+  /org/cfos:
+    $ref: './paths/org-cfos.yaml'
+  /org/cfos/{id}:
+    $ref: './paths/org-cfos-id.yaml'
+  /org/filial-cfo-links:
+    $ref: './paths/org-filial-cfo-links.yaml'
+  /org/filial-cfo-links/{id}:
+    $ref: './paths/org-filial-cfo-links-id.yaml'
+  /org/correction-types:
+    $ref: './paths/org-correction-types.yaml'
+  /org/correction-types/{id}:
+    $ref: './paths/org-correction-types-id.yaml'
+  /org/correction-types/{id}/requirements:
+    $ref: './paths/org-correction-types-id-requirements.yaml'
+  /org/requirements/{id}:
+    $ref: './paths/org-requirements-id.yaml'
+
+  /users:
+    $ref: './paths/users.yaml'
+  /users/{id}:
+    $ref: './paths/users-id.yaml'
+
+  /corrections:
+    $ref: './paths/corrections.yaml'
+  /corrections/stats:
+    $ref: './paths/corrections-stats.yaml'
+  /corrections/{humanId}:
+    $ref: './paths/corrections-human-id.yaml'
+  /corrections/{humanId}/slots/{slotId}/files:
+    $ref: './paths/corrections-human-id-slots-slot-id-files.yaml'
+  /corrections/{humanId}/send:
+    $ref: './paths/corrections-human-id-send.yaml'
+  /corrections/{humanId}/resubmit:
+    $ref: './paths/corrections-human-id-resubmit.yaml'
+  /corrections/{humanId}/send-to-dtoe:
+    $ref: './paths/corrections-human-id-send-to-dtoe.yaml'
+  /corrections/{humanId}/resubmit-to-dtoe:
+    $ref: './paths/corrections-human-id-resubmit-to-dtoe.yaml'
+  /corrections/{humanId}/cfo-approve:
+    $ref: './paths/corrections-human-id-cfo-approve.yaml'
+  /corrections/{humanId}/cfo-return:
+    $ref: './paths/corrections-human-id-cfo-return.yaml'
+  /corrections/{humanId}/dtoe-approve:
+    $ref: './paths/corrections-human-id-dtoe-approve.yaml'
+  /corrections/{humanId}/dtoe-return:
+    $ref: './paths/corrections-human-id-dtoe-return.yaml'
+  /corrections/{humanId}/remarks/{remarkId}/fix:
+    $ref: './paths/corrections-human-id-remarks-remark-id-fix.yaml'
+  /corrections/{humanId}/remarks/{remarkId}/reopen:
+    $ref: './paths/corrections-human-id-remarks-remark-id-reopen.yaml'
+  /corrections/{humanId}/remarks/{remarkId}:
+    $ref: './paths/corrections-human-id-remarks-remark-id.yaml'
+
+  /files/{id}/download:
+    $ref: './paths/files-id-download.yaml'
+
+  /notifications:
+    $ref: './paths/notifications.yaml'
+  /notifications/{id}/open:
+    $ref: './paths/notifications-id-open.yaml'
 
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+
+  schemas:
+    Role:
+      $ref: './components/schemas/role.yaml'
+    CorrectionStatus:
+      $ref: './components/schemas/correction-status.yaml'
+    CfoStatusValue:
+      $ref: './components/schemas/cfo-status-value.yaml'
+    RemarkStatus:
+      $ref: './components/schemas/remark-status.yaml'
+    PackageRequirementKind:
+      $ref: './components/schemas/package-requirement-kind.yaml'
+    ErrorResponse:
+      $ref: './components/schemas/error-response.yaml'
+
+    LoginRequest:
+      $ref: './components/schemas/auth.yaml#/LoginRequest'
+    AuthUser:
+      $ref: './components/schemas/auth.yaml#/AuthUser'
+
+    Filial:
+      $ref: './components/schemas/filial.yaml#/Filial'
+    FilialInput:
+      $ref: './components/schemas/filial.yaml#/FilialInput'
+    Cfo:
+      $ref: './components/schemas/cfo.yaml#/Cfo'
+    CfoInput:
+      $ref: './components/schemas/cfo.yaml#/CfoInput'
+    FilialCfoLink:
+      $ref: './components/schemas/filial-cfo-link.yaml#/FilialCfoLink'
+    FilialCfoLinkInput:
+      $ref: './components/schemas/filial-cfo-link.yaml#/FilialCfoLinkInput'
+    CorrectionType:
+      $ref: './components/schemas/correction-type.yaml#/CorrectionType'
+    CorrectionTypeInput:
+      $ref: './components/schemas/correction-type.yaml#/CorrectionTypeInput'
+    CorrectionTypeDetail:
+      $ref: './components/schemas/correction-type.yaml#/CorrectionTypeDetail'
+    PackageRequirement:
+      $ref: './components/schemas/package-requirement.yaml#/PackageRequirement'
+    PackageRequirementInput:
+      $ref: './components/schemas/package-requirement.yaml#/PackageRequirementInput'
+
+    User:
+      $ref: './components/schemas/user.yaml#/User'
+    UserCreateInput:
+      $ref: './components/schemas/user.yaml#/UserCreateInput'
+    UserUpdateInput:
+      $ref: './components/schemas/user.yaml#/UserUpdateInput'
+    UserSummary:
+      $ref: './components/schemas/user.yaml#/UserSummary'
+
+    Correction:
+      $ref: './components/schemas/correction.yaml#/Correction'
+    CorrectionListItem:
+      $ref: './components/schemas/correction.yaml#/CorrectionListItem'
+    PaginatedCorrections:
+      $ref: './components/schemas/correction.yaml#/PaginatedCorrections'
+    CorrectionCreateInput:
+      $ref: './components/schemas/correction.yaml#/CorrectionCreateInput'
+    CorrectionStats:
+      $ref: './components/schemas/correction-stats.yaml'
+    DocumentSlot:
+      $ref: './components/schemas/document-slot.yaml'
+    FileVersion:
+      $ref: './components/schemas/file-version.yaml'
+    CorrectionCfoStatus:
+      $ref: './components/schemas/correction-cfo-status.yaml'
+    Remark:
+      $ref: './components/schemas/remark.yaml#/Remark'
+    RemarkCreateInput:
+      $ref: './components/schemas/remark.yaml#/RemarkCreateInput'
+    RemarkReopenInput:
+      $ref: './components/schemas/remark.yaml#/RemarkReopenInput'
+    CorrectionHistoryEntry:
+      $ref: './components/schemas/correction-history-entry.yaml'
+    CorrectionDetail:
+      $ref: './components/schemas/correction-detail.yaml#/CorrectionDetail'
+    CfoSelectionInput:
+      $ref: './components/schemas/correction-detail.yaml#/CfoSelectionInput'
+
+    Notification:
+      $ref: './components/schemas/notification.yaml'

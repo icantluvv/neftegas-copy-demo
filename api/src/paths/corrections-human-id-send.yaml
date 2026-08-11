@@ -1,0 +1,23 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Направить корректировку на проверку выбранным ЦФО
+  operationId: sendCorrection
+  tags: [Corrections]
+  description: Филиал направляет укомплектованный пакет выбранным ЦФО.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/correction-detail.yaml#/CfoSelectionInput' }
+  responses:
+    '200':
+      description: Направлено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }
+    '400':
+      description: Пакет не укомплектован либо ЦФО не выбраны/не привязаны
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

@@ -1,0 +1,25 @@
+PackageRequirement:
+  type: object
+  required: [id, correctionTypeId, kind, name, isRequired, order]
+  properties:
+    id: { type: integer }
+    correctionTypeId: { type: integer }
+    kind: { $ref: './package-requirement-kind.yaml' }
+    name: { type: string }
+    isRequired: { type: boolean }
+    responsibleCfoId: { type: [integer, 'null'] }
+    namePattern: { type: string }
+    fileFormat: { type: string }
+    order: { type: integer }
+
+PackageRequirementInput:
+  type: object
+  required: [kind, name]
+  properties:
+    kind: { $ref: './package-requirement-kind.yaml' }
+    name: { type: string }
+    isRequired: { type: boolean, default: true }
+    responsibleCfoId: { type: [integer, 'null'] }
+    namePattern: { type: string }
+    fileFormat: { type: string }
+    order: { type: integer, default: 0 }

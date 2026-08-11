@@ -1,0 +1,16 @@
+Filial:
+  type: object
+  required: [id, code, name, isActive]
+  properties:
+    id: { type: integer }
+    code: { type: string, description: Краткое наименование }
+    name: { type: string, description: Полное наименование }
+    isActive: { type: boolean }
+
+FilialInput:
+  type: object
+  required: [code]
+  properties:
+    code: { type: string }
+    name: { type: string }
+    isActive: { type: boolean, default: true }

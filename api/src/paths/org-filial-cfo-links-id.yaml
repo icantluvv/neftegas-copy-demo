@@ -1,0 +1,23 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+patch:
+  summary: Обновить связь филиал-ЦФО
+  operationId: updateFilialCfoLink
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/filial-cfo-link.yaml#/FilialCfoLinkInput' }
+  responses:
+    '200':
+      description: Связь обновлена
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/filial-cfo-link.yaml#/FilialCfoLink' }
+delete:
+  summary: Удалить связь филиал-ЦФО
+  operationId: deleteFilialCfoLink
+  tags: [Org]
+  responses:
+    '204': { description: Удалено }

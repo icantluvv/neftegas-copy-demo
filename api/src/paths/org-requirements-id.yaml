@@ -1,0 +1,23 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+patch:
+  summary: Обновить требование пакета
+  operationId: updatePackageRequirement
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/package-requirement.yaml#/PackageRequirementInput' }
+  responses:
+    '200':
+      description: Требование обновлено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/package-requirement.yaml#/PackageRequirement' }
+delete:
+  summary: Удалить требование пакета
+  operationId: deletePackageRequirement
+  tags: [Org]
+  responses:
+    '204': { description: Удалено }

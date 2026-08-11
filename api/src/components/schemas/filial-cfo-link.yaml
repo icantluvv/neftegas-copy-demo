@@ -1,0 +1,16 @@
+FilialCfoLink:
+  type: object
+  required: [id, filialId, cfoId, isActive]
+  properties:
+    id: { type: integer }
+    filialId: { type: integer }
+    cfoId: { type: integer }
+    isActive: { type: boolean }
+
+FilialCfoLinkInput:
+  type: object
+  required: [filialId, cfoId]
+  properties:
+    filialId: { type: integer }
+    cfoId: { type: integer }
+    isActive: { type: boolean, default: true }

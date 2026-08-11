@@ -1,0 +1,29 @@
+get:
+  summary: Список филиалов
+  operationId: getFilials
+  tags: [Org]
+  parameters:
+    - { name: isActive, in: query, schema: { type: boolean } }
+  responses:
+    '200':
+      description: Список филиалов
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '../components/schemas/filial.yaml#/Filial' }
+post:
+  summary: Создать филиал
+  operationId: createFilial
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/filial.yaml#/FilialInput' }
+  responses:
+    '201':
+      description: Филиал создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/filial.yaml#/Filial' }

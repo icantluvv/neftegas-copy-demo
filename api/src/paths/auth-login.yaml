@@ -1,0 +1,21 @@
+post:
+  summary: Вход по логину и паролю
+  operationId: login
+  tags: [Auth]
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/auth.yaml#/LoginRequest' }
+  responses:
+    '200':
+      description: Успешный вход, устанавливает httpOnly cookie с токенами
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/auth.yaml#/AuthUser' }
+    '401':
+      description: Неверный логин/пароль или заблокированная учётная запись
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

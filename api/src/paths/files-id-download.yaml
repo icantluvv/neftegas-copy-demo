@@ -1,0 +1,17 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+get:
+  summary: Скачать файл версии
+  operationId: downloadFileVersion
+  tags: [Corrections]
+  responses:
+    '200':
+      description: Бинарное содержимое файла
+      content:
+        application/octet-stream:
+          schema: { type: string, format: binary }
+    '403':
+      description: Нет доступа
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

@@ -1,0 +1,10 @@
+get:
+  summary: Статистика по корректировкам для карточек дашборда
+  operationId: getCorrectionStats
+  tags: [Corrections]
+  responses:
+    '200':
+      description: Агрегированные счётчики для карточек дашборда (в рамках видимости роли)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-stats.yaml' }

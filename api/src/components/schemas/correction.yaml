@@ -1,0 +1,62 @@
+Correction:
+  type: object
+  required:
+    - id
+    - humanId
+    - filialId
+    - correctionTypeId
+    - authorId
+    - status
+    - stageNote
+    - createdAt
+    - updatedAt
+    - canSend
+    - canSendToDtoe
+    - openRemarksCount
+  properties:
+    id: { type: integer }
+    humanId: { type: string, example: COR-000123 }
+    filialId: { type: integer }
+    correctionTypeId: { type: integer }
+    authorId: { type: integer }
+    status: { $ref: './correction-status.yaml' }
+    stageNote: { type: string }
+    createdAt: { type: string, format: date-time }
+    updatedAt: { type: string, format: date-time }
+    sentToDtoeAt: { type: [string, 'null'], format: date-time }
+    decidedAt: { type: [string, 'null'], format: date-time }
+    canSend: { type: boolean, description: 'status === DRAFT' }
+    canSendToDtoe: { type: boolean, description: 'status === ALL_CFO_APPROVED' }
+    openRemarksCount: { type: integer }
+
+CorrectionListItem:
+  allOf:
+    - $ref: './correction.yaml#/Correction'
+    - type: object
+      required: [filial, correctionType, author]
+      properties:
+        filial: { $ref: './filial.yaml#/Filial' }
+        correctionType: { $ref: './correction-type.yaml#/CorrectionType' }
+        author: { $ref: './user.yaml#/UserSummary' }
+        myCfoStatus:
+          oneOf:
+            - $ref: './cfo-status-value.yaml'
+            - type: 'null'
+          description: Заполняется только для роли CFO
+
+PaginatedCorrections:
+  type: object
+  required: [items, total, page, pageSize]
+  properties:
+    items:
+      type: array
+      items: { $ref: './correction.yaml#/CorrectionListItem' }
+    total: { type: integer }
+    page: { type: integer }
+    pageSize: { type: integer }
+
+CorrectionCreateInput:
+  type: object
+  required: [correctionTypeId]
+  properties:
+    correctionTypeId: { type: integer }

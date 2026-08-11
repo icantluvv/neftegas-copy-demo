@@ -1,0 +1,27 @@
+CorrectionType:
+  type: object
+  required: [id, code, name, isActive]
+  properties:
+    id: { type: integer }
+    code: { type: string }
+    name: { type: string }
+    description: { type: string }
+    isActive: { type: boolean }
+
+CorrectionTypeInput:
+  type: object
+  required: [code, name]
+  properties:
+    code: { type: string }
+    name: { type: string }
+    description: { type: string }
+    isActive: { type: boolean, default: true }
+
+CorrectionTypeDetail:
+  allOf:
+    - $ref: './correction-type.yaml#/CorrectionType'
+    - type: object
+      properties:
+        requirements:
+          type: array
+          items: { $ref: './package-requirement.yaml#/PackageRequirement' }

@@ -1,0 +1,23 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+patch:
+  summary: Обновить ЦФО
+  operationId: updateCfo
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/cfo.yaml#/CfoInput' }
+  responses:
+    '200':
+      description: ЦФО обновлён
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/cfo.yaml#/Cfo' }
+delete:
+  summary: Удалить ЦФО
+  operationId: deleteCfo
+  tags: [Org]
+  responses:
+    '204': { description: Удалено }

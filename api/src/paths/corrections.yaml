@@ -1,0 +1,38 @@
+get:
+  summary: Список корректировок (в рамках видимости роли)
+  operationId: getCorrections
+  tags: [Corrections]
+  description: >
+    Список автоматически ограничен ролью: FILIAL видит свои, CFO — направленные
+    его ЦФО, DTOE/ADMIN — все.
+  parameters:
+    - { name: status, in: query, schema: { $ref: '../components/schemas/correction-status.yaml' } }
+    - { name: filialId, in: query, schema: { type: integer } }
+    - { name: cfoId, in: query, schema: { type: integer } }
+    - { name: correctionTypeId, in: query, schema: { type: integer } }
+    - { name: q, in: query, description: Поиск по ID корректировки, schema: { type: string } }
+    - { name: onlyWithRemarks, in: query, schema: { type: boolean } }
+    - { name: page, in: query, schema: { type: integer, default: 1 } }
+    - { name: pageSize, in: query, schema: { type: integer, default: 20 } }
+  responses:
+    '200':
+      description: Страница корректировок
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction.yaml#/PaginatedCorrections' }
+post:
+  summary: Создать корректировку
+  operationId: createCorrection
+  tags: [Corrections]
+  description: Доступно только роли FILIAL. Создаёт корректировку и ячейки пакета по типу.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/correction.yaml#/CorrectionCreateInput' }
+  responses:
+    '201':
+      description: Корректировка создана
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }

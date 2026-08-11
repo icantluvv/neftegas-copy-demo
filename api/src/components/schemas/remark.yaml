@@ -1,0 +1,54 @@
+Remark:
+  type: object
+  required:
+    - id
+    - humanId
+    - correctionId
+    - authorId
+    - createdAt
+    - sheetName
+    - rowRef
+    - cellRef
+    - description
+    - requiredAction
+    - status
+    - issuerLabel
+  properties:
+    id: { type: integer }
+    humanId: { type: string, example: REM-000045 }
+    correctionId: { type: integer }
+    cfoId:
+      type: [integer, 'null']
+      description: null — замечание от ДТОиР
+    authorId: { type: integer }
+    createdAt: { type: string, format: date-time }
+    relatedSlotId: { type: [integer, 'null'] }
+    fileVersionId: { type: [integer, 'null'] }
+    sheetName: { type: string }
+    rowRef: { type: string }
+    cellRef: { type: string }
+    description: { type: string }
+    requiredAction: { type: string }
+    status: { $ref: './remark-status.yaml' }
+    closedById: { type: [integer, 'null'] }
+    closedAt: { type: [string, 'null'], format: date-time }
+    issuerLabel: { type: string, description: "Код ЦФО либо «ДТОиР»" }
+
+RemarkCreateInput:
+  type: object
+  required: [description, requiredAction]
+  properties:
+    description: { type: string }
+    requiredAction: { type: string }
+    sheetName: { type: string }
+    rowRef: { type: string }
+    cellRef: { type: string }
+    relatedSlotId: { type: [integer, 'null'] }
+    fileVersionId: { type: [integer, 'null'] }
+
+RemarkReopenInput:
+  type: object
+  required: [description, requiredAction]
+  properties:
+    description: { type: string }
+    requiredAction: { type: string }

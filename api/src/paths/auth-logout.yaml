@@ -1,0 +1,7 @@
+post:
+  summary: Выход, очистка cookie
+  operationId: logout
+  tags: [Auth]
+  responses:
+    '204':
+      description: Куки очищены
