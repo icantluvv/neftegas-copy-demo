@@ -85,6 +85,21 @@ export default defineConfig({
 					pattern: 'ExpertTaskEvaluationSubmit',
 					options: { mini: false, importPath: 'zod' },
 				},
+				{
+					type: 'schemaName',
+					pattern: 'CorrectionDetail',
+					options: { mini: false, importPath: 'zod' },
+				},
+				{
+					type: 'schemaName',
+					pattern: 'CorrectionListItem',
+					options: { mini: false, importPath: 'zod' },
+				},
+				{
+					type: 'schemaName',
+					pattern: 'CorrectionTypeDetail',
+					options: { mini: false, importPath: 'zod' },
+				},
 			],
 		}),
 		pluginReactQuery({

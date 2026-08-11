@@ -10,7 +10,7 @@ export interface MockRoute {
 	method: RequestMethod
 	pattern: RegExp
 	status?: number
-	create: (config?: any) => unknown
+	create: () => unknown
 }
 
 const statusTexts: Record<number, string> = {
@@ -47,7 +47,7 @@ export async function getMockResponse<TData>(
 	const status = route.status ?? 200
 
 	return {
-		data: route.create(config) as TData,
+		data: route.create() as TData,
 		status,
 		statusText: statusTexts[status] ?? 'OK',
 		headers: new Headers({

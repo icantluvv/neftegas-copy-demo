@@ -1,26 +1,10 @@
-import type { GetContestsQueryResponse } from './codegen/types/contestsController/GetContests'
 import type { MockRoute, RequestMethod } from './mock-client'
 
 export type BaseMockScenarioName = 'default'
 
 const activeBaseMockScenario: BaseMockScenarioName = 'default'
 
-const openZlgContest: GetContestsQueryResponse = {
-	contests: [
-		{
-			slug: 'zlg-2026',
-			registration_open: true,
-		},
-	],
-}
-
-const alwaysActiveMockRoutes = [
-	{
-		method: 'GET',
-		pattern: /^\/api\/v1\/contests$/,
-		create: () => openZlgContest,
-	},
-] satisfies MockRoute[]
+const alwaysActiveMockRoutes: MockRoute[] = []
 
 const mockScenarios = {
 	default: [],

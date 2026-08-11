@@ -1,13 +1,7 @@
-import type { ReactElement, ReactNode } from 'react'
-
 import { describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 
-vi.mock('@sentry/nextjs', async () => ({
-	ErrorBoundary: ({ children }: { children: ReactNode }): ReactElement => <>{children}</>,
-}))
-
-const { ErrorFallback } = await import('./error-boundary')
+import { ErrorFallback } from './error-boundary'
 
 describe('<ErrorBoundary />', () => {
 	const errorMessage = 'Example error message'
