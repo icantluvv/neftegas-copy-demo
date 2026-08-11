@@ -3,7 +3,24 @@
 * Do not edit manually.
 */
 
-import * as z from "zod/mini";
+import * as z from "zod";
+import { cfoStatusValue2Schema } from "./cfoStatusValue2Schema";
 import { correctionSchema } from "./correctionSchema";
+import { correctionTypeSchema } from "./correctionTypeSchema";
+import { filialSchema } from "./filialSchema";
+import { userSummarySchema } from "./userSummarySchema";
 
-export const correctionListItemSchema = z.lazy(() => correctionSchema)
+export const correctionListItemSchema = z.lazy(() => correctionSchema).and(z.object({
+    get "filial"(){
+                return filialSchema
+              },
+get "correctionType"(){
+                return correctionTypeSchema
+              },
+get "author"(){
+                return userSummarySchema
+              },
+get "myCfoStatus"(){
+                return z.union([cfoStatusValue2Schema, z.null()]).describe("Заполняется только для роли CFO").optional()
+              }
+    }))

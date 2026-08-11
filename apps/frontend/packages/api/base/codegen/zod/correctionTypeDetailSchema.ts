@@ -3,7 +3,12 @@
 * Do not edit manually.
 */
 
-import * as z from "zod/mini";
+import * as z from "zod";
 import { correctionTypeSchema } from "./correctionTypeSchema";
+import { packageRequirementSchema } from "./packageRequirementSchema";
 
-export const correctionTypeDetailSchema = z.lazy(() => correctionTypeSchema)
+export const correctionTypeDetailSchema = z.lazy(() => correctionTypeSchema).and(z.object({
+    get "requirements"(){
+                return z.array(packageRequirementSchema).optional()
+              }
+    }))

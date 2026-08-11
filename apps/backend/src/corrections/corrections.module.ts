@@ -6,7 +6,9 @@ import { memoryStorage } from 'multer';
 import { Notification } from '../notifications/entities/notification.entity';
 import { Cfo } from '../org/entities/cfo.entity';
 import { CorrectionType } from '../org/entities/correction-type.entity';
+import { Filial } from '../org/entities/filial.entity';
 import { FilialCfoLink } from '../org/entities/filial-cfo-link.entity';
+import { PackageRequirement } from '../org/entities/package-requirement.entity';
 import { User } from '../users/entities/user.entity';
 import { CorrectionsController } from './corrections.controller';
 import { CorrectionsService } from './corrections.service';
@@ -28,7 +30,9 @@ import { FilesController } from './files.controller';
       Remark,
       CorrectionHistoryEntry,
       CorrectionType,
+      Filial,
       FilialCfoLink,
+      PackageRequirement,
       Cfo,
       User,
       Notification,

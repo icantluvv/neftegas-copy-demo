@@ -3,7 +3,52 @@
 * Do not edit manually.
 */
 
-import * as z from "zod/mini";
+import * as z from "zod";
+import { cfoSchema } from "./cfoSchema";
+import { correctionCfoStatus2Schema } from "./correctionCfoStatus2Schema";
+import { correctionHistoryEntry2Schema } from "./correctionHistoryEntry2Schema";
 import { correctionSchema } from "./correctionSchema";
+import { correctionTypeSchema } from "./correctionTypeSchema";
+import { documentSlot2Schema } from "./documentSlot2Schema";
+import { filialSchema } from "./filialSchema";
+import { remarkSchema } from "./remarkSchema";
+import { userSummarySchema } from "./userSummarySchema";
 
-export const correctionDetailSchema = z.lazy(() => correctionSchema)
+export const correctionDetailSchema = z.lazy(() => correctionSchema).and(z.object({
+    get "filial"(){
+                return filialSchema
+              },
+get "correctionType"(){
+                return correctionTypeSchema
+              },
+get "author"(){
+                return userSummarySchema
+              },
+get "slots"(){
+                return z.array(documentSlot2Schema)
+              },
+get "cfoStatuses"(){
+                return z.array(correctionCfoStatus2Schema)
+              },
+get "remarks"(){
+                return z.array(remarkSchema)
+              },
+get "history"(){
+                return z.array(correctionHistoryEntry2Schema)
+              },
+"packageComplete": z.boolean(),
+"missingRequirements": z.array(z.string()),
+get "myCfoStatus"(){
+                return z.union([correctionCfoStatus2Schema, z.null()]).optional()
+              },
+"myOpenRemarksCount": z.optional(z.int()),
+"isFilialOwner": z.boolean(),
+"isCfoReviewer": z.boolean(),
+"isDtoe": z.boolean(),
+get "availableCfos"(){
+                return z.array(cfoSchema).describe("ЦФО, доступные для отправки (linked_cfos), для формы «Направить»")
+              },
+get "returnedCfos"(){
+                return z.array(cfoSchema).describe("ЦФО в статусе RETURNED, для формы «Направить повторно»")
+              }
+    }))
