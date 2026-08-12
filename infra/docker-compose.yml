@@ -75,9 +75,6 @@ services:
       # next.config.ts, проксирующий /api/* на BACK_INTERNAL_URL, чтобы
       # httpOnly-cookie авторизации оставались same-site без настройки CORS.
       NEXT_PUBLIC_BACK_URL: /api
-      DADATA_URL: ${DADATA_URL:-http://localhost:9002}
-      DADATA_TOKEN: ${DADATA_TOKEN:-local}
-      PARTNER_API_TOKEN: ${PARTNER_API_TOKEN:-local}
     ports:
       - '3000:3000'
 

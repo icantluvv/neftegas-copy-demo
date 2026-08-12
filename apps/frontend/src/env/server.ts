@@ -9,9 +9,5 @@ export const serverEnvironment = createEnv({
 		BACK_INTERNAL_URL: z.url(),
 		BACK_INTERNAL_BASIC_AUTH: z.optional(z.string()),
 		MOCK_MODE: z._default(z.stringbool(), false),
-		DADATA_URL: z.url(),
-		DADATA_TOKEN: z.string(),
-		PARTNER_API_TOKEN: z.string(),
-		REGIONAL_REGISTRATION_KEY: z.optional(z.string()),
 	},
 })
