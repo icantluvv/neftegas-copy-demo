@@ -51,6 +51,8 @@ export function toDocumentSlotDto(slot: DocumentSlot) {
     requirementId: slot.requirementId,
     label: slot.label,
     isFilled: versions.length > 0,
+    isRequired: slot.requirement ? slot.requirement.isRequired : true,
+    responsibleCfo: slot.requirement?.responsibleCfo ? toCfoDto(slot.requirement.responsibleCfo) : null,
     currentVersion: current ? toFileVersionDto(current) : null,
   };
 }

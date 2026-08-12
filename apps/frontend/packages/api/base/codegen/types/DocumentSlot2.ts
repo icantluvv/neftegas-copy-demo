@@ -3,6 +3,7 @@
 * Do not edit manually.
 */
 
+import type { Cfo } from "./Cfo";
 import type { FileVersion2 } from "./FileVersion2";
 
 export interface DocumentSlot2 {
@@ -27,5 +28,14 @@ export interface DocumentSlot2 {
      * @type boolean
     */
     isFilled: boolean;
+    /**
+     * @description Пока не заполнены все обязательные слоты, направить пакет нельзя
+     * @type boolean
+    */
+    isRequired: boolean;
+    /**
+     * @description null — элемент проверяют все ЦФО маршрута, а не конкретное подразделение
+    */
+    responsibleCfo: (Cfo | null);
     currentVersion?: (FileVersion2 | null);
 }

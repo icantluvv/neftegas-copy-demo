@@ -1,5 +1,5 @@
 type: object
-required: [id, correctionId, requirementId, label, isFilled]
+required: [id, correctionId, requirementId, label, isFilled, isRequired, responsibleCfo]
 properties:
   id: { type: integer }
   correctionId: { type: integer }
@@ -8,6 +8,14 @@ properties:
     description: null — основной Excel-файл корректировки
   label: { type: string }
   isFilled: { type: boolean }
+  isRequired:
+    type: boolean
+    description: Пока не заполнены все обязательные слоты, направить пакет нельзя
+  responsibleCfo:
+    description: null — элемент проверяют все ЦФО маршрута, а не конкретное подразделение
+    oneOf:
+      - $ref: './cfo.yaml#/Cfo'
+      - type: 'null'
   currentVersion:
     oneOf:
       - $ref: './file-version.yaml'

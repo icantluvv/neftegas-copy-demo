@@ -4,6 +4,7 @@
 */
 
 import * as z from "zod/mini";
+import { cfoSchema } from "./cfoSchema";
 import { fileVersion2Schema } from "./fileVersion2Schema";
 
 export const documentSlotSchema = z.object({
@@ -12,6 +13,10 @@ export const documentSlotSchema = z.object({
 "requirementId": z.nullable(z.int()),
 "label": z.string(),
 "isFilled": z.boolean(),
+"isRequired": z.boolean(),
+get "responsibleCfo"(){
+                return z.union([cfoSchema, z.null()])
+              },
 get "currentVersion"(){
                 return z.optional(z.union([fileVersion2Schema, z.null()]))
               }

@@ -41,6 +41,7 @@ const DETAIL_RELATIONS = [
   'author',
   'slots',
   'slots.requirement',
+  'slots.requirement.responsibleCfo',
   'slots.versions',
   'cfoStatuses',
   'cfoStatuses.cfo',

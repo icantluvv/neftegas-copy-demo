@@ -4,10 +4,11 @@
 */
 
 import type { DocumentSlot2 } from "../types/DocumentSlot2";
+import { createCfo } from "./createCfo";
 import { createFileVersion2 } from "./createFileVersion2";
 import { faker } from "@faker-js/faker";
 
 export function createDocumentSlot2(data?: Partial<DocumentSlot2>): DocumentSlot2 {
 
-  return { ...{"id": faker.number.int(),"correctionId": faker.number.int(),"requirementId": faker.number.int(),"label": faker.string.alpha(),"isFilled": faker.datatype.boolean(),get "currentVersion"() { return faker.helpers.arrayElement<any>([createFileVersion2(), null]) },...(data || {})} }
+  return { ...{"id": faker.number.int(),"correctionId": faker.number.int(),"requirementId": faker.number.int(),"label": faker.string.alpha(),"isFilled": faker.datatype.boolean(),"isRequired": faker.datatype.boolean(),get "responsibleCfo"() { return faker.helpers.arrayElement<any>([createCfo(), null]) },get "currentVersion"() { return faker.helpers.arrayElement<any>([createFileVersion2(), null]) },...(data || {})} }
 }
