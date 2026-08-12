@@ -1,8 +1,8 @@
 'use client'
 
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import {Label} from "#/components/ui/label";
+import {Input} from "#/components/ui/input";
+import {Button} from "#/components/ui/button";
 import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
 import {AuthUser, LoginRequest, loginRequestSchema, useLogin} from "@/packages/api/base/codegen";
