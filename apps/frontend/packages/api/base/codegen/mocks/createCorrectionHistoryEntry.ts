@@ -4,12 +4,10 @@
 */
 
 import type { CorrectionHistoryEntry } from "../types/CorrectionHistoryEntry";
+import { createUserSummary } from "./createUserSummary";
 import { faker } from "@faker-js/faker";
 
 export function createCorrectionHistoryEntry(data?: Partial<CorrectionHistoryEntry>): CorrectionHistoryEntry {
 
-  return {
-    ...{"id": faker.number.int(),"correctionId": faker.number.int(),"timestamp": faker.date.anytime().toISOString(),"userId": faker.number.int(),"text": faker.string.alpha()},
-    ...data || {}
-  }
+  return { ...{"id": faker.number.int(),"correctionId": faker.number.int(),"timestamp": faker.date.anytime().toISOString(),"userId": faker.number.int(),get "user"() { return faker.helpers.arrayElement<any>([createUserSummary(), null]) },"text": faker.string.alpha(),...(data || {})} }
 }

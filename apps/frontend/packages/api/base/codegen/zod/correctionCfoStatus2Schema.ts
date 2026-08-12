@@ -4,16 +4,24 @@
 */
 
 import * as z from "zod/mini";
+import { cfoSchema } from "./cfoSchema";
 import { cfoStatusValue2Schema } from "./cfoStatusValue2Schema";
+import { userSummarySchema } from "./userSummarySchema";
 
 export const correctionCfoStatus2Schema = z.object({
     "id": z.int(),
 "correctionId": z.int(),
 "cfoId": z.int(),
+get "cfo"(){
+                return cfoSchema
+              },
 get "status"(){
                 return cfoStatusValue2Schema
               },
 "isRequired": z.boolean(),
 "decidedById": z.nullish(z.int()),
+get "decidedBy"(){
+                return z.optional(z.union([userSummarySchema, z.null()]))
+              },
 "decidedAt": z.nullish(z.string())
     })

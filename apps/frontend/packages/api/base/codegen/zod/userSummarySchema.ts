@@ -4,9 +4,14 @@
 */
 
 import * as z from "zod/mini";
+import { role2Schema } from "./role2Schema";
 
 export const userSummarySchema = z.object({
     "id": z.int(),
 "username": z.string(),
-"fullName": z.string()
+"fullName": z.string(),
+get "role"(){
+                return z.optional(role2Schema)
+              },
+"position": z.optional(z.string())
     })

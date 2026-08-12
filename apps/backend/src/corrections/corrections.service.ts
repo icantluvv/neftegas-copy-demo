@@ -45,6 +45,7 @@ const DETAIL_RELATIONS = [
   'slots.versions',
   'cfoStatuses',
   'cfoStatuses.cfo',
+  'cfoStatuses.decidedBy',
   'remarks',
   'remarks.cfo',
   'history',

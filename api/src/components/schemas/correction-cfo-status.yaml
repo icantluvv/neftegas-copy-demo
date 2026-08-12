@@ -1,10 +1,15 @@
 type: object
-required: [id, correctionId, cfoId, status, isRequired]
+required: [id, correctionId, cfoId, status, isRequired, cfo]
 properties:
   id: { type: integer }
   correctionId: { type: integer }
   cfoId: { type: integer }
+  cfo: { $ref: './cfo.yaml#/Cfo' }
   status: { $ref: './cfo-status-value.yaml' }
   isRequired: { type: boolean }
   decidedById: { type: [integer, 'null'] }
+  decidedBy:
+    oneOf:
+      - $ref: './user.yaml#/UserSummary'
+      - type: 'null'
   decidedAt: { type: [string, 'null'], format: date-time }

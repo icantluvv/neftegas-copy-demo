@@ -4,10 +4,12 @@
 */
 
 import type { CorrectionCfoStatus } from "../types/CorrectionCfoStatus";
+import { createCfo } from "./createCfo";
 import { createCfoStatusValue2 } from "./createCfoStatusValue2";
+import { createUserSummary } from "./createUserSummary";
 import { faker } from "@faker-js/faker";
 
 export function createCorrectionCfoStatus(data?: Partial<CorrectionCfoStatus>): CorrectionCfoStatus {
 
-  return { ...{"id": faker.number.int(),"correctionId": faker.number.int(),"cfoId": faker.number.int(),get "status"() { return createCfoStatusValue2() },"isRequired": faker.datatype.boolean(),"decidedById": faker.number.int(),"decidedAt": faker.date.anytime().toISOString(),...(data || {})} }
+  return { ...{"id": faker.number.int(),"correctionId": faker.number.int(),"cfoId": faker.number.int(),get "cfo"() { return createCfo() },get "status"() { return createCfoStatusValue2() },"isRequired": faker.datatype.boolean(),"decidedById": faker.number.int(),get "decidedBy"() { return faker.helpers.arrayElement<any>([createUserSummary(), null]) },"decidedAt": faker.date.anytime().toISOString(),...(data || {})} }
 }

@@ -3,6 +3,7 @@
 * Do not edit manually.
 */
 
+import type { UserSummary } from "./UserSummary";
 
 export interface CorrectionHistoryEntry {
     /**
@@ -21,6 +22,7 @@ export interface CorrectionHistoryEntry {
      * @type integer,null
     */
     userId?: number | null;
+    user?: (UserSummary | null);
     /**
      * @type string
     */

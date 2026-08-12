@@ -4,12 +4,10 @@
 */
 
 import type { UserSummary } from "../types/UserSummary";
+import { createRole2 } from "./createRole2";
 import { faker } from "@faker-js/faker";
 
 export function createUserSummary(data?: Partial<UserSummary>): UserSummary {
 
-  return {
-    ...{"id": faker.number.int(),"username": faker.string.alpha(),"fullName": faker.string.alpha()},
-    ...data || {}
-  }
+  return { ...{"id": faker.number.int(),"username": faker.string.alpha(),"fullName": faker.string.alpha(),get "role"() { return createRole2() },"position": faker.string.alpha(),...(data || {})} }
 }

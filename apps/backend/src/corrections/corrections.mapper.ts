@@ -10,7 +10,7 @@ import { FileVersion } from './entities/file-version.entity';
 import { Remark } from './entities/remark.entity';
 
 export function toUserSummaryDto(user: User) {
-  return { id: user.id, username: user.username, fullName: user.fullName };
+  return { id: user.id, username: user.username, fullName: user.fullName, role: user.role, position: user.position };
 }
 
 export function toFilialDto(filial: Filial) {
@@ -62,9 +62,11 @@ export function toCfoStatusDto(status: CorrectionCfoStatus) {
     id: status.id,
     correctionId: status.correctionId,
     cfoId: status.cfoId,
+    cfo: toCfoDto(status.cfo),
     status: status.status,
     isRequired: status.isRequired,
     decidedById: status.decidedById,
+    decidedBy: status.decidedBy ? toUserSummaryDto(status.decidedBy) : null,
     decidedAt: status.decidedAt,
   };
 }
@@ -97,6 +99,7 @@ export function toHistoryEntryDto(entry: CorrectionHistoryEntry) {
     correctionId: entry.correctionId,
     timestamp: entry.timestamp,
     userId: entry.userId,
+    user: entry.user ? toUserSummaryDto(entry.user) : null,
     text: entry.text,
   };
 }

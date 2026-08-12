@@ -4,11 +4,15 @@
 */
 
 import * as z from "zod/mini";
+import { userSummarySchema } from "./userSummarySchema";
 
 export const correctionHistoryEntrySchema = z.object({
     "id": z.int(),
 "correctionId": z.int(),
 "timestamp": z.string(),
 "userId": z.nullish(z.int()),
+get "user"(){
+                return z.optional(z.union([userSummarySchema, z.null()]))
+              },
 "text": z.string()
     })

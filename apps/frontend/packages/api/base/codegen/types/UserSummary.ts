@@ -3,6 +3,7 @@
 * Do not edit manually.
 */
 
+import type { Role2 } from "./Role2";
 
 export interface UserSummary {
     /**
@@ -17,4 +18,13 @@ export interface UserSummary {
      * @type string
     */
     fullName: string;
+    /**
+     * @description FILIAL/CFO/DTOE — роли из старого Django-проекта (accounts.Role). ADMIN — эквивалент is_staff/is_superuser (управление справочниками и пользователями).\n
+     * @type string | undefined
+    */
+    role?: Role2;
+    /**
+     * @type string | undefined
+    */
+    position?: string;
 }

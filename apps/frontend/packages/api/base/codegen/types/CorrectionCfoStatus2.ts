@@ -3,7 +3,9 @@
 * Do not edit manually.
 */
 
+import type { Cfo } from "./Cfo";
 import type { CfoStatusValue2 } from "./CfoStatusValue2";
+import type { UserSummary } from "./UserSummary";
 
 export interface CorrectionCfoStatus2 {
     /**
@@ -19,6 +21,10 @@ export interface CorrectionCfoStatus2 {
     */
     cfoId: number;
     /**
+     * @type object
+    */
+    cfo: Cfo;
+    /**
      * @type string
     */
     status: CfoStatusValue2;
@@ -30,6 +36,7 @@ export interface CorrectionCfoStatus2 {
      * @type integer,null
     */
     decidedById?: number | null;
+    decidedBy?: (UserSummary | null);
     /**
      * @type string,null, date-time
     */

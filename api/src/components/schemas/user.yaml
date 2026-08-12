@@ -54,3 +54,5 @@ UserSummary:
     id: { type: integer }
     username: { type: string }
     fullName: { type: string }
+    role: { $ref: './role.yaml' }
+    position: { type: string }
