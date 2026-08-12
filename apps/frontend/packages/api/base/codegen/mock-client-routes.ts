@@ -9,8 +9,8 @@ import { createCreateFilialCfoLinkMutationResponse } from './mocks/orgController
 import { createGetCorrectionTypesQueryResponse } from './mocks/orgController/createGetCorrectionTypes'
 import { createCreateCorrectionTypeMutationResponse } from './mocks/orgController/createCreateCorrectionType'
 import { createGetCorrectionStatsQueryResponse } from './mocks/correctionsController/createGetCorrectionStats'
+import { createLogoutAllMutationResponse } from './mocks/authController/createLogoutAll'
 import { createGetNotificationsQueryResponse } from './mocks/notificationsController/createGetNotifications'
-import { createRefreshMutationResponse } from './mocks/authController/createRefresh'
 import { createLogoutMutationResponse } from './mocks/authController/createLogout'
 import { createGetFilialsQueryResponse } from './mocks/orgController/createGetFilials'
 import { createCreateFilialMutationResponse } from './mocks/orgController/createCreateFilial'
@@ -61,8 +61,8 @@ export const mockRoutes = [
 	{ method: 'GET', pattern: /^\/org\/correction-types$/, create: createGetCorrectionTypesQueryResponse },
 	{ method: 'POST', pattern: /^\/org\/correction-types$/, status: 201, create: createCreateCorrectionTypeMutationResponse },
 	{ method: 'GET', pattern: /^\/corrections\/stats$/, create: createGetCorrectionStatsQueryResponse },
+	{ method: 'POST', pattern: /^\/auth\/logout-all$/, status: 204, create: createLogoutAllMutationResponse },
 	{ method: 'GET', pattern: /^\/notifications$/, create: createGetNotificationsQueryResponse },
-	{ method: 'POST', pattern: /^\/auth\/refresh$/, create: createRefreshMutationResponse },
 	{ method: 'POST', pattern: /^\/auth\/logout$/, status: 204, create: createLogoutMutationResponse },
 	{ method: 'GET', pattern: /^\/org\/filials$/, create: createGetFilialsQueryResponse },
 	{ method: 'POST', pattern: /^\/org\/filials$/, status: 201, create: createCreateFilialMutationResponse },

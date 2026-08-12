@@ -8,7 +8,7 @@ import type { ErrorResponse2 } from "../ErrorResponse2";
 import type { LoginRequest } from "../LoginRequest";
 
 /**
- * @description Успешный вход, устанавливает httpOnly cookie с токенами
+ * @description Успешный вход, устанавливает httpOnly cookie с идентификатором сессии
 */
 export type Login200 = AuthUser;
 

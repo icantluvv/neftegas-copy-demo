@@ -1,0 +1,12 @@
+post:
+  summary: Выход со всех устройств — завершение всех сессий пользователя
+  operationId: logoutAll
+  tags: [Auth]
+  responses:
+    '204':
+      description: Все сессии пользователя завершены, куки текущей сессии очищены
+    '401':
+      description: Не авторизован
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

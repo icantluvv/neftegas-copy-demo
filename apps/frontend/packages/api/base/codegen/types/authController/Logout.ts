@@ -5,7 +5,7 @@
 
 
 /**
- * @description Куки очищены
+ * @description Текущая сессия завершена, cookie очищена
 */
 export type Logout204 = unknown;
 

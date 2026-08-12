@@ -8,14 +8,10 @@ import {
 	isRequestMockModeEnabled,
 } from '#/mock-mode/runtime'
 
-import {
-	getOnProfileIncomplete,
-	getOnUnauthorized,
-	getServerUnauthorizedRetryHeaders,
-} from './client-handlers'
+import { getOnProfileIncomplete } from './client-handlers'
 import { serializeSearchParams } from './search-params'
 
-export { setOnProfileIncomplete, setOnUnauthorized } from './client-handlers'
+export { setOnProfileIncomplete } from './client-handlers'
 
 /** Subset of FetchRequestConfig */
 export interface RequestConfig<TData = unknown> {
@@ -170,7 +166,7 @@ async function getAuthHeaders(): Promise<HeadersInit> {
 	return resolvedHeaders
 }
 
-async function fetch<TData, TError = unknown, TVariables = unknown>(
+async function fetch<TData, _TError = unknown, TVariables = unknown>(
 	paramsConfig: RequestConfig<TVariables>,
 ): Promise<ResponseConfig<TData>> {
 	const config = mergeConfig(getConfig(), paramsConfig)
@@ -208,66 +204,6 @@ async function fetch<TData, TError = unknown, TVariables = unknown>(
 		signal: config.signal,
 		headers: requestHeaders,
 	})
-
-	if (response.status === 401) {
-		const onUnauthorized = getOnUnauthorized()
-		const retryHeaders = onUnauthorized
-			? requestHeaders
-			: await getServerUnauthorizedRetryHeaders(requestHeaders)
-
-		if (onUnauthorized) {
-			await onUnauthorized()
-		}
-
-		if (retryHeaders === null) {
-			const errorData = await getResponseJson<TError>(response)
-
-			throw new Error(response.statusText, {
-				cause: {
-					data: errorData,
-					status: response.status,
-					statusText: response.statusText,
-				},
-			})
-		}
-
-		const retryResponse = await globalThis.fetch(targetUrl, {
-			credentials: config.credentials ?? 'include',
-			method: config.method?.toUpperCase(),
-			body: isFormData ? (config.data as FormData) : JSON.stringify(config.data),
-			signal: config.signal,
-			headers: retryHeaders,
-		})
-		if (retryResponse.status === 304) {
-			return {
-				data: {} as TData,
-				status: retryResponse.status,
-				statusText: retryResponse.statusText,
-				headers: retryResponse.headers,
-			}
-		}
-		if (!retryResponse.ok) {
-			const errorData = await getResponseJson<TError>(retryResponse)
-
-			throw new Error(retryResponse.statusText, {
-				cause: {
-					data: errorData,
-					status: retryResponse.status,
-					statusText: retryResponse.statusText,
-				},
-			})
-		}
-		const retryData =
-			[204, 205, 304].includes(retryResponse.status) || !retryResponse.body
-				? {}
-				: await getResponseJson(retryResponse)
-		return {
-			data: retryData as TData,
-			status: retryResponse.status,
-			statusText: retryResponse.statusText,
-			headers: retryResponse.headers,
-		}
-	}
 
 	if (response.status === 304) {
 		return {

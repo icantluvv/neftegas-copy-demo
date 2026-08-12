@@ -1,7 +1,7 @@
 post:
-  summary: Выход, очистка cookie
+  summary: Выход — завершение текущей сессии, очистка cookie
   operationId: logout
   tags: [Auth]
   responses:
     '204':
-      description: Куки очищены
+      description: Текущая сессия завершена, cookie очищена

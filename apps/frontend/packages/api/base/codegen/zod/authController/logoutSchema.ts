@@ -6,7 +6,7 @@
 import * as z from "zod/mini";
 
 /**
- * @description Куки очищены
+ * @description Текущая сессия завершена, cookie очищена
  */
 export const logout204Schema = z.unknown()
 

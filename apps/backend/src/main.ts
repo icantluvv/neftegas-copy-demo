@@ -18,9 +18,11 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Gas Dashboard API')
-    .setDescription('Согласование корректировок — см. контракт в api/src/openapi.yaml')
+    .setDescription(
+      'Согласование корректировок — см. контракт в api/src/openapi.yaml',
+    )
     .setVersion('1.0')
-    .addCookieAuth('access_token')
+    .addCookieAuth('session_id')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

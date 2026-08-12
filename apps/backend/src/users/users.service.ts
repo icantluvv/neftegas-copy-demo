@@ -17,7 +17,8 @@ export class UsersService {
   findAll(query: FindUsersQueryDto) {
     const qb = this.users.createQueryBuilder('user');
     if (query.role) qb.andWhere('user.role = :role', { role: query.role });
-    if (query.filialId) qb.andWhere('user.filialId = :filialId', { filialId: query.filialId });
+    if (query.filialId)
+      qb.andWhere('user.filialId = :filialId', { filialId: query.filialId });
     if (query.cfoId) qb.andWhere('user.cfoId = :cfoId', { cfoId: query.cfoId });
     if (query.q) {
       qb.andWhere(
@@ -31,6 +32,12 @@ export class UsersService {
   async findByIdOrThrow(id: number) {
     const user = await this.users.findOne({ where: { id } });
     if (!user) throw new NotFoundException('Пользователь не найден');
+    return user;
+  }
+
+  async findActiveById(id: number): Promise<User | null> {
+    const user = await this.users.findOne({ where: { id } });
+    if (!user || !user.isActive || user.isLocked) return null;
     return user;
   }
 

@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { SessionAuthGuard } from './common/guards/session-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { CorrectionsModule } from './corrections/corrections.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { RedisModule } from './redis/redis.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module';
         synchronize: config.get('NODE_ENV') !== 'production',
       }),
     }),
+    RedisModule,
     AuthModule,
     UsersModule,
     CorrectionsModule,
@@ -36,7 +38,7 @@ import { UsersModule } from './users/users.module';
   ],
   controllers: [AppController],
   providers: [
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: SessionAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })

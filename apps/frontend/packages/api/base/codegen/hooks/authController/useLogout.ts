@@ -26,7 +26,7 @@ export function logoutMutationOptions<TContext = unknown>(config: Partial<Reques
 }
 
 /**
- * @summary Выход, очистка cookie
+ * @summary Выход — завершение текущей сессии, очистка cookie
  * {@link /auth/logout}
  */
 export function useLogout<TContext>(options: 

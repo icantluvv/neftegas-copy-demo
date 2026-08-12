@@ -7,7 +7,7 @@ import type { LogoutMutationResponse } from "../../types/authController/Logout";
 import { faker } from "@faker-js/faker";
 
 /**
- * @description Куки очищены
+ * @description Текущая сессия завершена, cookie очищена
  */
 export function createLogout204() {
 

@@ -16,11 +16,24 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
     build: ../apps/backend
     restart: unless-stopped
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     environment:
       NODE_ENV: production
@@ -30,8 +43,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-gas_dashboard}
       POSTGRES_USER: ${POSTGRES_USER:-gas_dashboard}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gas_dashboard}
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
+      REDIS_URL: redis://redis:6379
       CORS_ORIGIN: http://localhost:3000
       UPLOADS_DIR: /app/uploads
     volumes:

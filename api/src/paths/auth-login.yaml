@@ -10,7 +10,7 @@ post:
         schema: { $ref: '../components/schemas/auth.yaml#/LoginRequest' }
   responses:
     '200':
-      description: Успешный вход, устанавливает httpOnly cookie с токенами
+      description: Успешный вход, устанавливает httpOnly cookie с идентификатором сессии
       content:
         application/json:
           schema: { $ref: '../components/schemas/auth.yaml#/AuthUser' }

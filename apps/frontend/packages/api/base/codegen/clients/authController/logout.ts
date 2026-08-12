@@ -14,7 +14,7 @@ function getLogoutUrl() {
 }
 
 /**
- * @summary Выход, очистка cookie
+ * @summary Выход — завершение текущей сессии, очистка cookie
  * {@link /auth/logout}
  */
 export async function logout(config: Partial<RequestConfig> & { client?: Client } = {}) {

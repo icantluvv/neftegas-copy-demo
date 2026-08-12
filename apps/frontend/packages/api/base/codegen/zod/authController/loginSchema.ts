@@ -9,7 +9,7 @@ import { errorResponse2Schema } from "../errorResponse2Schema";
 import { loginRequestSchema } from "../loginRequestSchema";
 
 /**
- * @description Успешный вход, устанавливает httpOnly cookie с токенами
+ * @description Успешный вход, устанавливает httpOnly cookie с идентификатором сессии
  */
 export const login200Schema = z.lazy(() => authUserSchema)
 

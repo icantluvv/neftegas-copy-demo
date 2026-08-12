@@ -10,7 +10,7 @@ import { createLoginRequest } from "../createLoginRequest";
 import { faker } from "@faker-js/faker";
 
 /**
- * @description Успешный вход, устанавливает httpOnly cookie с токенами
+ * @description Успешный вход, устанавливает httpOnly cookie с идентификатором сессии
  */
 export function createLogin200(data?: Partial<Login200>): Login200 {
 
