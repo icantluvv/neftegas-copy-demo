@@ -112,7 +112,7 @@ describe("canApproveAsCfo / canReturnAsCfo", () => {
   it("разрешает согласование/возврат, пока статус ЦФО PENDING", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
-      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, status: "PENDING", isRequired: true, decidedById: null, decidedAt: null },
+      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedAt: null },
     });
 
     expect(canApproveAsCfo(detail)).toBe(true);
@@ -122,7 +122,7 @@ describe("canApproveAsCfo / canReturnAsCfo", () => {
   it("запрещает повторное согласование, если статус ЦФО уже APPROVED", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
-      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, status: "APPROVED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
+      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "APPROVED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
     });
 
     expect(canApproveAsCfo(detail)).toBe(false);
@@ -131,7 +131,7 @@ describe("canApproveAsCfo / canReturnAsCfo", () => {
   it("запрещает возврат, если статус ЦФО уже RETURNED", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
-      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, status: "RETURNED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
+      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "RETURNED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
     });
 
     expect(canReturnAsCfo(detail)).toBe(false);
@@ -143,7 +143,7 @@ describe("canSendToDtoe", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
       status: "ALL_CFO_APPROVED",
-      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, status: "APPROVED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
+      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "APPROVED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
     });
 
     expect(canSendToDtoe(detail)).toBe(true);
@@ -153,7 +153,7 @@ describe("canSendToDtoe", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
       status: "PARTIALLY_APPROVED",
-      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, status: "APPROVED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
+      myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "APPROVED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
     });
 
     expect(canSendToDtoe(detail)).toBe(false);
