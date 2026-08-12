@@ -10,9 +10,9 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 
 const ROLE_HOME_ROUTE: Partial<Record<AuthUser["role"], string>> = {
-  FILIAL: "/filial",
-  CFO: "/cfo",
-  DTOE: "/dtoe",
+  FILIAL: "/dashboard",
+  CFO: "/dashboard",
+  DTOE: "/dashboard",
 };
 
 export function LoginForm() {

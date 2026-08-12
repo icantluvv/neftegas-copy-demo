@@ -76,28 +76,28 @@ describe('<LoginForm />', () => {
 		expect(state.mutateMock).not.toHaveBeenCalled()
 	})
 
-	it('перенаправляет на /filial при успешном входе роли FILIAL', async () => {
+	it('перенаправляет на /dashboard при успешном входе роли FILIAL', async () => {
 		await render(<LoginForm />)
 
 		state.onSuccess?.(createAuthUser({ role: 'FILIAL' }))
 
-		expect(useRouter().replace).toHaveBeenCalledWith('/filial')
+		expect(useRouter().replace).toHaveBeenCalledWith('/dashboard')
 	})
 
-	it('перенаправляет на /cfo при успешном входе роли CFO', async () => {
+	it('перенаправляет на /dashboard при успешном входе роли CFO', async () => {
 		await render(<LoginForm />)
 
 		state.onSuccess?.(createAuthUser({ role: 'CFO' }))
 
-		expect(useRouter().replace).toHaveBeenCalledWith('/cfo')
+		expect(useRouter().replace).toHaveBeenCalledWith('/dashboard')
 	})
 
-	it('перенаправляет на /dtoe при успешном входе роли DTOE', async () => {
+	it('перенаправляет на /dashboard при успешном входе роли DTOE', async () => {
 		await render(<LoginForm />)
 
 		state.onSuccess?.(createAuthUser({ role: 'DTOE' }))
 
-		expect(useRouter().replace).toHaveBeenCalledWith('/dtoe')
+		expect(useRouter().replace).toHaveBeenCalledWith('/dashboard')
 	})
 
 	it('показывает тост с единым сообщением об ошибке при 401', async () => {

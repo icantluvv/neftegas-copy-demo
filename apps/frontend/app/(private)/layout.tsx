@@ -1,7 +1,7 @@
 import {getMe} from "@repo/api/base/codegen/clients/authController/getMe";
 import {redirect} from "next/navigation";
 
-import {SidebarNav} from "./components/sidebar-nav";
+import {SidebarNav} from "#/components/sidebar-nav";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +14,9 @@ function isRedirectToLoginError(error: unknown): boolean {
 }
 
 export default async function PrivateLayout({children}: { children: React.ReactNode }) {
+    let user;
     try {
-        await getMe();
+        user = await getMe();
     } catch (error) {
         if (isRedirectToLoginError(error)) {
             redirect("/");
@@ -25,7 +26,7 @@ export default async function PrivateLayout({children}: { children: React.ReactN
 
     return (
         <div className="flex min-h-svh">
-            <SidebarNav/>
+            <SidebarNav user={user}/>
             <div className="w-full flex-1 min-h-screen md:w-4/5">{children}</div>
         </div>
     );
