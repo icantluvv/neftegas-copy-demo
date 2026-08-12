@@ -1,6 +1,7 @@
 import {getMe} from "@repo/api/base/codegen/clients/authController/getMe";
 import {redirect} from "next/navigation";
 
+import {NotificationBell} from "#/components/notification-bell";
 import {SidebarNav} from "#/components/sidebar-nav";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,12 @@ export default async function PrivateLayout({children}: { children: React.ReactN
     return (
         <div className="flex min-h-svh">
             <SidebarNav user={user}/>
-            <div className="w-full flex-1 min-h-screen md:w-4/5">{children}</div>
+            <div className="flex w-full flex-1 min-h-screen flex-col md:w-4/5">
+                <header className="flex justify-end border-b border-border px-4 py-2">
+                    <NotificationBell/>
+                </header>
+                <div className="flex-1">{children}</div>
+            </div>
         </div>
     );
 }

@@ -13,19 +13,19 @@
 
 ## 3. Frontend
 
-- [ ] 3.1 [frontend] Перегенерировать Kubb-клиент из обновлённого `api/src/openapi.yaml` (появляется `useMarkAllNotificationsRead` или аналогичный хук в `apps/frontend/packages/api/base/codegen/**`) — не редактировать сгенерированные файлы вручную.
-- [ ] 3.2 [frontend] Падающий component-тест `NotificationBell`: бейдж скрыт при 0 непрочитанных, показывает точное число 1–9, показывает «9+» при >9.
-- [ ] 3.3 [frontend] Реализовать `NotificationBell` (иконка + бейдж), подключить `useGetNotifications` с `refetchInterval: 60_000`; довести тест 3.2 до green.
-- [ ] 3.4 [frontend] Падающий component-тест: клик по колокольчику открывает панель без перехода маршрута; повторный клик, клик вне панели и `Escape` закрывают панель.
-- [ ] 3.5 [frontend] Реализовать popover-панель (открытие/закрытие по клику, вне-клику, `Escape`, без блокировки остального интерфейса); довести тест 3.4 до green.
-- [ ] 3.6 [frontend] Падающий component-тест: панель показывает не более 7 последних уведомлений (новые сверху), непрочитанные выделены жирным, пустое состояние «Новых уведомлений нет», ссылка «Все уведомления» ведёт на `/notifications`.
-- [ ] 3.7 [frontend] Реализовать содержимое панели (список из первых 7 записей уже загруженного `getNotifications`, заголовок с числом непрочитанных, ссылка «Все уведомления»); довести тест 3.6 до green.
-- [ ] 3.8 [frontend] Падающий component-тест: клик по записи в панели помечает её прочитанной (`useOpenNotification`) и переходит на маршрут корректировки.
-- [ ] 3.9 [frontend] Реализовать обработчик клика по записи панели (mutate `openNotification` → `router.push` на `/corrections/[humanId]`); довести тест 3.8 до green.
-- [ ] 3.10 [frontend] Падающий component-тест: кнопка «Отметить все прочитанными» в панели вызывает массовую пометку и инвалидирует общий query key `getNotifications` (бейдж обнуляется).
-- [ ] 3.11 [frontend] Реализовать кнопку «Отметить все прочитанными» в панели (`useMarkAllNotificationsRead` + `invalidateQueries`); довести тест 3.10 до green.
-- [ ] 3.12 [frontend] Подключить `NotificationBell` в `apps/frontend/app/(private)/layout.tsx` рядом с `SidebarNav` (новая top-bar обёртка шапки).
-- [ ] 3.13 [frontend] Создать маршрут-заглушку `apps/frontend/app/(private)/corrections/[humanId]/page.tsx`: серверный компонент, читает `humanId` из параметров, отображает текст-заглушку без запросов к бэкенду.
+- [x] 3.1 [frontend] Перегенерировать Kubb-клиент из обновлённого `api/src/openapi.yaml` (появляется `useMarkAllNotificationsRead` в `apps/frontend/packages/api/base/codegen/**`) — не редактировать сгенерированные файлы вручную. Коммит ограничен файлами, относящимися к `markAllNotificationsRead` — параллельно в рабочем дереве шли несвязанные изменения другого change (`document-slot`), их не трогал.
+- [x] 3.2 [frontend] Падающий component-тест `NotificationBell`: бейдж скрыт при 0 непрочитанных, показывает точное число 1–9, показывает «9+» при >9.
+- [x] 3.3 [frontend] Реализовать `NotificationBell` (иконка + бейдж), подключить `useGetNotifications` с `refetchInterval: 60_000`; довести тест 3.2 до green.
+- [x] 3.4 [frontend] Падающий component-тест: клик по колокольчику открывает панель без перехода маршрута; повторный клик, клик вне панели и `Escape` закрывают панель.
+- [x] 3.5 [frontend] Реализовать popover-панель (открытие/закрытие по клику, вне-клику, `Escape`, без блокировки остального интерфейса) на базе `@base-ui/react/popover` (уже в зависимостях, даёт dismiss по клику вне/Escape из коробки); довести тест 3.4 до green.
+- [x] 3.6 [frontend] Падающий component-тест: панель показывает не более 7 последних уведомлений (новые сверху), непрочитанные выделены жирным, пустое состояние «Новых уведомлений нет», ссылка «Все уведомления» ведёт на `/notifications`.
+- [x] 3.7 [frontend] Реализовать содержимое панели (список из первых 7 записей уже загруженного `getNotifications`, заголовок с числом непрочитанных, ссылка «Все уведомления»); довести тест 3.6 до green.
+- [x] 3.8 [frontend] Падающий component-тест: клик по записи в панели помечает её прочитанной (`useOpenNotification`) и переходит на маршрут корректировки.
+- [x] 3.9 [frontend] Реализовать обработчик клика по записи панели (mutate `openNotification` → `router.push` на `/corrections/[humanId]`); довести тест 3.8 до green.
+- [x] 3.10 [frontend] Падающий component-тест: кнопка «Отметить все прочитанными» в панели вызывает массовую пометку и инвалидирует общий query key `getNotifications` (бейдж обнуляется).
+- [x] 3.11 [frontend] Реализовать кнопку «Отметить все прочитанными» в панели (`useMarkAllNotificationsRead` + `invalidateQueries`); довести тест 3.10 до green.
+- [x] 3.12 [frontend] Подключить `NotificationBell` в `apps/frontend/app/(private)/layout.tsx` рядом с `SidebarNav` (новая top-bar обёртка шапки).
+- [x] 3.13 [frontend] Создать маршрут-заглушку `apps/frontend/app/(private)/corrections/[humanId]/page.tsx`: серверный компонент, читает `humanId` из параметров, отображает текст-заглушку без запросов к бэкенду.
 - [ ] 3.14 [frontend] Падающий component-тест `NotificationsTable`: колонки «Дата»/«Сообщение», непрочитанные строки жирным, пустое состояние «Уведомлений нет».
 - [ ] 3.15 [frontend] Реализовать `apps/frontend/app/(private)/notifications/page.tsx` (серверная страница) и `apps/frontend/app/(private)/notifications/components/notifications-table.tsx` (клиентский компонент на `useGetNotifications`, тот же query key, что и у `NotificationBell`); довести тест 3.14 до green.
 - [ ] 3.16 [frontend] Падающий component-тест: кнопка «Открыть» в строке помечает запись прочитанной и переходит на `/corrections/[humanId]`.

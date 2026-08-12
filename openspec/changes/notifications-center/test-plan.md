@@ -7,28 +7,29 @@ P1
 
 | Requirement | Scenario | Risk | Test level | Test file | Status |
 |---|---|---:|---|---|---|
-| Колокольчик уведомлений в шапке | Колокольчик виден на любой приватной странице | P2 | Component | `notification-bell.component.test.tsx` | Planned |
-| Бейдж числа непрочитанных на колокольчике | Бейдж скрыт при нуле непрочитанных | P1 | Component | `notification-bell.component.test.tsx` | Planned |
-| Бейдж числа непрочитанных на колокольчике | Бейдж показывает точное число от 1 до 9 | P1 | Component | `notification-bell.component.test.tsx` | Planned |
-| Бейдж числа непрочитанных на колокольчике | Бейдж показывает «9+» при числе больше 9 | P2 | Component | `notification-bell.component.test.tsx` | Planned |
-| Бейдж числа непрочитанных на колокольчике | Бейдж обновляется фоновым опросом | P2 | Unit (конфигурация `refetchInterval`) | `use-notifications.unit.test.ts` | Planned |
-| Открытие и закрытие выпадающей панели уведомлений | Клик по колокольчику открывает панель без перехода | P1 | Component | `notification-bell.component.test.tsx` | Planned |
-| Открытие и закрытие выпадающей панели уведомлений | Повторный клик по колокольчику закрывает панель | P2 | Component | `notification-bell.component.test.tsx` | Planned |
-| Открытие и закрытие выпадающей панели уведомлений | Клик вне панели закрывает её | P2 | Component | `notification-bell.component.test.tsx` | Planned |
-| Открытие и закрытие выпадающей панели уведомлений | Escape закрывает панель | P2 | Component | `notification-bell.component.test.tsx` | Planned |
-| Содержимое выпадающей панели уведомлений | Панель показывает не более 7 последних записей | P1 | Component | `notification-bell.component.test.tsx` | Planned |
-| Содержимое выпадающей панели уведомлений | Непрочитанные записи выделены в панели | P1 | Component | `notification-bell.component.test.tsx` | Planned |
-| Содержимое выпадающей панели уведомлений | Пустая панель показывает заглушку | P2 | Component | `notification-bell.component.test.tsx` | Planned |
-| Содержимое выпадающей панели уведомлений | Ссылка «Все уведомления» ведёт на полный список | P1 | Component | `notification-bell.component.test.tsx` | Planned |
+| Колокольчик уведомлений в шапке | Колокольчик виден на любой приватной странице | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done (структурно — триггер рендерится безусловно в каждом тесте файла и смонтирован в `(private)/layout.tsx`) |
+| Бейдж числа непрочитанных на колокольчике | Бейдж скрыт при нуле непрочитанных | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Бейдж числа непрочитанных на колокольчике | Бейдж показывает точное число от 1 до 9 | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Бейдж числа непрочитанных на колокольчике | Бейдж показывает «9+» при числе больше 9 | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Бейдж числа непрочитанных на колокольчике | Бейдж обновляется фоновым опросом | P2 | Component (конфигурация `refetchInterval`, передаваемая в `useGetNotifications`) | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Открытие и закрытие выпадающей панели уведомлений | Клик по колокольчику открывает панель без перехода | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Открытие и закрытие выпадающей панели уведомлений | Повторный клик по колокольчику закрывает панель | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Открытие и закрытие выпадающей панели уведомлений | Клик вне панели закрывает её | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Открытие и закрытие выпадающей панели уведомлений | Escape закрывает панель | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Содержимое выпадающей панели уведомлений | Панель показывает не более 7 последних записей | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Содержимое выпадающей панели уведомлений | Непрочитанные записи выделены в панели | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Содержимое выпадающей панели уведомлений | Пустая панель показывает заглушку | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Содержимое выпадающей панели уведомлений | Ссылка «Все уведомления» ведёт на полный список | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Содержимое выпадающей панели уведомлений | Клик по записи в панели помечает её прочитанной и переходит на корректировку | P0 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Страница полного списка уведомлений | Страница доступна авторизованному пользователю любой роли | P0 | E2E | `notifications.e2e.spec.ts` | Planned |
 | Страница полного списка уведомлений | Непрочитанные записи выделены на странице | P1 | Component | `notifications-table.component.test.tsx` | Planned |
 | Страница полного списка уведомлений | Пустой список | P2 | Component | `notifications-table.component.test.tsx` | Planned |
 | Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `notifications.e2e.spec.ts`, `notifications-table.component.test.tsx` | Planned |
 | Фильтр «Только непрочитанные» на странице уведомлений | Включение фильтра скрывает прочитанные записи | P1 | Component | `notifications-table.component.test.tsx` | Planned |
 | Фильтр «Только непрочитанные» на странице уведомлений | Выключение фильтра возвращает полный список | P2 | Component | `notifications-table.component.test.tsx` | Planned |
-| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» из панели обнуляет бейдж | P1 | Component | `notification-bell.component.test.tsx` | Planned |
+| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» из панели обнуляет бейдж | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E | `notifications.e2e.spec.ts` | Planned |
-| Пометка прочитанным только по явному действию пользователя | Открытие панели не меняет статус прочитанности | P1 | Component | `notification-bell.component.test.tsx` | Planned |
+| Пометка прочитанным только по явному действию пользователя | Открытие панели не меняет статус прочитанности | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие карточки корректировки напрямую не помечает уведомления прочитанными | P2 | Manual | — | Planned (manual) |
 | Один и тот же список уведомлений для обоих входов | Пометка прочитанным в панели отражается на странице | P1 | Component | `notification-bell.component.test.tsx` | Planned |
 | Один и тот же список уведомлений для обоих входов | Пометка прочитанным на странице отражается в панели | P1 | Component | `notifications-table.component.test.tsx` | Planned |
