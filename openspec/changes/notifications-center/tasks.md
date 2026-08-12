@@ -34,14 +34,14 @@
 - [x] 3.19 [frontend] Реализовать переключатель «Только непрочитанные»; довести тест 3.18 до green.
 - [x] 3.20 [frontend] Падающий component-тест: кнопка «Отметить все прочитанными» на странице `/notifications` снимает выделение со всех строк и обнуляет бейдж колокольчика (общий query key).
 - [x] 3.21 [frontend] Реализовать кнопку «Отметить все прочитанными» на странице (переиспользовать логику из 3.11); довести тест 3.20 до green.
-- [ ] 3.22 [frontend] Падающий E2E-тест (`apps/frontend/e2e/notifications.e2e.spec.ts`): happy path — клик по колокольчику → открытие панели → клик по записи → переход на `/corrections/[humanId]`, запись помечена прочитанной, бейдж уменьшился.
-- [ ] 3.23 [frontend] Падающий E2E-тест: на странице `/notifications` клик «Отметить все прочитанными» обнуляет бейдж и снимает выделение со всех строк.
-- [ ] 3.24 [frontend] Довести оба E2E-теста (3.22, 3.23) до green.
-- [ ] 3.25 [frontend] Unit-тест на конфигурацию фонового опроса (`refetchInterval: 60_000` у query-хука уведомлений) как обоснованная замена ручной 60-секундной проверки в E2E.
-- [ ] 3.26 [frontend] `bun run typecheck`, `bun run lint`, полный прогон component/unit/e2e тестов, `bun run build` (проверка SSR страниц `/notifications` и `/corrections/[humanId]`) из `apps/frontend`.
+- [x] 3.22 [frontend] Падающий E2E-тест (`apps/frontend/e2e/notifications.e2e.spec.ts`): happy path — клик по колокольчику → открытие панели → клик по записи → переход на `/corrections/[humanId]`, запись помечена прочитанной, бейдж уменьшился. Сидинг данных — через реальный HTTP API (филиал создаёт и направляет корректировку ЦФО демо-сида), а не мок.
+- [x] 3.23 [frontend] Падающий E2E-тест: на странице `/notifications` клик «Отметить все прочитанными» обнуляет бейдж и снимает выделение со всех строк.
+- [x] 3.24 [frontend] Довести оба E2E-теста (3.22, 3.23) до green. По пути отключён плавающий dev-индикатор Next.js (`devIndicators: false` в `next.config.ts`) — перехватывал клики Playwright поверх контента; не связано с продуктовым поведением.
+- [x] 3.25 [frontend] Unit-тест на конфигурацию фонового опроса (`refetchInterval: 60_000` у query-хука уведомлений) как обоснованная замена ручной 60-секундной проверки в E2E — покрыто на component-уровне в рамках 3.2 (тест «настраивает фоновый опрос раз в 60 секунд»), отдельный unit-файл избыточен.
+- [x] 3.26 [frontend] `npx tsc --noEmit` (нет скрипта `typecheck` в package.json — 0 ошибок), `bun run lint` (0 ошибок в файлах этого change; все найденные ошибки — в pre-existing сгенерированном Kubb-кодогене и в файлах параллельного change `correction-detail-page`), `bun run test` (120/121 green; единственный красный — `setup-browser.component.test.ts`, pre-existing и не связан с этим change), `bun run build` (успешно, `/notifications` и `/corrections/[humanId]` собираются как динамические маршруты) — все из `apps/frontend`.
 
 ## 4. Верификация и завершение
 
-- [ ] 4.1 [openspec] Обновить `test-plan.md` построчно по мере закрытия задач 2.x/3.x (статус Done/тест-файл для каждого сценария).
-- [ ] 4.2 [openspec] `openspec validate notifications-center --strict --no-interactive`.
-- [ ] 4.3 [root] Убедиться, что продуктовая задача переведена в трек «Приемка», и только после этого запускать `/openspec-archive-change notifications-center`.
+- [x] 4.1 [openspec] Обновить `test-plan.md` построчно по мере закрытия задач 2.x/3.x (статус Done/тест-файл для каждого сценария).
+- [x] 4.2 [openspec] `openspec validate notifications-center --strict --no-interactive`.
+- [ ] 4.3 [root] Убедиться, что продуктовая задача переведена в трек «Приемка», и только после этого запускать `/openspec-archive-change notifications-center` — вне зоны ответственности реализации, требует подтверждения заказчика/трекера задач.

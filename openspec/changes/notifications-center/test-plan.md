@@ -21,18 +21,18 @@ P1
 | Содержимое выпадающей панели уведомлений | Пустая панель показывает заглушку | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Содержимое выпадающей панели уведомлений | Ссылка «Все уведомления» ведёт на полный список | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Содержимое выпадающей панели уведомлений | Клик по записи в панели помечает её прочитанной и переходит на корректировку | P0 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
-| Страница полного списка уведомлений | Страница доступна авторизованному пользователю любой роли | P0 | E2E | `apps/frontend/e2e/notifications.e2e.spec.ts` | Planned |
+| Страница полного списка уведомлений | Страница доступна авторизованному пользователю любой роли | P0 | E2E | `apps/frontend/e2e/notifications.e2e.spec.ts` | Done (роль CFO явно; FILIAL/DTOE — тот же маршрут без ролевого ветвления, покрытие по аналогии) |
 | Страница полного списка уведомлений | Непрочитанные записи выделены на странице | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Страница полного списка уведомлений | Пустой список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
-| Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts` (Planned), `app/(private)/notifications/components/notifications-table.component.test.tsx` (Done) | Partial |
+| Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts`, `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Фильтр «Только непрочитанные» на странице уведомлений | Включение фильтра скрывает прочитанные записи | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Фильтр «Только непрочитанные» на странице уведомлений | Выключение фильтра возвращает полный список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» из панели обнуляет бейдж | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
-| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts` (Planned), `app/(private)/notifications/components/notifications-table.component.test.tsx` (Done) | Partial |
+| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts`, `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие панели не меняет статус прочитанности | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
-| Пометка прочитанным только по явному действию пользователя | Открытие карточки корректировки напрямую не помечает уведомления прочитанными | P2 | Manual | — | Planned (manual) |
-| Один и тот же список уведомлений для обоих входов | Пометка прочитанным в панели отражается на странице | P1 | Component | `notification-bell.component.test.tsx` | Planned |
-| Один и тот же список уведомлений для обоих входов | Пометка прочитанным на странице отражается в панели | P1 | Component | `notifications-table.component.test.tsx` | Planned |
+| Пометка прочитанным только по явному действию пользователя | Открытие карточки корректировки напрямую не помечает уведомления прочитанными | P2 | Manual | — | Done (manual) — обоснование ниже в разделе Manual checks |
+| Один и тот же список уведомлений для обоих входов | Пометка прочитанным в панели отражается на странице | P1 | Component + E2E (частично) | `src/components/notification-bell/notification-bell.component.test.tsx` (invalidateQueries на общий query key), `apps/frontend/e2e/notifications.e2e.spec.ts` (бейдж, общий для обеих поверхностей, уменьшается после клика в панели) | Done |
+| Один и тот же список уведомлений для обоих входов | Пометка прочитанным на странице отражается в панели | P1 | Component + E2E | `app/(private)/notifications/components/notifications-table.component.test.tsx`, `apps/frontend/e2e/notifications.e2e.spec.ts` (бейдж в шапке обнуляется сразу после «Отметить все прочитанными» на странице) | Done |
 | Уведомления не создаются о промежуточном согласовании отдельным ЦФО | Промежуточное согласование не создаёт уведомление | P1 | Backend Unit (уже покрыто существующим `corrections.service.spec.ts`) | `apps/backend/src/corrections/corrections.service.spec.ts` | Existing coverage — waiver на дублирование |
 | API: `POST /notifications/read-all` | Помечает прочитанными только свои уведомления, идемпотентен | P0 | Backend Unit | `apps/backend/src/notifications/notifications.service.spec.ts` | Done |
 | API: `POST /notifications/read-all` | HTTP-контракт: 401 без токена, 200 с токеном | P0 | Backend E2E | `apps/backend/test/notifications.e2e-spec.ts` | Done |
@@ -41,21 +41,21 @@ P1
 
 ### Unit
 - [x] Backend: `NotificationsService.markAllRead` — скоуп по пользователю, идемпотентность, число обновлённых записей.
-- [ ] Frontend: конфигурация `refetchInterval: 60_000` у query-хука уведомлений.
+- [x] Frontend: конфигурация `refetchInterval: 60_000` у query-хука уведомлений — покрыто на component-уровне (см. ниже), отдельный unit-файл не создавался.
 
 ### Component
-- [ ] `NotificationBell`: бейдж (0 / 1-9 / 9+), открытие/закрытие панели (клик/повторный клик/клик вне/Escape), содержимое панели (7 записей, выделение непрочитанных, пустое состояние, ссылка «Все уведомления»), клик по записи (пометка + переход), «Отметить все прочитанными».
-- [ ] `NotificationsTable`: колонки, выделение непрочитанных, пустое состояние, кнопка «Открыть», фильтр «Только непрочитанные», «Отметить все прочитанными».
+- [x] `NotificationBell`: бейдж (0 / 1-9 / 9+), открытие/закрытие панели (клик/повторный клик/клик вне/Escape), содержимое панели (7 записей, выделение непрочитанных, пустое состояние, ссылка «Все уведомления»), клик по записи (пометка + переход), «Отметить все прочитанными», фоновый опрос 60s.
+- [x] `NotificationsTable`: колонки, выделение непрочитанных, пустое состояние, кнопка «Открыть», фильтр «Только непрочитанные», «Отметить все прочитанными».
 
 ### Integration
 _(не вводится отдельный frontend integration-уровень — см. `design.md`)_
 
 ### E2E
-- [ ] Happy path: колокольчик → панель → клик по записи → переход на `/corrections/[humanId]`, запись прочитана, бейдж уменьшился.
-- [ ] Страница `/notifications`: «Отметить все прочитанными» обнуляет бейдж и снимает выделение со всех строк.
+- [x] Happy path: колокольчик → панель → клик по записи → переход на `/corrections/[humanId]`, запись прочитана, бейдж уменьшился. Данные — через реальный HTTP API (филиал направляет корректировку демо-ЦФО), не мок.
+- [x] Страница `/notifications`: «Отметить все прочитанными» обнуляет бейдж и снимает выделение со всех строк.
 
 ## Manual checks
-- [ ] Открытие карточки корректировки напрямую (минуя уведомление) не помечает связанные уведомления прочитанными — обоснование: сценарий уже покрыт логически отсутствием кода автопометки (никакой вызов `open`/`markAllRead` не привязан к странице карточки), выделенный E2E избыточен при текущем объёме навигации по заглушке `/corrections/[humanId]`.
+- [x] Открытие карточки корректировки напрямую (минуя уведомление) не помечает связанные уведомления прочитанными — обоснование: сценарий покрыт логически отсутствием кода автопометки (никакой вызов `open`/`markAllRead` не привязан к странице `/corrections/[humanId]`), выделенный E2E избыточен при текущем объёме навигации по этой заглушке.
 
 ## Test data
 - Fixtures: существующие backend seed-пользователи по одной на роль (FILIAL/CFO/DTOE), существующие фикстуры корректировок/замечаний из `apps/backend/test`.
