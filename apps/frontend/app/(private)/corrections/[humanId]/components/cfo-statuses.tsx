@@ -29,7 +29,7 @@ export function CfoStatuses({ detail }: { detail: CorrectionDetail }) {
     return null;
   }
 
-  const columns: ColumnDef<CorrectionCfoStatus2, any>[] = [
+  const columns: ColumnDef<CorrectionCfoStatus2, unknown>[] = [
     { id: "cfo", header: "ЦФО", cell: ({ row }) => row.original.cfo.name },
     {
       id: "status",

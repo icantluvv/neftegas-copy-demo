@@ -17,8 +17,6 @@ vi.mock("@/packages/api/base/codegen", async (importOriginal) => {
 	};
 });
 
-const { PackageCompleteness: _unused } = await import("./package-completeness");
-
 function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail {
 	return {
 		id: 1,

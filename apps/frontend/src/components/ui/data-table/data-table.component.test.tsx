@@ -9,7 +9,7 @@ interface Row {
 	required: boolean
 }
 
-const columns: ColumnDef<Row, any>[] = [
+const columns: ColumnDef<Row, unknown>[] = [
 	{ accessorKey: 'label', header: 'Элемент' },
 	{ accessorKey: 'required', header: 'Обязателен', cell: (ctx) => (ctx.getValue() ? 'Да' : 'Нет') },
 ]

@@ -6,7 +6,7 @@ import { DataTable } from "#/components/ui/data-table";
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
 export function HistoryLog({ detail }: { detail: CorrectionDetail }) {
-  const columns: ColumnDef<CorrectionHistoryEntry2, any>[] = [
+  const columns: ColumnDef<CorrectionHistoryEntry2, unknown>[] = [
     {
       id: "timestamp",
       header: "Дата и время",

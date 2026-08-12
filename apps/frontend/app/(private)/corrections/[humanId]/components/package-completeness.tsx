@@ -77,7 +77,7 @@ function UploadSlotFileCell({ detail, slot }: { detail: CorrectionDetail; slot: 
 }
 
 export function PackageCompleteness({ detail }: { detail: CorrectionDetail }) {
-  const columns: ColumnDef<DocumentSlot2, any>[] = [
+  const columns: ColumnDef<DocumentSlot2, unknown>[] = [
     { accessorKey: "label", header: "Элемент" },
     {
       id: "isRequired",

@@ -138,7 +138,7 @@ function RemarksActionBar({ detail }: { detail: CorrectionDetail }) {
 }
 
 export function RemarksList({ detail, currentUserId }: { detail: CorrectionDetail; currentUserId: number }) {
-  const columns: ColumnDef<Remark, any>[] = [
+  const columns: ColumnDef<Remark, unknown>[] = [
     { accessorKey: "humanId", header: "ID" },
     { id: "slot", header: "Элемент пакета", cell: ({ row }) => slotLabel(detail, row.original.relatedSlotId) },
     { accessorKey: "issuerLabel", header: "От кого" },
