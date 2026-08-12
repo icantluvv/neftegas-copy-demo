@@ -9,16 +9,16 @@
       `openapi.yaml`, перегенерировать Kubb-клиент штатной командой (без ручного
       редактирования `codegen/`).
 
-      Найдено расхождение: `DocumentSlot` не содержал `isRequired` и
-      `responsibleCfo`, нужные для колонок «Обязателен» и «Проверяет ЦФО» блока
-      «Комплектность пакета» (proposal.md, 4.2). Данные уже загружались через
-      связь `slots.requirement`/`requirement.responsibleCfo` — не хватало
-      только маппинга. Исправлено аддитивно, без breaking changes: добавлены
-      поля в `api/src/components/schemas/document-slot.yaml`, маппинг в
-      `apps/backend/src/corrections/corrections.mapper.ts` (`toDocumentSlotDto`),
-      relation `slots.requirement.responsibleCfo` в `corrections.service.ts`
-      (`DETAIL_RELATIONS`); Kubb-клиент перегенерирован. `npm run lint` (api),
-      `npx tsc --noEmit` (backend и frontend) — зелёные. Commit `231a518`.
+      Найдено и исправлено три расхождения аддитивно (без breaking changes),
+      все три — relation уже загружалась бэкендом, не хватало маппинга в DTO:
+      1. `DocumentSlot`: добавлены `isRequired`, `responsibleCfo` (нужны для
+         колонок «Обязателен»/«Проверяет ЦФО»). Commit `231a518`.
+      2. `CorrectionCfoStatus`: добавлены `cfo`, `decidedBy` (нужны для
+         названия ЦФО и «кто решил» с ФИО/должностью).
+      3. `CorrectionHistoryEntry`: добавлен `user`; `UserSummary` дополнен
+         `role`/`position` (нужны для колонки «Пользователь» истории).
+         Commit `be9799f`.
+      `npm run lint` (api), `npx tsc --noEmit` (backend и frontend) — зелёные.
 
 ## 2. Backend
 
@@ -28,49 +28,49 @@ _(нет задач)_
 
 ### 3.1 UI-примитивы
 
-- [ ] 3.1.1 [frontend] Failing component-тест для `apps/frontend/src/components/ui/badge/badge.component.test.tsx` (варианты цвета по статусу) → реализовать `badge.tsx` (+`index.ts`) → green.
-- [ ] 3.1.2 [frontend] Failing component-тест для `apps/frontend/src/components/ui/table/table.component.test.tsx` → реализовать `table.tsx` (+`index.ts`) → green.
-- [ ] 3.1.3 [frontend] Failing component-тест для `apps/frontend/src/components/ui/dialog/dialog.component.test.tsx` (открытие/закрытие, форма внутри) → реализовать `dialog.tsx` (+`index.ts`) → green.
+- [x] 3.1.1 [frontend] Failing component-тест для `apps/frontend/src/components/ui/badge/badge.component.test.tsx` (варианты цвета по статусу) → реализовать `badge.tsx` (+`index.ts`) → green.
+- [x] 3.1.2 [frontend] Failing component-тест для `apps/frontend/src/components/ui/table/table.component.test.tsx` → реализовать `table.tsx` (+`index.ts`) → green. Дополнительно: `apps/frontend/src/components/ui/data-table/` — обёртка над Table на TanStack Table (`@tanstack/react-table` v8), переиспользуется всеми табличными блоками карточки.
+- [x] 3.1.3 [frontend] Failing component-тест для `apps/frontend/src/components/ui/dialog/dialog.component.test.tsx` (открытие/закрытие, форма внутри) → реализовать `dialog.tsx` (+`index.ts`) → green.
 
 ### 3.2 Guard-логика и маппинг статусов
 
-- [ ] 3.2.1 [frontend] Failing unit-тест `apps/frontend/app/(private)/corrections/[id]/lib/permissions.unit.test.ts`, покрывающий guard-условия из `specs/correction-detail-page/spec.md` (видимость и активность каждой кнопки/блока по роли, статусу корректировки, `myCfoStatus`, `returnedCfos`, статусам замечаний) → реализовать `permissions.ts` → green.
-- [ ] 3.2.2 [frontend] Failing unit-тест `apps/frontend/app/(private)/corrections/[id]/lib/status-labels.unit.test.ts` (текст и цвет бейджа для каждого статуса корректировки/ЦФО/замечания) → реализовать `status-labels.ts` → green.
+- [x] 3.2.1 [frontend] Failing unit-тест `apps/frontend/app/(private)/corrections/[humanId]/lib/permissions.unit.test.ts`, покрывающий guard-условия из `specs/correction-detail-page/spec.md` → реализовать `permissions.ts` → green (25 тестов). Каталог `[id]` переименован в `[humanId]` — конфликт имени динамического сегмента с маршрутом `/corrections/[humanId]`, уже созданным параллельной фичей уведомлений.
+- [x] 3.2.2 [frontend] Failing unit-тест `.../lib/status-labels.unit.test.ts` (текст и цвет бейджа для каждого статуса корректировки/ЦФО/замечания) → реализовать `status-labels.ts` → green.
 
 ### 3.3 Данные и мутации
 
-- [ ] 3.3.1 [frontend] Подключить `apps/frontend/app/(private)/corrections/[id]/page.tsx`: `getMe()`, ролевой доступ через существующий `(private)/layout.tsx`, `prefetchQuery(getCorrectionSuspenseQueryOptions({ humanId: params.id }))` из `apps/frontend/packages/api/base/codegen/hooks/correctionsController/useGetCorrectionSuspense.ts`, `dehydrate` + `HydrationBoundary` по паттерну `docs/adr/frontend-data-fetching.md`.
-- [ ] 3.3.2 [frontend] Реализовать `apps/frontend/app/(private)/corrections/[id]/components/correction-detail-view.tsx` (`"use client"`), читающий `useGetCorrectionSuspense({ humanId })` и компонующий блоки.
-- [ ] 3.3.3 [frontend] Обвязать существующие Kubb-мутационные хуки (`useReturnCorrectionByCfo`, `useApproveCorrectionByCfo`, `useSendCorrectionToDtoe`, `useResubmitCorrection`, `useResubmitToDtoe`, `useSendCorrection`, `useDtoeApprove`, `useDtoeReturn`, upload-файла в слот, fix/delete замечания) единой инвалидацией/`setQueryData` по `getCorrectionSuspenseQueryKey({ humanId })` в `.../lib/use-correction-mutations.ts`.
+- [x] 3.3.1 [frontend] `apps/frontend/app/(private)/corrections/[humanId]/page.tsx`: `getMe()` (роль + `currentUserId`), `fetchQuery(getCorrectionSuspenseQueryOptions({ humanId }))` с try/catch на 403/404, `dehydrate` + `HydrationBoundary` по паттерну `docs/adr/frontend-data-fetching.md`.
+- [x] 3.3.2 [frontend] `.../components/correction-detail-view.tsx` (`"use client"`), читает `useGetCorrectionSuspense({ humanId })` и компонует все блоки.
+- [x] 3.3.3 [frontend] Каждый блок-мутатор инвалидирует `getCorrectionSuspenseQueryKey({ humanId })` в своём `onSuccess` (без отдельного файла `use-correction-mutations.ts` — оставлено локально по месту использования: `package-completeness.tsx`, `send-for-review-form.tsx`, `remarks-list.tsx`, `resubmit-panel.tsx`).
 
 ### 3.4 Блок «Шапка корректировки»
 
-- [ ] 3.4.1 [frontend] Failing component-тест `correction-header.component.test.tsx` (Scenario: «Шапка отображается всем ролям одинаково») → реализовать `correction-header.tsx` → green.
+- [x] 3.4.1 [frontend] Failing component-тест `correction-header.component.test.tsx` → реализовать `correction-header.tsx` → green.
 
 ### 3.5 Блок «Комплектность пакета»
 
-- [ ] 3.5.1 [frontend] Failing component-тест `package-completeness.component.test.tsx`, покрывающий сценарии загрузки первой версии, версии по замечанию, недоступности после `APPROVED_BY_DTOE`, скрытия кнопки для ЦФО/ДТОиР → реализовать `package-completeness.tsx` (таблица слотов + `useUploadSlotFile`) → green.
-- [ ] 3.5.2 [frontend] Failing component-тест на форму «Направить» (выбор ЦФО из `availableCfos`, disabled при незаполненных обязательных слотах) → реализовать форму направления (TanStack Form) → green.
+- [x] 3.5.1 [frontend] Failing component-тест `package-completeness.component.test.tsx` (загрузка версии, недоступность после `APPROVED_BY_DTOE`, скрытие для ЦФО/ДТОиР) → реализовать `package-completeness.tsx` (`DataTable` + `useUploadFileVersion`) → green.
+- [x] 3.5.2 [frontend] Failing component-тест `send-for-review-form.component.test.tsx` (выбор ЦФО из `availableCfos`, disabled при незаполненных обязательных слотах) → реализовать `send-for-review-form.tsx` (react-hook-form, по паттерну `login-form.tsx` — не TanStack Form, в проекте использован react-hook-form) → green.
 
 ### 3.6 Блок «Статусы ЦФО»
 
-- [ ] 3.6.1 [frontend] Failing component-тест `cfo-statuses.component.test.tsx` (read-only рендер, отсутствие управляющих элементов) → реализовать `cfo-statuses.tsx` → green.
+- [x] 3.6.1 [frontend] Failing component-тест `cfo-statuses.component.test.tsx` (read-only рендер, отсутствие управляющих элементов) → реализовать `cfo-statuses.tsx` → green.
 
 ### 3.7 Блок «Замечания»
 
-- [ ] 3.7.1 [frontend] Failing component-тест на согласование ЦФО (кнопка активна только при `myCfoStatus.status === 'PENDING'`) → реализовать действие «Согласовать» → green.
-- [ ] 3.7.2 [frontend] Failing component-тест на форму возврата с замечанием (ЦФО и ДТОиР), создание `Remark` через `RemarkCreateInput` → реализовать диалог возврата (`dialog` + TanStack Form) → green.
-- [ ] 3.7.3 [frontend] Failing component-тест `remarks-list.component.test.tsx`: «Отметить исправленным» доступна филиалу для своих `OPEN`-замечаний, недоступна для `CLOSED`; удаление доступно только автору и только в `OPEN` → реализовать `remarks-list.tsx` → green.
-- [ ] 3.7.4 [frontend] Failing component-тест на финальное согласование/возврат ДТОиР → реализовать соответствующие действия → green.
+- [x] 3.7.1 [frontend] Failing component-тест на согласование ЦФО (`myCfoStatus.status === 'PENDING'`) → реализовать действие «Согласовать» в `remarks-list.tsx` → green.
+- [x] 3.7.2 [frontend] Failing component-тест `return-remark-dialog.component.test.tsx` на форму возврата с замечанием (ЦФО и ДТОиР), `RemarkCreateInput` → реализовать `return-remark-dialog.tsx` (dialog + react-hook-form) → green.
+- [x] 3.7.3 [frontend] Failing component-тест `remarks-list.component.test.tsx`: «Отметить исправленным»/«Удалить» guard-условия → реализовать `remarks-list.tsx` → green (7 тестов).
+- [x] 3.7.4 [frontend] Failing component-тест на финальное согласование/возврат ДТОиР и направление в ДТОиР → реализовать в `remarks-list.tsx` (`RemarksActionBar`) → green.
 
 ### 3.8 Блок «Повторное направление»
 
-- [ ] 3.8.1 [frontend] Failing component-тест `resubmit-panel.component.test.tsx`: блок скрыт при пустом `returnedCfos`, кнопка неактивна без выбранного ЦФО, кнопка неактивна при открытых замечаниях выбранного ЦФО, успешное повторное направление не сбрасывает статус ранее согласовавших ЦФО → реализовать `resubmit-panel.tsx` → green.
-- [ ] 3.8.2 [frontend] Failing component-тест на повторное направление в ДТОиР (`RETURNED_BY_DTOE`, кнопка активна только когда все замечания ДТОиР `FIXED_BY_FILIAL`) → реализовать действие → green.
+- [x] 3.8.1 [frontend] Failing component-тест `resubmit-panel.component.test.tsx` → реализовать `resubmit-panel.tsx` → green.
+- [x] 3.8.2 [frontend] Failing component-тест на повторное направление в ДТОиР → реализовать в `resubmit-panel.tsx` → green.
 
 ### 3.9 Блок «История действий»
 
-- [ ] 3.9.1 [frontend] Failing component-тест `history-log.component.test.tsx` (read-only, хронологический порядок, отсутствие элементов редактирования/удаления) → реализовать `history-log.tsx` → green.
+- [x] 3.9.1 [frontend] Failing component-тест `history-log.component.test.tsx` → реализовать `history-log.tsx` (`DataTable`) → green.
 
 ### 3.10 Сквозные E2E
 
@@ -79,9 +79,9 @@ _(нет задач)_
 
 ### 3.11 Верификация
 
-- [ ] 3.11.1 [frontend] `bun run typecheck`
-- [ ] 3.11.2 [frontend] `bun run lint`
-- [ ] 3.11.3 [frontend] `bun run test` (unit + component)
-- [ ] 3.11.4 [frontend] `bun run build`
-- [ ] 3.11.5 [frontend] Прогнать `apps/frontend/e2e/correction-detail.e2e.spec.ts`
+- [x] 3.11.1 [frontend] `npx tsc --noEmit -p tsconfig.json` — чисто (нет отдельного скрипта `typecheck` в `package.json`).
+- [x] 3.11.2 [frontend] `bun run lint` — без ошибок в коде фичи (устранены `no-explicit-any` в `DataTable`/column defs); часть pre-existing ошибок/варнингов в сгенерированном `packages/api/base/codegen/**` и несвязанных файлах вне scope этой фичи.
+- [x] 3.11.3 [frontend] `bun run test` (unit + component) — 117/118 зелёные; единственный красный (`setup-browser.component.test.ts`, сравнение `oklch` vs `#171717`) — pre-existing, воспроизводится на `dev` без изменений этой фичи.
+- [x] 3.11.4 [frontend] `bun run build` — успешно, `/corrections/[humanId]` в дереве маршрутов.
+- [ ] 3.11.5 [frontend] Прогнать `apps/frontend/e2e/correction-detail.e2e.spec.ts` — блокируется 3.10.
 - [ ] 3.11.6 [openspec] Обновить `test-plan.md` (статусы строк покрытия) и выполнить `openspec validate correction-detail-page --strict --no-interactive`
