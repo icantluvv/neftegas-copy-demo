@@ -1,0 +1,16 @@
+{
+  "name": "update-specs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "@types/node": "^25.9.1",
+    "playwright": "^1.59.1",
+    "sanitize-filename": "^1.6.4",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1"
+  }
+}

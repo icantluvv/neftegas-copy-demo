@@ -1,0 +1,140 @@
+{
+  "cookies": [
+    {
+      "name": "seraph.confluence",
+      "value": "82673670%3Ae8406057944bbf8ec3d370388944eebe67de4a05",
+      "domain": "confluence.dobro.services",
+      "path": "/",
+      "expires": 1780913309.359861,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ajs_anonymous_id",
+      "value": "%2251e4e4a9-0370-43a2-b97b-38c76c383312%22",
+      "domain": ".figma.com",
+      "path": "/",
+      "expires": 1782295810,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "JSESSIONID",
+      "value": "CB7DFFAA65519950060B2EA79CF0B346",
+      "domain": "confluence.dobro.services",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_yasc",
+      "value": "+EfUYfyjSt1jwU449RWCq0XcoxxMBhAAtkLO4GxqxfnV7wJqLEDkclL/SB+aYn9s1EEBvEM=.MTc4MDA1MTE3OTkwMg==",
+      "domain": ".confluence.dobro.services",
+      "path": "/",
+      "expires": 1814611179.926089,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "AWSALBTGCORS",
+      "value": "+NxdgyaLccUcL4CWM88F+0gL0okCWQ2Gsdb+m/xp+ez6Up8RGPYMj3CbXwfUSmVdyuSB7RhNHfwEI7jPdgxGJS7vfySPQpucbn/eOzknR5Qa9I0gZgW1IJjgFlztrxAmpXvsY04yv7+q1QQVqE/+Np9TZID8L0DlDhNe80Hn05kH",
+      "domain": "www.figma.com",
+      "path": "/",
+      "expires": 1780656826.10081,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "AWSALBCORS",
+      "value": "uVhqvU+5DT2NBhIu2yr3LgigGDJLiTCGsOIx2pabRLS0EY/pO1TeS0BaZcWvzqntrbosyJyv0CFXlFaFdEYHJbsAqYrAuV1FLXiTPB5gA8GDpvNAOWaaWRJCMI9z",
+      "domain": "www.figma.com",
+      "path": "/",
+      "expires": 1780656826.100851,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://confluence.dobro.services",
+      "localStorage": [
+        {
+          "name": "confluence.i.rybakov@webpractik.ru.sidebar.width",
+          "value": "285"
+        },
+        {
+          "name": "k15t/cxp/word/export/selected/zlg/templateId",
+          "value": "com.k15t.scroll.office.default-template-1"
+        },
+        {
+          "name": "atlassian-analytics.confluence.lock",
+          "value": "null"
+        },
+        {
+          "name": "atst.healthcheck.sensors.page-protocols",
+          "value": "cki626"
+        },
+        {
+          "name": "k15t/cxp/word/export/selected/zlg/pageSet",
+          "value": "descendants"
+        }
+      ]
+    },
+    {
+      "origin": "https://www.figma.com",
+      "localStorage": [
+        {
+          "name": "STATSIG_LOCAL_STORAGE_STABLE_ID",
+          "value": "51e4e4a9-0370-43a2-b97b-38c76c383312"
+        },
+        {
+          "name": "active-text-review-plugin",
+          "value": "{\"type\":16,\"value\":null}"
+        },
+        {
+          "name": "dev-handoff-code-language",
+          "value": "{\"type\":17,\"value\":{\"id\":\"WEB\",\"type\":\"first-party\"}}"
+        },
+        {
+          "name": "statsig.stable_id.501823423",
+          "value": "\"51e4e4a9-0370-43a2-b97b-38c76c383312\""
+        },
+        {
+          "name": "use-local-related-link-plugin",
+          "value": "0"
+        },
+        {
+          "name": "statsig.session_id.184042872",
+          "value": "{\"sessionID\":\"d48c7914-f8cb-4241-a8cb-e3899fe735d6\",\"startTime\":1780052029580,\"lastUpdate\":1780052038451}"
+        },
+        {
+          "name": "hot-reload-plugin-dev",
+          "value": "1"
+        },
+        {
+          "name": "use-realms-for-plugin-dev",
+          "value": "0"
+        },
+        {
+          "name": "statsig.stable_id.184042872",
+          "value": "\"51e4e4a9-0370-43a2-b97b-38c76c383312\""
+        },
+        {
+          "name": "active-canvas-pixel-preview",
+          "value": "0"
+        },
+        {
+          "name": "dev-handoff-preferences",
+          "value": "{\"type\":18,\"value\":{\"codeExtensionPreferences\":{\"WEB\":{\"scaleFactor\":16.0,\"unit\":0,\"customSettings\":{}},\"IOS\":{\"scaleFactor\":1.0,\"unit\":1,\"customSettings\":{}},\"IOS_UIKIT\":{\"scaleFactor\":1.0,\"unit\":1,\"customSettings\":{}},\"ANDROID\":{\"scaleFactor\":1.0,\"unit\":1,\"customSettings\":{}},\"FIGMA_PROPERTIES\":{\"scaleFactor\":1.0,\"unit\":0,\"customSettings\":{}},\"ANDROID_XML\":{\"scaleFactor\":1.0,\"unit\":1,\"customSettings\":{}}}}}"
+        }
+      ]
+    }
+  ]
+}
