@@ -71,7 +71,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
                                     href={item.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10",
+                                        "flex min-h-12 items-center rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-white/10",
                                         isActive && "bg-white/10"
                                     )}
                                 >
@@ -86,16 +86,16 @@ export function SidebarNav({user}: { user: AuthUser }) {
                     <div className="flex min-w-0 items-center gap-3">
                         <div
                             aria-hidden="true"
-                            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold"
+                            className="flex size-9 shrink-0 select-none items-center justify-center rounded-full bg-white/10 text-xs font-semibold"
                         >
                             {getInitials(user.fullName)}
                         </div>
-                        <span className="truncate text-sm font-medium">{user.fullName}</span>
+                        <span className="truncate text-base font-medium">{user.fullName}</span>
                     </div>
 
                     <Button
                         variant="ghost"
-                        size="icon"
+                        size='icon-lg'
                         aria-label="Выйти"
                         className="shrink-0 text-sidebar-foreground hover:bg-white/10 hover:text-sidebar-foreground"
                         onClick={handleLogout}
