@@ -21,14 +21,14 @@ P1
 | Содержимое выпадающей панели уведомлений | Пустая панель показывает заглушку | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Содержимое выпадающей панели уведомлений | Ссылка «Все уведомления» ведёт на полный список | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Содержимое выпадающей панели уведомлений | Клик по записи в панели помечает её прочитанной и переходит на корректировку | P0 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
-| Страница полного списка уведомлений | Страница доступна авторизованному пользователю любой роли | P0 | E2E | `notifications.e2e.spec.ts` | Planned |
-| Страница полного списка уведомлений | Непрочитанные записи выделены на странице | P1 | Component | `notifications-table.component.test.tsx` | Planned |
-| Страница полного списка уведомлений | Пустой список | P2 | Component | `notifications-table.component.test.tsx` | Planned |
-| Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `notifications.e2e.spec.ts`, `notifications-table.component.test.tsx` | Planned |
-| Фильтр «Только непрочитанные» на странице уведомлений | Включение фильтра скрывает прочитанные записи | P1 | Component | `notifications-table.component.test.tsx` | Planned |
-| Фильтр «Только непрочитанные» на странице уведомлений | Выключение фильтра возвращает полный список | P2 | Component | `notifications-table.component.test.tsx` | Planned |
+| Страница полного списка уведомлений | Страница доступна авторизованному пользователю любой роли | P0 | E2E | `apps/frontend/e2e/notifications.e2e.spec.ts` | Planned |
+| Страница полного списка уведомлений | Непрочитанные записи выделены на странице | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
+| Страница полного списка уведомлений | Пустой список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
+| Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts` (Planned), `app/(private)/notifications/components/notifications-table.component.test.tsx` (Done) | Partial |
+| Фильтр «Только непрочитанные» на странице уведомлений | Включение фильтра скрывает прочитанные записи | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
+| Фильтр «Только непрочитанные» на странице уведомлений | Выключение фильтра возвращает полный список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» из панели обнуляет бейдж | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
-| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E | `notifications.e2e.spec.ts` | Planned |
+| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts` (Planned), `app/(private)/notifications/components/notifications-table.component.test.tsx` (Done) | Partial |
 | Пометка прочитанным только по явному действию пользователя | Открытие панели не меняет статус прочитанности | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие карточки корректировки напрямую не помечает уведомления прочитанными | P2 | Manual | — | Planned (manual) |
 | Один и тот же список уведомлений для обоих входов | Пометка прочитанным в панели отражается на странице | P1 | Component | `notification-bell.component.test.tsx` | Planned |
