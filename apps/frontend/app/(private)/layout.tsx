@@ -18,7 +18,7 @@ export default async function PrivateLayout({children}: { children: React.ReactN
         await getMe();
     } catch (error) {
         if (isRedirectToLoginError(error)) {
-            redirect("/login");
+            redirect("/");
         }
         throw error;
     }

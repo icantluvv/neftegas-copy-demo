@@ -54,14 +54,14 @@ describe('<SidebarNav />', () => {
 		await expect.element(view.getByRole('button', { name: 'Выйти' })).toBeVisible()
 	})
 
-	it('вызывает мутацию выхода и перенаправляет на /login при успехе', async () => {
+	it('вызывает мутацию выхода и перенаправляет на / при успехе', async () => {
 		const view = await render(<SidebarNav />)
 
 		await view.getByRole('button', { name: 'Выйти' }).click()
 		state.onSuccess?.()
 
 		expect(state.mutateMock).toHaveBeenCalled()
-		expect(useRouter().replace).toHaveBeenCalledWith('/login')
+		expect(useRouter().replace).toHaveBeenCalledWith('/')
 	})
 
 	it('показывает тост с ошибкой при неудачном выходе и не перенаправляет', async () => {

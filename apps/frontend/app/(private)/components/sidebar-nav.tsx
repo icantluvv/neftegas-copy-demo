@@ -20,7 +20,7 @@ export function SidebarNav() {
   const logout = useLogout({
     mutation: {
       onSuccess: () => {
-        router.replace("/login");
+        router.replace("/");
       },
       onError: () => {
         toast.error("Не удалось выйти из аккаунта");
