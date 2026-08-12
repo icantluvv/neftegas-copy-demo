@@ -108,10 +108,25 @@ describe('<NotificationsTable />', () => {
 		]
 		const view = await renderWithQueryClient(<NotificationsTable />)
 
-		await view.getByRole('checkbox', { name: 'Только непрочитанные' }).click()
+		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
+		await view.getByRole('option', { name: 'Только непрочитанные' }).click()
 
 		await expect.element(view.getByText('Событие А')).toBeVisible()
 		await expect.element(view.getByText('Событие Б')).not.toBeInTheDocument()
+	})
+
+	it('фильтр «Только прочитанные» скрывает непрочитанные записи', async () => {
+		state.notifications = [
+			notification({ id: 1, text: 'Событие А', isRead: false }),
+			notification({ id: 2, text: 'Событие Б', isRead: true }),
+		]
+		const view = await renderWithQueryClient(<NotificationsTable />)
+
+		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
+		await view.getByRole('option', { name: 'Только прочитанные' }).click()
+
+		await expect.element(view.getByText('Событие Б')).toBeVisible()
+		await expect.element(view.getByText('Событие А')).not.toBeInTheDocument()
 	})
 
 	it('выключение фильтра возвращает полный список', async () => {
@@ -121,8 +136,10 @@ describe('<NotificationsTable />', () => {
 		]
 		const view = await renderWithQueryClient(<NotificationsTable />)
 
-		await view.getByRole('checkbox', { name: 'Только непрочитанные' }).click()
-		await view.getByRole('checkbox', { name: 'Только непрочитанные' }).click()
+		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
+		await view.getByRole('option', { name: 'Только непрочитанные' }).click()
+		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
+		await view.getByRole('option', { name: 'Все' }).click()
 
 		await expect.element(view.getByText('Событие Б')).toBeVisible()
 	})

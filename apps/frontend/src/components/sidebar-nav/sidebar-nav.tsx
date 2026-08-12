@@ -41,7 +41,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
                 size="icon"
                 aria-label={isOpen ? "Закрыть меню" : "Открыть меню"}
                 onClick={() => setIsOpen((open) => !open)}
-                className="fixed top-4 right-4 z-50 size-9 bg-sidebar text-sidebar-foreground hover:bg-sidebar hover:text-sidebar-foreground md:hidden"
+                className="fixed top-2 left-4 z-50 size-9 bg-sidebar text-sidebar-foreground hover:bg-sidebar hover:text-sidebar-foreground md:hidden"
             >
                 {isOpen ? <X className="size-5"/> : <Menu className="size-5"/>}
             </Button>
@@ -57,9 +57,9 @@ export function SidebarNav({user}: { user: AuthUser }) {
                         <div
                             data-testid="sidebar-logo"
                             aria-hidden="true"
-                            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10"
+                            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white/10"
                         />
-                        <span className="text-sm font-semibold">Черноморнефтегаз</span>
+                        <span className="text-sm font-semibold uppercase">Черноморнефтегаз</span>
                     </div>
 
                     <nav className="flex flex-col gap-1">

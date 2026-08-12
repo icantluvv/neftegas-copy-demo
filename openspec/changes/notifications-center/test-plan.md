@@ -26,8 +26,9 @@ P1
 | Страница полного списка уведомлений | Непрочитанные записи выделены на странице | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Страница полного списка уведомлений | Пустой список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts`, `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
-| Фильтр «Только непрочитанные» на странице уведомлений | Включение фильтра скрывает прочитанные записи | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
-| Фильтр «Только непрочитанные» на странице уведомлений | Выключение фильтра возвращает полный список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
+| Фильтр по статусу прочтения на странице уведомлений | Фильтр «Только непрочитанные» скрывает прочитанные записи | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
+| Фильтр по статусу прочтения на странице уведомлений | Фильтр «Только прочитанные» скрывает непрочитанные записи | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
+| Фильтр по статусу прочтения на странице уведомлений | Значение «Все» возвращает полный список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts`, `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие панели не меняет статус прочитанности | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие карточки корректировки напрямую не помечает уведомления прочитанными | P2 | Manual | — | Done (manual) — обоснование ниже в разделе Manual checks |
@@ -45,7 +46,7 @@ P1
 
 ### Component
 - [x] `NotificationBell`: бейдж (0 / 1-9 / 9+), открытие/закрытие панели (клик/повторный клик/клик вне/Escape), содержимое панели (7 записей, выделение непрочитанных, пустое состояние, ссылка «Все уведомления», отсутствие кнопки массовой пометки), клик по записи (пометка + переход), фоновый опрос 60s.
-- [x] `NotificationsTable`: колонки, выделение непрочитанных, пустое состояние, кнопка «Открыть», фильтр «Только непрочитанные», «Отметить все прочитанными».
+- [x] `NotificationsTable`: колонки (сортировка через TanStack Table), выделение непрочитанных, пустое состояние, кнопка «Открыть», фильтр по статусу прочтения (Все / Только непрочитанные / Только прочитанные), «Отметить все прочитанными».
 
 ### Integration
 _(не вводится отдельный frontend integration-уровень — см. `design.md`)_

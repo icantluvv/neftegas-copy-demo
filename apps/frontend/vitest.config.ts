@@ -65,6 +65,7 @@ export default defineConfig({
 		include: [
 			'@base-ui/react/button',
 			'@base-ui/react/input',
+			'@base-ui/react/select',
 			'@hookform/resolvers/zod',
 			'@t3-oss/env-nextjs',
 			'@tanstack/react-query',
