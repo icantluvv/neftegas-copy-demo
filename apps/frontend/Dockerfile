@@ -4,7 +4,13 @@ COPY package.json bun.lock ./
 COPY packages/api/package.json ./packages/api/package.json
 RUN bun install --frozen-lockfile
 EXPOSE 3000
-CMD ["bun", "run", "dev"]
+# node_modules живёт в именованном volume (см. docker-compose.dev.yml) и
+# переживает ребилд образа — `bun install` из шага выше на уже созданном
+# volume не выполняется повторно. `bun install` при каждом старте
+# синхронизирует volume с bun.lock (быстро, если ничего не менялось) — без
+# этого добавление зависимости в package.json приводит к ошибке модуля до
+# ручного docker exec bun install.
+CMD ["sh", "-c", "bun install --frozen-lockfile && bun run dev"]
 
 FROM oven/bun:1.3 AS build
 WORKDIR /app

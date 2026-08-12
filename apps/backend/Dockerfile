@@ -3,7 +3,13 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 EXPOSE 4000
-CMD ["npm", "run", "start:dev"]
+# node_modules живёт в именованном volume (см. docker-compose.dev.yml) и
+# переживает ребилд образа, поэтому `npm ci` из шага выше на уже созданном
+# volume не выполняется повторно. `npm install` при каждом старте
+# синхронизирует volume с package-lock.json (быстро, если ничего не менялось)
+# — без этого добавление зависимости в package.json приводит к
+# "Cannot find module" в watch-режиме до ручного docker exec npm install.
+CMD ["sh", "-c", "npm install && npm run start:dev"]
 
 FROM node:24-alpine AS build
 WORKDIR /app
