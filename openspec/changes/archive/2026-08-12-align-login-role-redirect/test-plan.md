@@ -14,25 +14,24 @@ P1
 | Состояние кнопки «Войти» во время запроса | Кнопка заблокирована во время запроса | P2 | Component | `apps/frontend/app/(public)/components/login-form.component.test.tsx` | Done |
 | Единое сообщение об ошибке аутентификации | Неверный email или пароль | P1 | Backend e2e + Component | `apps/backend/test/auth.e2e-spec.ts`, `login-form.component.test.tsx` | Done |
 | Сообщение об ошибке сервера при попытке входа | Ошибка сервера при входе | P2 | Component | `apps/frontend/app/(public)/components/login-form.component.test.tsx` | Done |
-| Редирект после входа по роли пользователя | Успешный вход пользователя с ролью FILIAL | P0 | E2E | `apps/frontend/e2e/login.e2e.spec.ts` | Written, not run — см. примечание ниже |
-| Редирект после входа по роли пользователя | Успешный вход пользователя с ролью CFO | P0 | E2E | `apps/frontend/e2e/login.e2e.spec.ts` | Written, not run — см. примечание ниже |
+| Редирект после входа по роли пользователя | Успешный вход пользователя с ролью FILIAL | P0 | E2E | `apps/frontend/e2e/dashboard.e2e.spec.ts` | Superseded — см. примечание ниже |
+| Редирект после входа по роли пользователя | Успешный вход пользователя с ролью CFO | P0 | E2E | `apps/frontend/e2e/dashboard.e2e.spec.ts` | Superseded — см. примечание ниже |
 | Редирект после входа по роли пользователя | Успешный вход пользователя с ролью DTOE | P1 | Component | `login-form.component.test.tsx` | Done |
 | Доступ к ролевому разделу только для соответствующей роли | Пользователь открывает свой раздел | P1 | Backend e2e | `apps/backend/test/corrections-stats.e2e-spec.ts` | Done |
-| Доступ к ролевому разделу только для соответствующей роли | Пользователь открывает чужой раздел напрямую | P0 | E2E + Backend e2e | `apps/frontend/e2e/login.e2e.spec.ts` (написан, не прогнан), `apps/backend/test/corrections-stats.e2e-spec.ts` (done) | Backend done, E2E written not run |
+| Доступ к ролевому разделу только для соответствующей роли | Пользователь открывает чужой раздел напрямую | P0 | E2E + Backend e2e | `apps/frontend/e2e/dashboard.e2e.spec.ts` (эквивалент), `apps/backend/test/corrections-stats.e2e-spec.ts` (done) | Superseded — см. примечание ниже |
 | Доступ к ролевому разделу только для соответствующей роли | Неавторизованный пользователь пытается открыть ролевой раздел | P2 | Manual (существующее поведение `(private)/layout.tsx`, не меняется этим change) | — | Waived — покрыто существующим поведением, вне изменений этого change |
 
-**Примечание про E2E (P0)**: `apps/frontend/e2e/login.e2e.spec.ts` написан и покрывает все три
-сценария (FILIAL→/filial, CFO→/cfo, CFO→/dtoe→«Доступ запрещён»), но не был запущен
-в этой рабочей сессии — уже поднятый локальный dev-стек в Docker собран с
-`NEXT_PUBLIC_MOCK_MODE=true` (значение зашито в клиентский бандл на старте `next dev`,
-из-за чего логин отвечает случайными фейковыми данными вместо реального бэкенда), а
-попытка поднять чистый локальный `next dev` с `MOCK_MODE=false` уперлась в отдельный,
-не связанный с этим change баг окружения (Node.js 24: флаг `--env-file` нельзя
-передать через `NODE_OPTIONS`, а `next dev` прокидывает `execArgv` в дочерний процесс).
-По решению пользователя — не терять время на устранение этого дальше в рамках change;
-тесты нужно прогнать в CI или в пересобранном контейнере без mock-режима перед
-архивированием change. До первого успешного прогона P0-сценарии остаются
-формально непокрытыми автотестом (написанный тест не верифицирован).
+**Примечание про E2E (P0)**: изначально `apps/frontend/e2e/login.e2e.spec.ts` был написан
+для покрытия этих сценариев (FILIAL→/filial, CFO→/cfo, CFO→/dtoe→«Доступ запрещён»), но не
+был прогнан в исходной сессии (dev-стек с `NEXT_PUBLIC_MOCK_MODE=true`). Позже change
+`sidebar-nav-and-role-dashboard` заменил маршруты `/filial`, `/cfo`, `/dtoe` единым
+`/dashboard` и удалил их целиком — `login.e2e.spec.ts` устарел (проверял
+несуществующие маршруты, 3/3 падал) и был удалён. Требования этого change
+(«Редирект после входа по роли», «Доступ к ролевому разделу только для своей роли»)
+формально сняты (`REMOVED`) в спеках `sidebar-nav-and-role-dashboard`; наблюдаемое
+поведение — вход под каждой ролью ведёт на верный ролевой экран — сохранено и
+верифицировано в `apps/frontend/e2e/dashboard.e2e.spec.ts` (4/4 зелёные), только целевой
+маршрут теперь один для всех ролей.
 
 ## Required automated tests
 
@@ -51,10 +50,7 @@ _(нет — вся логика этого change покрывается на c
 _(не вводится — см. правило проекта: отдельный frontend integration-уровень не создаётся)_
 
 ### E2E
-- [x] Написан: успешный вход `FILIAL` → редирект на `/filial`
-- [x] Написан: успешный вход `CFO` → редирект на `/cfo`
-- [x] Написан: `CFO` открывает `/dtoe` напрямую по URL → экран «Доступ запрещён»
-- [ ] **Не прогнан** ни один из трёх — см. примечание в Scenario coverage
+- [x] Эквивалент реализован в `apps/frontend/e2e/dashboard.e2e.spec.ts` (4/4 зелёные) — см. примечание в Scenario coverage; исходный `login.e2e.spec.ts` устарел и удалён вместе с маршрутами `/filial`, `/cfo`, `/dtoe`
 
 ### Backend (Jest e2e/feature)
 - [x] `POST /auth/login`: некорректный формат email → `400` (`apps/backend/test/auth.e2e-spec.ts`)
