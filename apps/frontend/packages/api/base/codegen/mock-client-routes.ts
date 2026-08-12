@@ -3,6 +3,7 @@
 import type { MockRoute } from '../mock-client'
 import { createGetCorrectionStatsFilialQueryResponse } from './mocks/correctionsController/createGetCorrectionStatsFilial'
 import { createGetCorrectionStatsDtoeQueryResponse } from './mocks/correctionsController/createGetCorrectionStatsDtoe'
+import { createMarkAllNotificationsReadMutationResponse } from './mocks/notificationsController/createMarkAllNotificationsRead'
 import { createGetCorrectionStatsCfoQueryResponse } from './mocks/correctionsController/createGetCorrectionStatsCfo'
 import { createGetFilialCfoLinksQueryResponse } from './mocks/orgController/createGetFilialCfoLinks'
 import { createCreateFilialCfoLinkMutationResponse } from './mocks/orgController/createCreateFilialCfoLink'
@@ -55,6 +56,7 @@ import { createDeleteRemarkMutationResponse } from './mocks/correctionsControlle
 export const mockRoutes = [
 	{ method: 'GET', pattern: /^\/corrections\/stats\/filial$/, create: createGetCorrectionStatsFilialQueryResponse },
 	{ method: 'GET', pattern: /^\/corrections\/stats\/dtoe$/, create: createGetCorrectionStatsDtoeQueryResponse },
+	{ method: 'POST', pattern: /^\/notifications\/read-all$/, create: createMarkAllNotificationsReadMutationResponse },
 	{ method: 'GET', pattern: /^\/corrections\/stats\/cfo$/, create: createGetCorrectionStatsCfoQueryResponse },
 	{ method: 'GET', pattern: /^\/org\/filial-cfo-links$/, create: createGetFilialCfoLinksQueryResponse },
 	{ method: 'POST', pattern: /^\/org\/filial-cfo-links$/, status: 201, create: createCreateFilialCfoLinkMutationResponse },
