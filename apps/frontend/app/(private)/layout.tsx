@@ -26,7 +26,7 @@ export default async function PrivateLayout({children}: { children: React.ReactN
     return (
         <div className="flex min-h-svh">
             <SidebarNav/>
-            <div className="w-full md:w-4/5">{children}</div>
+            <div className="w-full flex-1 min-h-screen md:w-4/5">{children}</div>
         </div>
     );
 }
