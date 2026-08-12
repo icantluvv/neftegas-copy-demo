@@ -1,6 +1,6 @@
 ## 1. API
 
-- [ ] 1.1 [api] Подтвердить, что `api/src/openapi.yaml` уже полностью описывает
+- [x] 1.1 [api] Подтвердить, что `api/src/openapi.yaml` уже полностью описывает
       карточку корректировки (`CorrectionDetail`, все use-case эндпоинты из
       `design.md` — API Shape) без необходимости изменений; сверить со
       `apps/backend/src/corrections/corrections.controller.ts` и
@@ -8,6 +8,17 @@
       `apps/frontend/packages/api/base/codegen/` расходятся с текущим
       `openapi.yaml`, перегенерировать Kubb-клиент штатной командой (без ручного
       редактирования `codegen/`).
+
+      Найдено расхождение: `DocumentSlot` не содержал `isRequired` и
+      `responsibleCfo`, нужные для колонок «Обязателен» и «Проверяет ЦФО» блока
+      «Комплектность пакета» (proposal.md, 4.2). Данные уже загружались через
+      связь `slots.requirement`/`requirement.responsibleCfo` — не хватало
+      только маппинга. Исправлено аддитивно, без breaking changes: добавлены
+      поля в `api/src/components/schemas/document-slot.yaml`, маппинг в
+      `apps/backend/src/corrections/corrections.mapper.ts` (`toDocumentSlotDto`),
+      relation `slots.requirement.responsibleCfo` в `corrections.service.ts`
+      (`DETAIL_RELATIONS`); Kubb-клиент перегенерирован. `npm run lint` (api),
+      `npx tsc --noEmit` (backend и frontend) — зелёные. Commit `231a518`.
 
 ## 2. Backend
 
