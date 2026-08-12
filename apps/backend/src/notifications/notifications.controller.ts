@@ -1,4 +1,12 @@
-import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -18,5 +26,11 @@ export class NotificationsController {
   @Post(':id/open')
   open(@CurrentUser() user: User, @Param('id', ParseIntPipe) id: number) {
     return this.service.open(user, id);
+  }
+
+  @Post('read-all')
+  @HttpCode(HttpStatus.OK)
+  readAll(@CurrentUser() user: User) {
+    return this.service.markAllRead(user);
   }
 }

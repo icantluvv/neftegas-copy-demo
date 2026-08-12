@@ -1,15 +1,15 @@
 ## 1. API
 
-- [ ] 1.1 [api] Добавить `api/src/paths/notifications-read-all.yaml` (`POST /notifications/read-all`, request без тела, response `200 { updatedCount: integer }`, `401` без авторизации) и зарегистрировать путь в `api/src/openapi.yaml`; выполнить `npm run lint` из `api/` (и `npm run bundle`, если требуется схемой проекта). `GET /notifications` и `POST /notifications/:id/open` контракт не меняют — подтвердить явно.
+- [x] 1.1 [api] Добавить `api/src/paths/notifications-read-all.yaml` (`POST /notifications/read-all`, request без тела, response `200 { updatedCount: integer }`, `401` без авторизации) и зарегистрировать путь в `api/src/openapi.yaml`; выполнить `npm run lint` из `api/` (и `npm run bundle`, если требуется схемой проекта). `GET /notifications` и `POST /notifications/:id/open` контракт не меняют — подтвердить явно.
 
 ## 2. Backend
 
-- [ ] 2.1 [backend] Написать падающий unit-тест `NotificationsService.markAllRead`: помечает прочитанными только уведомления текущего пользователя (не задевает чужие записи), идемпотентен при повторном вызове (0 обновлений без ошибки), возвращает число реально обновлённых записей.
-- [ ] 2.2 [backend] Реализовать `NotificationsService.markAllRead(user)` (одним `UPDATE` по `userId` и `isRead = false`) — минимальная реализация до green.
-- [ ] 2.3 [backend] Добавить `NotificationsController.readAll` (`POST /notifications/read-all`, `@CurrentUser()`), задействовать `NotificationsService.markAllRead`.
-- [ ] 2.4 [backend] Написать падающий e2e-тест (`apps/backend/test/*.e2e-spec.ts`): `POST /notifications/read-all` без токена → `401`; с токеном → `200`, последующий `GET /notifications` возвращает все записи с `isRead: true`.
-- [ ] 2.5 [backend] Прогнать e2e до green, при необходимости доработать guard/сериализацию ответа.
-- [ ] 2.6 [backend] `npm run lint` и `npm run test` из `apps/backend`.
+- [x] 2.1 [backend] Написать падающий unit-тест `NotificationsService.markAllRead`: помечает прочитанными только уведомления текущего пользователя (не задевает чужие записи), идемпотентен при повторном вызове (0 обновлений без ошибки), возвращает число реально обновлённых записей.
+- [x] 2.2 [backend] Реализовать `NotificationsService.markAllRead(user)` (одним `UPDATE` по `userId` и `isRead = false`) — минимальная реализация до green.
+- [x] 2.3 [backend] Добавить `NotificationsController.readAll` (`POST /notifications/read-all`, `@CurrentUser()`), задействовать `NotificationsService.markAllRead`.
+- [x] 2.4 [backend] Написать падающий e2e-тест (`apps/backend/test/*.e2e-spec.ts`): `POST /notifications/read-all` без токена → `401`; с токеном → `200`, последующий `GET /notifications` возвращает все записи с `isRead: true`.
+- [x] 2.5 [backend] Прогнать e2e до green, при необходимости доработать guard/сериализацию ответа (потребовался явный `@HttpCode(HttpStatus.OK)` — Nest по умолчанию отвечает 201 на POST).
+- [x] 2.6 [backend] `npm run lint` и `npm run test` из `apps/backend` (lint: 0 ошибок в файлах этой задачи; 15 ошибок/3 предупреждения — pre-existing debt в незатронутых файлах `auth.controller.ts`, `current-user.decorator.ts`, `roles.guard.ts`, `session-auth.guard.ts(.spec.ts)`, `corrections.mapper.ts`, `corrections.service.ts`, `main.ts`; test: 15/15 green).
 
 ## 3. Frontend
 

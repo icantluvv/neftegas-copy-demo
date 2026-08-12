@@ -109,6 +109,8 @@ paths:
     $ref: './paths/notifications.yaml'
   /notifications/{id}/open:
     $ref: './paths/notifications-id-open.yaml'
+  /notifications/read-all:
+    $ref: './paths/notifications-read-all.yaml'
 
 components:
   securitySchemes:

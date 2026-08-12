@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -19,7 +23,10 @@ function toDto(notification: Notification) {
 
 @Injectable()
 export class NotificationsService {
-  constructor(@InjectRepository(Notification) private notifications: Repository<Notification>) {}
+  constructor(
+    @InjectRepository(Notification)
+    private notifications: Repository<Notification>,
+  ) {}
 
   async findForUser(user: User) {
     const rows = await this.notifications.find({
@@ -31,11 +38,22 @@ export class NotificationsService {
   }
 
   async open(user: User, id: number) {
-    const notification = await this.notifications.findOne({ where: { id }, relations: ['correction'] });
+    const notification = await this.notifications.findOne({
+      where: { id },
+      relations: ['correction'],
+    });
     if (!notification) throw new NotFoundException();
     if (notification.userId !== user.id) throw new ForbiddenException();
     notification.isRead = true;
     await this.notifications.save(notification);
     return toDto(notification);
+  }
+
+  async markAllRead(user: User) {
+    const result = await this.notifications.update(
+      { userId: user.id, isRead: false },
+      { isRead: true },
+    );
+    return { updatedCount: result.affected ?? 0 };
   }
 }

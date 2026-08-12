@@ -1,0 +1,15 @@
+post:
+  summary: Отметить все уведомления текущего пользователя прочитанными
+  operationId: markAllNotificationsRead
+  tags: [Notifications]
+  description: Идемпотентно — уже прочитанные записи повторно не пересчитываются.
+  responses:
+    '200':
+      description: Уведомления помечены прочитанными
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [updatedCount]
+            properties:
+              updatedCount: { type: integer, description: 'Число записей, реально переведённых из непрочитанных в прочитанные' }

@@ -33,13 +33,13 @@ P1
 | Один и тот же список уведомлений для обоих входов | Пометка прочитанным в панели отражается на странице | P1 | Component | `notification-bell.component.test.tsx` | Planned |
 | Один и тот же список уведомлений для обоих входов | Пометка прочитанным на странице отражается в панели | P1 | Component | `notifications-table.component.test.tsx` | Planned |
 | Уведомления не создаются о промежуточном согласовании отдельным ЦФО | Промежуточное согласование не создаёт уведомление | P1 | Backend Unit (уже покрыто существующим `corrections.service.spec.ts`) | `apps/backend/src/corrections/corrections.service.spec.ts` | Existing coverage — waiver на дублирование |
-| API: `POST /notifications/read-all` | Помечает прочитанными только свои уведомления, идемпотентен | P0 | Backend Unit | `notifications.service.spec.ts` | Planned |
-| API: `POST /notifications/read-all` | HTTP-контракт: 401 без токена, 200 с токеном | P0 | Backend E2E | `notifications.e2e-spec.ts` | Planned |
+| API: `POST /notifications/read-all` | Помечает прочитанными только свои уведомления, идемпотентен | P0 | Backend Unit | `apps/backend/src/notifications/notifications.service.spec.ts` | Done |
+| API: `POST /notifications/read-all` | HTTP-контракт: 401 без токена, 200 с токеном | P0 | Backend E2E | `apps/backend/test/notifications.e2e-spec.ts` | Done |
 
 ## Required automated tests
 
 ### Unit
-- [ ] Backend: `NotificationsService.markAllRead` — скоуп по пользователю, идемпотентность, число обновлённых записей.
+- [x] Backend: `NotificationsService.markAllRead` — скоуп по пользователю, идемпотентность, число обновлённых записей.
 - [ ] Frontend: конфигурация `refetchInterval: 60_000` у query-хука уведомлений.
 
 ### Component
