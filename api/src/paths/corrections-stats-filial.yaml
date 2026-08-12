@@ -1,0 +1,16 @@
+get:
+  summary: Статистика по корректировкам для раздела филиала
+  operationId: getCorrectionStatsFilial
+  tags: [Corrections]
+  description: Доступно только пользователю роли FILIAL.
+  responses:
+    '200':
+      description: Агрегированные счётчики в рамках видимости роли FILIAL
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-stats.yaml' }
+    '403':
+      description: У пользователя не роль FILIAL
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

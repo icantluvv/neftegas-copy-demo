@@ -1,0 +1,16 @@
+get:
+  summary: Статистика по корректировкам для раздела ДТОиР
+  operationId: getCorrectionStatsDtoe
+  tags: [Corrections]
+  description: Доступно только пользователю роли DTOE.
+  responses:
+    '200':
+      description: Агрегированные счётчики в рамках видимости роли DTOE
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-stats.yaml' }
+    '403':
+      description: У пользователя не роль DTOE
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

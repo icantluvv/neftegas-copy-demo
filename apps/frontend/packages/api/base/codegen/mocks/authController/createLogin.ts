@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Login200, Login401, LoginMutationRequest, LoginMutationResponse } from "../../types/authController/Login";
+import type { Login200, Login400, Login401, LoginMutationRequest, LoginMutationResponse } from "../../types/authController/Login";
 import { createAuthUser } from "../createAuthUser";
 import { createErrorResponse2 } from "../createErrorResponse2";
 import { createLoginRequest } from "../createLoginRequest";
@@ -18,7 +18,15 @@ export function createLogin200(data?: Partial<Login200>): Login200 {
 }
 
 /**
- * @description Неверный логин/пароль или заблокированная учётная запись
+ * @description Некорректный формат email
+ */
+export function createLogin400(data?: Partial<Login400>): Login400 {
+
+  return createErrorResponse2(data)
+}
+
+/**
+ * @description Неверный email/пароль или заблокированная учётная запись
  */
 export function createLogin401(data?: Partial<Login401>): Login401 {
 

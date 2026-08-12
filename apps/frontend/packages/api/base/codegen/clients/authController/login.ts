@@ -5,7 +5,7 @@
 
 import fetch from "../../../client";
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { LoginMutationRequest, LoginMutationResponse, Login401 } from "../../types/authController/Login";
+import type { LoginMutationRequest, LoginMutationResponse, Login400, Login401 } from "../../types/authController/Login";
 import { loginMutationResponseSchema, loginMutationRequestSchema } from "../../zod/authController/loginSchema";
 
 function getLoginUrl() {
@@ -14,7 +14,7 @@ function getLoginUrl() {
 }
 
 /**
- * @summary Вход по логину и паролю
+ * @summary Вход по email и паролю
  * {@link /auth/login}
  */
 export async function login({ data }: { data: LoginMutationRequest }, config: Partial<RequestConfig<LoginMutationRequest>> & { client?: Client } = {}) {
@@ -22,6 +22,6 @@ export async function login({ data }: { data: LoginMutationRequest }, config: Pa
 
   const requestData = loginMutationRequestSchema.parse(data)
 
-  const res = await request<LoginMutationResponse, ResponseErrorConfig<Login401>, LoginMutationRequest>({ method : "POST", url : getLoginUrl().url.toString(), data : requestData, ... requestConfig })
+  const res = await request<LoginMutationResponse, ResponseErrorConfig<Login400 | Login401>, LoginMutationRequest>({ method : "POST", url : getLoginUrl().url.toString(), data : requestData, ... requestConfig })
   return loginMutationResponseSchema.parse(res.data)
 }

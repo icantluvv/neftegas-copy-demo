@@ -6,6 +6,6 @@
 import * as z from "zod/mini";
 
 export const loginRequestSchema = z.object({
-    "username": z.string(),
+    "email": z.email(),
 "password": z.string()
     })

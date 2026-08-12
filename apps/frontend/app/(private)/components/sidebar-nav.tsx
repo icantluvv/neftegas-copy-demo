@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLogout } from "@/packages/api/base/codegen";
 
-const navItems = [{ href: "/dashboard", label: "Дашборд" }];
+const navItems: { href: string; label: string }[] = [];
 
 export function SidebarNav() {
   const pathname = usePathname();

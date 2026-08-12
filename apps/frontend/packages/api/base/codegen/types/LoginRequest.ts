@@ -6,9 +6,9 @@
 
 export interface LoginRequest {
     /**
-     * @type string
+     * @type string, email
     */
-    username: string;
+    email: string;
     /**
      * @type string, password
     */

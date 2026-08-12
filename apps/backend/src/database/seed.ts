@@ -14,7 +14,10 @@ import { Cfo } from '../org/entities/cfo.entity';
 import { CorrectionType } from '../org/entities/correction-type.entity';
 import { FilialCfoLink } from '../org/entities/filial-cfo-link.entity';
 import { Filial } from '../org/entities/filial.entity';
-import { PackageRequirement, PackageRequirementKind } from '../org/entities/package-requirement.entity';
+import {
+  PackageRequirement,
+  PackageRequirementKind,
+} from '../org/entities/package-requirement.entity';
 import { Role, User } from '../users/entities/user.entity';
 
 /**
@@ -59,7 +62,9 @@ async function main() {
   const userRepo = dataSource.getRepository(User);
 
   if (await userRepo.exist({ where: {} })) {
-    console.log('В базе уже есть пользователи — сид пропущен (не перезаписываю данные).');
+    console.log(
+      'В базе уже есть пользователи — сид пропущен (не перезаписываю данные).',
+    );
     await dataSource.destroy();
     return;
   }
@@ -79,7 +84,11 @@ async function main() {
 
   for (const filial of filials) {
     for (const cfo of cfos) {
-      await linkRepo.save({ filialId: filial.id, cfoId: cfo.id, isActive: true });
+      await linkRepo.save({
+        filialId: filial.id,
+        cfoId: cfo.id,
+        isActive: true,
+      });
     }
   }
 
@@ -114,13 +123,41 @@ async function main() {
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
   await userRepo.save([
-    { username: 'filial', passwordHash, role: Role.FILIAL, filialId: filials[0].id, firstName: 'Филиал', lastName: 'Демо' },
-    { username: 'cfo', passwordHash, role: Role.CFO, cfoId: cfos[0].id, firstName: 'ЦФО', lastName: 'Демо' },
-    { username: 'dtoe', passwordHash, role: Role.DTOE, firstName: 'ДТОиР', lastName: 'Демо' },
-    { username: 'admin', passwordHash, role: Role.ADMIN, firstName: 'Админ', lastName: 'Демо' },
+    {
+      username: 'filial@demo.local',
+      passwordHash,
+      role: Role.FILIAL,
+      filialId: filials[0].id,
+      firstName: 'Филиал',
+      lastName: 'Демо',
+    },
+    {
+      username: 'cfo@demo.local',
+      passwordHash,
+      role: Role.CFO,
+      cfoId: cfos[0].id,
+      firstName: 'ЦФО',
+      lastName: 'Демо',
+    },
+    {
+      username: 'dtoe@demo.local',
+      passwordHash,
+      role: Role.DTOE,
+      firstName: 'ДТОиР',
+      lastName: 'Демо',
+    },
+    {
+      username: 'admin@demo.local',
+      passwordHash,
+      role: Role.ADMIN,
+      firstName: 'Админ',
+      lastName: 'Демо',
+    },
   ]);
 
-  console.log(`Сид завершён. Логины: filial / cfo / dtoe / admin, пароль для всех: ${DEMO_PASSWORD}`);
+  console.log(
+    `Сид завершён. Логины: filial@demo.local / cfo@demo.local / dtoe@demo.local / admin@demo.local, пароль для всех: ${DEMO_PASSWORD}`,
+  );
   await dataSource.destroy();
 }
 

@@ -69,6 +69,12 @@ paths:
     $ref: './paths/corrections.yaml'
   /corrections/stats:
     $ref: './paths/corrections-stats.yaml'
+  /corrections/stats/filial:
+    $ref: './paths/corrections-stats-filial.yaml'
+  /corrections/stats/cfo:
+    $ref: './paths/corrections-stats-cfo.yaml'
+  /corrections/stats/dtoe:
+    $ref: './paths/corrections-stats-dtoe.yaml'
   /corrections/{humanId}:
     $ref: './paths/corrections-human-id.yaml'
   /corrections/{humanId}/slots/{slotId}/files:

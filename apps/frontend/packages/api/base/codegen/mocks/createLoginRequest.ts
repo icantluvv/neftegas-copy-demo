@@ -9,7 +9,7 @@ import { faker } from "@faker-js/faker";
 export function createLoginRequest(data?: Partial<LoginRequest>): LoginRequest {
 
   return {
-    ...{"username": faker.string.alpha(),"password": faker.string.alpha()},
+    ...{"email": faker.internet.email(),"password": faker.string.alpha()},
     ...data || {}
   }
 }

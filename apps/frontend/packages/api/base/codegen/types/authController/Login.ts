@@ -13,7 +13,12 @@ import type { LoginRequest } from "../LoginRequest";
 export type Login200 = AuthUser;
 
 /**
- * @description Неверный логин/пароль или заблокированная учётная запись
+ * @description Некорректный формат email
+*/
+export type Login400 = ErrorResponse2;
+
+/**
+ * @description Неверный email/пароль или заблокированная учётная запись
 */
 export type Login401 = ErrorResponse2;
 
@@ -24,5 +29,5 @@ export type LoginMutationResponse = Login200;
 export type LoginMutation = {
     Response: Login200;
     Request: LoginMutationRequest;
-    Errors: Login401;
+    Errors: Login400 | Login401;
 };

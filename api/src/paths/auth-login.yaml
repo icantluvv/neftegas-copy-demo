@@ -1,5 +1,5 @@
 post:
-  summary: Вход по логину и паролю
+  summary: Вход по email и паролю
   operationId: login
   tags: [Auth]
   security: []
@@ -14,8 +14,13 @@ post:
       content:
         application/json:
           schema: { $ref: '../components/schemas/auth.yaml#/AuthUser' }
+    '400':
+      description: Некорректный формат email
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
     '401':
-      description: Неверный логин/пароль или заблокированная учётная запись
+      description: Неверный email/пароль или заблокированная учётная запись
       content:
         application/json:
           schema: { $ref: '../components/schemas/error-response.yaml' }

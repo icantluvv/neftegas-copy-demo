@@ -4,7 +4,7 @@
 */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { LoginMutationRequest, LoginMutationResponse, Login401 } from "../../types/authController/Login";
+import type { LoginMutationRequest, LoginMutationResponse, Login400, Login401 } from "../../types/authController/Login";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { login } from "../../clients/authController/login";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ export type LoginMutationKey = ReturnType<typeof loginMutationKey>
 export function loginMutationOptions<TContext = unknown>(config: Partial<RequestConfig<LoginMutationRequest>> & { client?: Client } = {}) {
 
         const mutationKey = loginMutationKey()
-        return mutationOptions<LoginMutationResponse, ResponseErrorConfig<Login401>, {data: LoginMutationRequest}, TContext>({
+        return mutationOptions<LoginMutationResponse, ResponseErrorConfig<Login400 | Login401>, {data: LoginMutationRequest}, TContext>({
           mutationKey,
           mutationFn: async({ data }) => {
             return login({ data }, config)
@@ -26,12 +26,12 @@ export function loginMutationOptions<TContext = unknown>(config: Partial<Request
 }
 
 /**
- * @summary Вход по логину и паролю
+ * @summary Вход по email и паролю
  * {@link /auth/login}
  */
 export function useLogin<TContext>(options: 
 {
-  mutation?: UseMutationOptions<LoginMutationResponse, ResponseErrorConfig<Login401>, {data: LoginMutationRequest}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<LoginMutationResponse, ResponseErrorConfig<Login400 | Login401>, {data: LoginMutationRequest}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<LoginMutationRequest>> & { client?: Client },
 }
  = {}) {
@@ -40,13 +40,13 @@ export function useLogin<TContext>(options:
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? loginMutationKey()
 
-          const baseOptions = loginMutationOptions(config) as UseMutationOptions<LoginMutationResponse, ResponseErrorConfig<Login401>, {data: LoginMutationRequest}, TContext>
+          const baseOptions = loginMutationOptions(config) as UseMutationOptions<LoginMutationResponse, ResponseErrorConfig<Login400 | Login401>, {data: LoginMutationRequest}, TContext>
           
 
-          return useMutation<LoginMutationResponse, ResponseErrorConfig<Login401>, {data: LoginMutationRequest}, TContext>({
+          return useMutation<LoginMutationResponse, ResponseErrorConfig<Login400 | Login401>, {data: LoginMutationRequest}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<LoginMutationResponse, ResponseErrorConfig<Login401>, {data: LoginMutationRequest}, TContext>
+          }, queryClient) as UseMutationResult<LoginMutationResponse, ResponseErrorConfig<Login400 | Login401>, {data: LoginMutationRequest}, TContext>
       
 }

@@ -25,11 +25,17 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<User | null> {
+  /**
+   * `email` сравнивается с колонкой `username` — она хранит логин пользователя.
+   * Полное согласование `User.username`/`User.email` с моделью из
+   * apps/backend/AGENTS.md вынесено в отдельный change (см. design.md Open
+   * Questions в change align-login-role-redirect).
+   */
+  async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.users
       .createQueryBuilder('user')
       .addSelect('user.passwordHash')
-      .where('user.username = :username', { username })
+      .where('user.username = :email', { email })
       .getOne();
     if (!user || !user.isActive || user.isLocked) {
       return null;
@@ -38,25 +44,14 @@ export class AuthService {
     return passwordMatches ? user : null;
   }
 
-  private signAccessToken(user: User) {
-    const payload: JwtPayload = { sub: user.id, role: user.role };
-    return this.jwt.sign(payload, {
-      secret: this.config.get('JWT_ACCESS_SECRET', 'dev-access-secret'),
-      expiresIn: ACCESS_TOKEN_TTL,
-    });
-  }
-
-  private signRefreshToken(user: User) {
-    const payload: JwtPayload = { sub: user.id, role: user.role };
-    return this.jwt.sign(payload, {
-      secret: this.config.get('JWT_REFRESH_SECRET', 'dev-refresh-secret'),
-      expiresIn: REFRESH_TOKEN_TTL,
-    });
-  }
-
   setAuthCookies(res: Response, user: User) {
     const secure = this.config.get('NODE_ENV') === 'production';
-    const common = { httpOnly: true, secure, sameSite: 'lax' as const, path: '/' };
+    const common = {
+      httpOnly: true,
+      secure,
+      sameSite: 'lax' as const,
+      path: '/',
+    };
     res.cookie(ACCESS_TOKEN_COOKIE, this.signAccessToken(user), {
       ...common,
       maxAge: ACCESS_TOKEN_MAX_AGE_MS,
@@ -72,7 +67,10 @@ export class AuthService {
     res.clearCookie(REFRESH_TOKEN_COOKIE, { path: '/' });
   }
 
-  async refresh(refreshToken: string | undefined, res: Response): Promise<User> {
+  async refresh(
+    refreshToken: string | undefined,
+    res: Response,
+  ): Promise<User> {
     if (!refreshToken) {
       throw new UnauthorizedException();
     }
@@ -90,5 +88,21 @@ export class AuthService {
     }
     this.setAuthCookies(res, user);
     return user;
+  }
+
+  private signAccessToken(user: User) {
+    const payload: JwtPayload = { sub: user.id, role: user.role };
+    return this.jwt.sign(payload, {
+      secret: this.config.get('JWT_ACCESS_SECRET', 'dev-access-secret'),
+      expiresIn: ACCESS_TOKEN_TTL,
+    });
+  }
+
+  private signRefreshToken(user: User) {
+    const payload: JwtPayload = { sub: user.id, role: user.role };
+    return this.jwt.sign(payload, {
+      secret: this.config.get('JWT_REFRESH_SECRET', 'dev-refresh-secret'),
+      expiresIn: REFRESH_TOKEN_TTL,
+    });
   }
 }

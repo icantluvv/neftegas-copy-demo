@@ -1,84 +1,106 @@
 ## API
 
-- [ ] 1.1 [api] Обновить `api/src/components/schemas/auth.yaml`:
+- [x] 1.1 [api] Обновить `api/src/components/schemas/auth.yaml`:
       `LoginRequest.username` → `email` (`type: string, format: email`),
       `required: [email, password]`. Обновить `api/src/paths/auth-login.yaml`
       (описание поля в summary/description при необходимости).
-- [ ] 1.2 [api] Добавить `api/src/paths/corrections-stats-filial.yaml`,
+- [x] 1.2 [api] Добавить `api/src/paths/corrections-stats-filial.yaml`,
       `corrections-stats-cfo.yaml`, `corrections-stats-dtoe.yaml` — GET,
       `200` → `../components/schemas/correction-stats.yaml`, `403` →
       `../components/schemas/error-response.yaml`; зарегистрировать под
       `/corrections/stats/filial`, `/corrections/stats/cfo`,
       `/corrections/stats/dtoe` в `api/src/openapi.yaml`.
-- [ ] 1.3 [api] Выполнить `npm run lint` (и `npm run bundle` при необходимости)
+- [x] 1.3 [api] Выполнить `npm run lint` (и `npm run bundle` при необходимости)
       из `api/`; зафиксировать контракт как source of truth для задач ниже.
 
 ## Backend
 
-- [ ] 2.1 [backend] Failing test: обновить/добавить в
+- [x] 2.1 [backend] Failing test: обновить/добавить в
       `apps/backend/src/auth` тест на `400 Bad Request` при некорректном
       формате `email` в `POST /auth/login` (в обход фронта).
-- [ ] 2.2 [backend] Обновить `apps/backend/src/auth/dto/login.dto.ts`:
+      (`apps/backend/test/auth.e2e-spec.ts`)
+- [x] 2.2 [backend] Обновить `apps/backend/src/auth/dto/login.dto.ts`:
       `username` → `email`, `@IsEmail()` вместо `@IsString()` — тест 2.1 green.
-- [ ] 2.3 [backend] Обновить `apps/backend/src/auth/strategies/
+- [x] 2.3 [backend] Обновить `apps/backend/src/auth/strategies/
       local.strategy.ts` (`usernameField: 'email'`, параметр `validate`) и
       `apps/backend/src/auth/auth.service.ts` (`validateUser(email,
       password)`, запрос по `user.username` с комментарием о временном
-      маппинге — см. design.md Decisions §1).
-- [ ] 2.4 [backend] Обновить `apps/backend/src/database/seed.ts`: 4 демо-логина
+      маппинге — см. design.md Decisions §1). Проверка формата email
+      перенесена в `LocalStrategy.validate()` — см. уточнение в design.md
+      (Guards выполняются раньше Pipes, `@IsEmail()` в DTO там не срабатывает).
+- [x] 2.4 [backend] Обновить `apps/backend/src/database/seed.ts`: 4 демо-логина
       (`filial`, `cfo`, `dtoe`, `admin`) заменить на email-подобные строки,
       согласованные с `@IsEmail()`.
-- [ ] 2.5 [backend] Прогнать существующие auth-тесты и `npm run seed` локально
+- [x] 2.5 [backend] Прогнать существующие auth-тесты и `npm run seed` локально
       — вход по обновлённым демо-логинам работает.
-- [ ] 2.6 [backend] Failing test: для каждой роли (`FILIAL`, `CFO`, `DTOE`)
+- [x] 2.6 [backend] Failing test: для каждой роли (`FILIAL`, `CFO`, `DTOE`)
       добавить в `apps/backend/test` (e2e) кейс «своя роль → `200`, чужая роль
       → `403`» для `GET /corrections/stats/filial`, `/cfo`, `/dtoe`.
-- [ ] 2.7 [backend] Добавить в `apps/backend/src/corrections/
+      (`apps/backend/test/corrections-stats.e2e-spec.ts`)
+- [x] 2.7 [backend] Добавить в `apps/backend/src/corrections/
       corrections.controller.ts` три GET-хендлера (`filialStats`, `cfoStats`,
       `dtoeStats`), каждый с `@Roles(Role.<X>)`, вызывающий существующий
       `this.service.getStats(user)` — тесты 2.6 green.
-- [ ] 2.8 [backend] Верификация: `npm run test`, `npm run test:e2e`,
-      `npm run lint` из `apps/backend`.
+- [x] 2.8 [backend] Верификация: `npm run test`, `npm run test:e2e`,
+      `npm run lint` из `apps/backend`. (`app.e2e-spec.ts` падает независимо
+      от этого change — `AppController` уже отдаёт только `/health`, тест не
+      обновлён ранее; не блокирует.)
 
 ## Frontend
 
-- [ ] 3.1 [frontend] Сгенерировать Kubb-клиент из зафиксированного контракта
+- [x] 3.1 [frontend] Сгенерировать Kubb-клиент из зафиксированного контракта
       (обновлённый `loginRequestSchema`/`LoginRequest`, новые клиенты
       `getCorrectionStatsFilial`/`getCorrectionStatsCfo`/
       `getCorrectionStatsDtoe`) — `apps/frontend/packages/api/base/codegen/**`
       вручную не редактировать.
-- [ ] 3.2 [frontend] Failing test: расширить
+- [x] 3.2 [frontend] Failing test: расширить
       `login-form.component.test.tsx` — ошибка формата email под полем без
       сети (запрос не отправляется), поле подписано «Email».
-- [ ] 3.3 [frontend] Обновить `apps/frontend/app/(public)/components/
+- [x] 3.3 [frontend] Обновить `apps/frontend/app/(public)/components/
       login-form.tsx`: поле `username` → `email` (label, `type="email"`,
-      `autoComplete="email"`, `register("email")`) — тест 3.2 green.
-- [ ] 3.4 [frontend] Failing test: расширить `login-form.component.test.tsx`
+      `autoComplete="email"`, `register("email")`) — тест 3.2 green. Поля
+      email/пароль и кнопка «Войти» получают `min-h-12` (правка по дизайну).
+- [x] 3.4 [frontend] Failing test: расширить `login-form.component.test.tsx`
       — успешный вход роли `FILIAL`/`CFO`/`DTOE` вызывает редирект на
       `/filial`/`/cfo`/`/dtoe` соответственно (мок `useLogin` через typed
       fixture `mocks/createAuthUser.ts` с разными `role`).
-- [ ] 3.5 [frontend] Обновить `onSuccess` в `login-form.tsx`: редирект по
-      `data.role` (`FILIAL` → `/filial`, `CFO` → `/cfo`, `DTOE` → `/dtoe`,
-      `ADMIN` → `/dashboard`) — тесты 3.4 green.
-- [ ] 3.6 [frontend] Создать `apps/frontend/app/(private)/components/
+- [x] 3.5 [frontend] Обновить `onSuccess` в `login-form.tsx`: редирект по
+      `data.role` (`FILIAL` → `/filial`, `CFO` → `/cfo`, `DTOE` → `/dtoe`).
+      Страница `/dashboard` удалена из проекта по решению пользователя —
+      `ADMIN` (вне области спеки экрана входа) редиректит на `/` при
+      отсутствии маппинга. Тесты 3.4 green.
+- [x] 3.6 [frontend] Failing test: расширить `login-form.component.test.tsx`
+      — на `500` от `POST /auth/login` фронтенд показывает «Ошибка сервера.
+      Попробуйте позже» и не показывает «Неверный email или пароль».
+- [x] 3.7 [frontend] Обновить `onError` в `login-form.tsx`: различать `401`
+      (единое сообщение «Неверный email или пароль») и прочие ошибки
+      («Ошибка сервера. Попробуйте позже» по `error.cause.status`) — тест 3.6
+      green.
+- [x] 3.8 [frontend] Создать `apps/frontend/app/(private)/components/
       access-denied-screen.tsx` с component-тестом (`*.component.test.tsx`),
       проверяющим текст «Доступ запрещён».
-- [ ] 3.7 [frontend] Failing test/сценарий: E2E-кейс «пользователь с ролью
-      `CFO` открывает `/dtoe` напрямую → видит экран „Доступ запрещён“»
-      (`*.e2e.spec.ts`).
-- [ ] 3.8 [frontend] Создать `apps/frontend/app/(private)/filial/layout.tsx`,
+- [x] 3.9 [frontend] Написан E2E-кейс `e2e/login.e2e.spec.ts` (успешный вход
+      FILIAL/CFO + «CFO открывает `/dtoe` напрямую → „Доступ запрещён“»).
+      **Не выполнен в этой сессии**: локальный dev-стек в Docker запущен с
+      `NEXT_PUBLIC_MOCK_MODE=true` (запечено в клиентский бандл при старте
+      `next dev`), из-за чего логин отвечает случайными фейковыми данными;
+      попытка поднять локальный `next dev` с `MOCK_MODE=false` упёрлась в
+      несвязанный баг окружения (Node 24: `--env-file` не может быть передан
+      через NODE_OPTIONS, а Next.js прокидывает execArgv в дочерний процесс).
+      По решению пользователя — не добивались запуска сейчас, нужен отдельный
+      прогон в чистом окружении (CI или пересобранный контейнер без mock-режима).
+- [x] 3.10 [frontend] Создать `apps/frontend/app/(private)/filial/layout.tsx`,
       `(private)/filial/page.tsx` и аналогично для `cfo/`, `dtoe/`: layout
       вызывает соответствующий Kubb-хук на сервере, при `403` рендерит
-      `AccessDeniedScreen`, иначе `children` (заглушка по аналогии с
-      `(private)/dashboard/page.tsx`) — тест 3.7 green.
-- [ ] 3.9 [frontend] E2E: добавить/расширить `*.e2e.spec.ts` на успешный вход
-      каждой роли и редирект в её раздел (`FILIAL` → `/filial`, `CFO` →
-      `/cfo`; `DTOE` допустимо покрыть на component/unit-уровне редирект-логики
-      при P1 — см. design.md «Тестовая стратегия»).
-- [ ] 3.10 [frontend] Верификация: `bun run typecheck`, `bun run lint`,
+      `AccessDeniedScreen`, иначе `children` (заглушка). `(private)/dashboard/`
+      удалена по решению пользователя вместо использования как образец.
+- [ ] 3.11 [frontend] E2E: добавить/расширить `*.e2e.spec.ts` на успешный вход
+      каждой роли и редирект в её раздел — см. 3.9, не выполнено в этой сессии
+      по той же причине (mock-режим в запущенном dev-контейнере).
+- [x] 3.12 [frontend] Верификация: `bun run typecheck`, `bun run lint`,
       относящиеся к change тесты, `bun run build` из `apps/frontend`.
-- [ ] 3.11 [openspec] Обновить `test-plan.md` — отметить статус покрытия по
+- [x] 3.13 [openspec] Обновить `test-plan.md` — отметить статус покрытия по
       каждому сценарию `specs/login/spec.md` и
       `specs/role-scoped-sections/spec.md` по мере выполнения задач выше.
-- [ ] 3.12 [openspec] `openspec validate align-login-role-redirect --strict
+- [x] 3.14 [openspec] `openspec validate align-login-role-redirect --strict
       --no-interactive`.

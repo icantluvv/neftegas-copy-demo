@@ -48,13 +48,9 @@ describe('<SidebarNav />', () => {
 		await page.viewport(DESKTOP_VIEWPORT.width, DESKTOP_VIEWPORT.height)
 	})
 
-	it('показывает пункт навигации «Дашборд» и кнопку «Выйти»', async () => {
+	it('показывает кнопку «Выйти»', async () => {
 		const view = await render(<SidebarNav />)
 
-		await expect.element(view.getByRole('link', { name: 'Дашборд' })).toHaveAttribute(
-			'href',
-			'/dashboard',
-		)
 		await expect.element(view.getByRole('button', { name: 'Выйти' })).toBeVisible()
 	})
 
@@ -86,7 +82,7 @@ describe('<SidebarNav />', () => {
 		it('скрывает сайдбар и показывает кнопку-бургер по умолчанию', async () => {
 			const view = await render(<SidebarNav />)
 
-			await expect.element(view.getByRole('link', { name: 'Дашборд', includeHidden: true })).not.toBeVisible()
+			await expect.element(view.getByRole('button', { name: 'Выйти', includeHidden: true })).not.toBeVisible()
 			await expect.element(view.getByRole('button', { name: 'Открыть меню' })).toBeVisible()
 		})
 
@@ -95,7 +91,7 @@ describe('<SidebarNav />', () => {
 
 			await view.getByRole('button', { name: 'Открыть меню' }).click()
 
-			await expect.element(view.getByRole('link', { name: 'Дашборд' })).toBeVisible()
+			await expect.element(view.getByRole('button', { name: 'Выйти' })).toBeVisible()
 		})
 
 		it('закрывает сайдбар по повторному клику на бургер', async () => {
@@ -104,16 +100,7 @@ describe('<SidebarNav />', () => {
 			await view.getByRole('button', { name: 'Открыть меню' }).click()
 			await view.getByRole('button', { name: 'Закрыть меню' }).click()
 
-			await expect.element(view.getByRole('link', { name: 'Дашборд', includeHidden: true })).not.toBeVisible()
-		})
-
-		it('закрывает сайдбар при выборе пункта навигации', async () => {
-			const view = await render(<SidebarNav />)
-
-			await view.getByRole('button', { name: 'Открыть меню' }).click()
-			await view.getByRole('link', { name: 'Дашборд' }).click()
-
-			await expect.element(view.getByRole('link', { name: 'Дашборд', includeHidden: true })).not.toBeVisible()
+			await expect.element(view.getByRole('button', { name: 'Выйти', includeHidden: true })).not.toBeVisible()
 		})
 	})
 })

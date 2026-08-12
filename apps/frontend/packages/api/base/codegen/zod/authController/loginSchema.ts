@@ -14,7 +14,12 @@ import { loginRequestSchema } from "../loginRequestSchema";
 export const login200Schema = z.lazy(() => authUserSchema)
 
 /**
- * @description Неверный логин/пароль или заблокированная учётная запись
+ * @description Некорректный формат email
+ */
+export const login400Schema = z.lazy(() => errorResponse2Schema)
+
+/**
+ * @description Неверный email/пароль или заблокированная учётная запись
  */
 export const login401Schema = z.lazy(() => errorResponse2Schema)
 

@@ -5,9 +5,15 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import {useForm} from "react-hook-form";
-import {LoginRequest, loginRequestSchema, useLogin} from "@/packages/api/base/codegen";
+import {AuthUser, LoginRequest, loginRequestSchema, useLogin} from "@/packages/api/base/codegen";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
+
+const ROLE_HOME_ROUTE: Partial<Record<AuthUser["role"], string>> = {
+  FILIAL: "/filial",
+  CFO: "/cfo",
+  DTOE: "/dtoe",
+};
 
 export function LoginForm() {
   const router = useRouter();
@@ -22,11 +28,16 @@ export function LoginForm() {
 
   const login = useLogin({
     mutation: {
-      onSuccess: () => {
-        router.replace("/dashboard");
+      onSuccess: (data) => {
+        router.replace(ROLE_HOME_ROUTE[data.role] ?? "/");
       },
-      onError: () => {
-        toast.error("Неверный логин или пароль");
+      onError: (error) => {
+        const status = (error as { cause?: { status?: number } }).cause?.status;
+        if (status === 401) {
+          toast.error("Неверный email или пароль");
+          return;
+        }
+        toast.error("Ошибка сервера. Попробуйте позже");
       },
     },
   });
@@ -43,16 +54,18 @@ export function LoginForm() {
         <h1 className="text-xl font-semibold">Вход</h1>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="username">Логин</Label>
+          <Label htmlFor="email">Email</Label>
           <Input
-              id="username"
-              autoComplete="username"
-              aria-invalid={!!errors.username}
-              {...register("username")}
+              id="email"
+              type="email"
+              autoComplete="email"
+              className="min-h-12"
+              aria-invalid={!!errors.email}
+              {...register("email")}
           />
-          {errors.username && (
+          {errors.email && (
               <p className="text-sm text-destructive">
-                {errors.username.message}
+                {errors.email.message}
               </p>
           )}
         </div>
@@ -63,6 +76,7 @@ export function LoginForm() {
               id="password"
               type="password"
               autoComplete="current-password"
+              className="min-h-12"
               aria-invalid={!!errors.password}
               {...register("password")}
           />
@@ -73,7 +87,7 @@ export function LoginForm() {
           )}
         </div>
 
-        <Button type="submit" disabled={login.isPending}>
+        <Button type="submit" className="min-h-12" disabled={login.isPending}>
           {login.isPending ? "Входим…" : "Войти"}
         </Button>
       </form>

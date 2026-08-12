@@ -1,0 +1,16 @@
+get:
+  summary: Статистика по корректировкам для раздела ЦФО
+  operationId: getCorrectionStatsCfo
+  tags: [Corrections]
+  description: Доступно только пользователю роли CFO.
+  responses:
+    '200':
+      description: Агрегированные счётчики в рамках видимости роли CFO
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-stats.yaml' }
+    '403':
+      description: У пользователя не роль CFO
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

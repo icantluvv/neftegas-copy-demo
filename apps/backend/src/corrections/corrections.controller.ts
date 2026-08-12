@@ -47,6 +47,24 @@ export class CorrectionsController {
     return this.service.getStats(user);
   }
 
+  @Roles(Role.FILIAL)
+  @Get('stats/filial')
+  filialStats(@CurrentUser() user: User) {
+    return this.service.getStats(user);
+  }
+
+  @Roles(Role.CFO)
+  @Get('stats/cfo')
+  cfoStats(@CurrentUser() user: User) {
+    return this.service.getStats(user);
+  }
+
+  @Roles(Role.DTOE)
+  @Get('stats/dtoe')
+  dtoeStats(@CurrentUser() user: User) {
+    return this.service.getStats(user);
+  }
+
   @Get(':humanId')
   findOne(@CurrentUser() user: User, @Param('humanId') humanId: string) {
     return this.service.findOne(user, humanId);
@@ -62,18 +80,33 @@ export class CorrectionsController {
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: UploadFileDto,
   ) {
-    return this.service.uploadFileVersion(user, humanId, slotId, file, dto.note, dto.remarkId);
+    return this.service.uploadFileVersion(
+      user,
+      humanId,
+      slotId,
+      file,
+      dto.note,
+      dto.remarkId,
+    );
   }
 
   @Roles(Role.FILIAL)
   @Post(':humanId/send')
-  send(@CurrentUser() user: User, @Param('humanId') humanId: string, @Body() dto: CfoSelectionDto) {
+  send(
+    @CurrentUser() user: User,
+    @Param('humanId') humanId: string,
+    @Body() dto: CfoSelectionDto,
+  ) {
     return this.service.send(user, humanId, dto);
   }
 
   @Roles(Role.FILIAL)
   @Post(':humanId/resubmit')
-  resubmit(@CurrentUser() user: User, @Param('humanId') humanId: string, @Body() dto: CfoSelectionDto) {
+  resubmit(
+    @CurrentUser() user: User,
+    @Param('humanId') humanId: string,
+    @Body() dto: CfoSelectionDto,
+  ) {
     return this.service.resubmit(user, humanId, dto);
   }
 
@@ -97,7 +130,11 @@ export class CorrectionsController {
 
   @Roles(Role.CFO)
   @Post(':humanId/cfo-return')
-  cfoReturn(@CurrentUser() user: User, @Param('humanId') humanId: string, @Body() dto: RemarkCreateDto) {
+  cfoReturn(
+    @CurrentUser() user: User,
+    @Param('humanId') humanId: string,
+    @Body() dto: RemarkCreateDto,
+  ) {
     return this.service.cfoReturn(user, humanId, dto);
   }
 
@@ -109,7 +146,11 @@ export class CorrectionsController {
 
   @Roles(Role.DTOE)
   @Post(':humanId/dtoe-return')
-  dtoeReturn(@CurrentUser() user: User, @Param('humanId') humanId: string, @Body() dto: RemarkCreateDto) {
+  dtoeReturn(
+    @CurrentUser() user: User,
+    @Param('humanId') humanId: string,
+    @Body() dto: RemarkCreateDto,
+  ) {
     return this.service.dtoeReturn(user, humanId, dto);
   }
 
