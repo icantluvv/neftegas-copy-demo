@@ -13,7 +13,6 @@ function renderWithQueryClient(ui: React.ReactElement) {
 
 const useGetNotificationsMock = vi.hoisted(() => vi.fn())
 const useOpenNotificationMock = vi.hoisted(() => vi.fn())
-const useMarkAllNotificationsReadMock = vi.hoisted(() => vi.fn())
 
 vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@/packages/api/base/codegen')>()
@@ -22,7 +21,6 @@ vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 		...actual,
 		useGetNotifications: useGetNotificationsMock,
 		useOpenNotification: useOpenNotificationMock,
-		useMarkAllNotificationsRead: useMarkAllNotificationsReadMock,
 	}
 })
 
@@ -44,14 +42,12 @@ function notification(overrides: Partial<Notification>): Notification {
 const state = {
 	notifications: [] as Notification[],
 	openMutateMock: vi.fn(),
-	markAllReadMutateMock: vi.fn(),
 	refetchIntervalSeen: undefined as number | undefined,
 }
 
 beforeEach(() => {
 	state.notifications = []
 	state.openMutateMock.mockClear()
-	state.markAllReadMutateMock.mockClear()
 	state.refetchIntervalSeen = undefined
 
 	useGetNotificationsMock.mockImplementation((options?: { query?: { refetchInterval?: number } }) => {
@@ -63,10 +59,6 @@ beforeEach(() => {
 	})
 	useOpenNotificationMock.mockImplementation(() => ({
 		mutate: state.openMutateMock,
-		isPending: false,
-	}))
-	useMarkAllNotificationsReadMock.mockImplementation(() => ({
-		mutate: state.markAllReadMutateMock,
 		isPending: false,
 	}))
 })
@@ -178,14 +170,15 @@ describe('<NotificationBell />', () => {
 		await expect.element(view.getByText('Важное событие')).not.toBeInTheDocument()
 	})
 
-	it('«Отметить все прочитанными» вызывает массовую пометку', async () => {
+	it('панель не содержит кнопку «Отметить все прочитанными»', async () => {
 		state.notifications = [notification({ id: 1, isRead: false })]
 		const view = await renderWithQueryClient(<NotificationBell />)
 
 		await view.getByRole('button', { name: 'Уведомления' }).click()
-		await view.getByRole('button', { name: 'Отметить все прочитанными' }).click()
 
-		expect(state.markAllReadMutateMock).toHaveBeenCalled()
+		await expect
+			.element(view.getByRole('button', { name: 'Отметить все прочитанными' }))
+			.not.toBeInTheDocument()
 	})
 
 	it('открытие панели не вызывает мутации пометки', async () => {
@@ -195,6 +188,5 @@ describe('<NotificationBell />', () => {
 		await view.getByRole('button', { name: 'Уведомления' }).click()
 
 		expect(state.openMutateMock).not.toHaveBeenCalled()
-		expect(state.markAllReadMutateMock).not.toHaveBeenCalled()
 	})
 })

@@ -48,7 +48,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
 
             <aside
                 className={cn(
-                    "z-40 flex-col justify-between gap-8 bg-sidebar p-4 text-sidebar-foreground md:static md:flex md:w-1/5",
+                    "z-40 h-full shrink-0 flex-col justify-between gap-8 overflow-y-auto bg-sidebar p-4 text-sidebar-foreground md:static md:flex md:w-1/5",
                     isOpen ? "fixed inset-0 flex w-full" : "hidden"
                 )}
             >

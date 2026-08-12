@@ -21,13 +21,13 @@ P1
 | Содержимое выпадающей панели уведомлений | Пустая панель показывает заглушку | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Содержимое выпадающей панели уведомлений | Ссылка «Все уведомления» ведёт на полный список | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Содержимое выпадающей панели уведомлений | Клик по записи в панели помечает её прочитанной и переходит на корректировку | P0 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
+| Содержимое выпадающей панели уведомлений | В панели нет кнопки массовой пометки | P2 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Страница полного списка уведомлений | Страница доступна авторизованному пользователю любой роли | P0 | E2E | `apps/frontend/e2e/notifications.e2e.spec.ts` | Done (роль CFO явно; FILIAL/DTOE — тот же маршрут без ролевого ветвления, покрытие по аналогии) |
 | Страница полного списка уведомлений | Непрочитанные записи выделены на странице | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Страница полного списка уведомлений | Пустой список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Кнопка «Открыть» в строке таблицы уведомлений | Кнопка «Открыть» помечает запись прочитанной и переходит на корректировку | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts`, `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Фильтр «Только непрочитанные» на странице уведомлений | Включение фильтра скрывает прочитанные записи | P1 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Фильтр «Только непрочитанные» на странице уведомлений | Выключение фильтра возвращает полный список | P2 | Component | `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
-| Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» из панели обнуляет бейдж | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Массовая пометка всех уведомлений прочитанными | «Отметить все прочитанными» со страницы снимает выделение со всех строк | P0 | E2E + Component | `apps/frontend/e2e/notifications.e2e.spec.ts`, `app/(private)/notifications/components/notifications-table.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие панели не меняет статус прочитанности | P1 | Component | `src/components/notification-bell/notification-bell.component.test.tsx` | Done |
 | Пометка прочитанным только по явному действию пользователя | Открытие карточки корректировки напрямую не помечает уведомления прочитанными | P2 | Manual | — | Done (manual) — обоснование ниже в разделе Manual checks |
@@ -44,7 +44,7 @@ P1
 - [x] Frontend: конфигурация `refetchInterval: 60_000` у query-хука уведомлений — покрыто на component-уровне (см. ниже), отдельный unit-файл не создавался.
 
 ### Component
-- [x] `NotificationBell`: бейдж (0 / 1-9 / 9+), открытие/закрытие панели (клик/повторный клик/клик вне/Escape), содержимое панели (7 записей, выделение непрочитанных, пустое состояние, ссылка «Все уведомления»), клик по записи (пометка + переход), «Отметить все прочитанными», фоновый опрос 60s.
+- [x] `NotificationBell`: бейдж (0 / 1-9 / 9+), открытие/закрытие панели (клик/повторный клик/клик вне/Escape), содержимое панели (7 записей, выделение непрочитанных, пустое состояние, ссылка «Все уведомления», отсутствие кнопки массовой пометки), клик по записи (пометка + переход), фоновый опрос 60s.
 - [x] `NotificationsTable`: колонки, выделение непрочитанных, пустое состояние, кнопка «Открыть», фильтр «Только непрочитанные», «Отметить все прочитанными».
 
 ### Integration

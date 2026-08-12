@@ -26,13 +26,13 @@ export default async function PrivateLayout({children}: { children: React.ReactN
     }
 
     return (
-        <div className="flex min-h-svh">
+        <div className="flex h-svh">
             <SidebarNav user={user}/>
-            <div className="flex w-full flex-1 min-h-screen flex-col md:w-4/5">
-                <header className="flex justify-end border-b border-border px-4 py-2">
+            <div className="flex h-full w-full flex-1 flex-col overflow-hidden md:w-4/5">
+                <header className="flex shrink-0 justify-end border-b border-border px-4 py-2">
                     <NotificationBell/>
                 </header>
-                <div className="flex-1">{children}</div>
+                <div className="flex-1 overflow-y-auto">{children}</div>
             </div>
         </div>
     );

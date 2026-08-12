@@ -44,13 +44,14 @@ export function NotificationsTable() {
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-lg font-semibold">Уведомления</h1>
+        <h1 className="text-2xl font-semibold">Уведомления</h1>
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               role="checkbox"
               aria-label="Только непрочитанные"
+              className="size-6"
               checked={onlyUnread}
               onChange={(e) => setOnlyUnread(e.target.checked)}
             />
@@ -60,6 +61,7 @@ export function NotificationsTable() {
             type="button"
             variant="outline"
             size="sm"
+            className="min-h-12"
             onClick={handleMarkAllRead}
             disabled={markAllRead.isPending}
           >

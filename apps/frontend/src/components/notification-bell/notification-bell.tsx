@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 import {
   getNotificationsQueryKey,
   useGetNotifications,
-  useMarkAllNotificationsRead,
   useOpenNotification,
   type Notification,
 } from "@/packages/api/base/codegen";
@@ -31,7 +30,6 @@ export function NotificationBell() {
     query: { refetchInterval: POLL_INTERVAL_MS },
   });
   const openNotification = useOpenNotification();
-  const markAllRead = useMarkAllNotificationsRead();
 
   const notifications = notificationsQuery.data ?? [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -46,10 +44,6 @@ export function NotificationBell() {
     openNotification.mutate({ id: notification.id }, { onSuccess: invalidateNotifications });
     setOpen(false);
     router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
-  }
-
-  function handleMarkAllRead() {
-    markAllRead.mutate(undefined, { onSuccess: invalidateNotifications });
   }
 
   return (
@@ -71,18 +65,10 @@ export function NotificationBell() {
       <Popover.Portal>
         <Popover.Positioner sideOffset={8} align="end">
           <Popover.Popup className="w-80 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-lg">
-            <div className="flex items-center justify-between gap-2 pb-2">
+            <div className="pb-2">
               <span className="text-sm font-semibold">
                 Уведомления{unreadCount > 0 ? ` (${unreadCount})` : ""}
               </span>
-              <button
-                type="button"
-                className="text-xs font-medium text-primary hover:underline"
-                onClick={handleMarkAllRead}
-                disabled={markAllRead.isPending}
-              >
-                Отметить все прочитанными
-              </button>
             </div>
             {panelItems.length === 0 ? (
               <p className="py-4 text-center text-sm text-muted-foreground">Новых уведомлений нет</p>
@@ -109,7 +95,7 @@ export function NotificationBell() {
             )}
             <Link
               href="/notifications"
-              className="mt-2 block text-center text-xs font-medium text-primary hover:underline"
+              className="mt-2 flex min-h-6 items-center justify-center text-center text-xs font-medium text-primary hover:underline"
               onClick={() => setOpen(false)}
             >
               Все уведомления
