@@ -2,13 +2,14 @@
 
 import { useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 
 import type { CorrectionDetail, DocumentSlot2 } from "@/packages/api/base/codegen";
 import { getCorrectionSuspenseQueryKey } from "@/packages/api/base/codegen/hooks/correctionsController/useGetCorrectionSuspense";
 import { useUploadFileVersion } from "@/packages/api/base/codegen";
 
 import { Button } from "#/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#/components/ui/table";
+import { DataTable } from "#/components/ui/data-table";
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
 import { canUploadSlotFile } from "../lib/permissions";
@@ -17,7 +18,20 @@ function openRemarkForSlot(detail: CorrectionDetail, slotId: number) {
   return detail.remarks.find((remark) => remark.relatedSlotId === slotId && remark.status !== "CLOSED");
 }
 
-function SlotRow({ detail, slot }: { detail: CorrectionDetail; slot: DocumentSlot2 }) {
+function CurrentVersionCell({ slot }: { slot: DocumentSlot2 }) {
+  if (!slot.currentVersion) {
+    return <span className="text-muted-foreground">Нет версий</span>;
+  }
+
+  return (
+    <div className="flex flex-col">
+      <span>Версия {slot.currentVersion.versionNumber}</span>
+      <span className="text-xs text-muted-foreground">{formatNotificationDateTime(slot.currentVersion.uploadedAt)}</span>
+    </div>
+  );
+}
+
+function UploadSlotFileCell({ detail, slot }: { detail: CorrectionDetail; slot: DocumentSlot2 }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const upload = useUploadFileVersion({
@@ -27,6 +41,10 @@ function SlotRow({ detail, slot }: { detail: CorrectionDetail; slot: DocumentSlo
       },
     },
   });
+
+  if (!canUploadSlotFile(detail)) {
+    return null;
+  }
 
   const relatedRemark = openRemarkForSlot(detail, slot.id);
 
@@ -43,62 +61,50 @@ function SlotRow({ detail, slot }: { detail: CorrectionDetail; slot: DocumentSlo
   }
 
   return (
-    <TableRow>
-      <TableCell>{slot.label}</TableCell>
-      <TableCell>{slot.isRequired ? "Да" : "Нет"}</TableCell>
-      <TableCell>{slot.responsibleCfo ? slot.responsibleCfo.name : "Все ЦФО маршрута"}</TableCell>
-      <TableCell>
-        {slot.currentVersion ? (
-          <div className="flex flex-col">
-            <span>Версия {slot.currentVersion.versionNumber}</span>
-            <span className="text-xs text-muted-foreground">
-              {formatNotificationDateTime(slot.currentVersion.uploadedAt)}
-            </span>
-          </div>
-        ) : (
-          <span className="text-muted-foreground">Нет версий</span>
-        )}
-      </TableCell>
-      <TableCell>
-        {canUploadSlotFile(detail) && (
-          <>
-            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              disabled={upload.isPending}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Загрузить версию
-            </Button>
-          </>
-        )}
-      </TableCell>
-    </TableRow>
+    <>
+      <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        disabled={upload.isPending}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        Загрузить версию
+      </Button>
+    </>
   );
 }
 
 export function PackageCompleteness({ detail }: { detail: CorrectionDetail }) {
+  const columns: ColumnDef<DocumentSlot2, any>[] = [
+    { accessorKey: "label", header: "Элемент" },
+    {
+      id: "isRequired",
+      header: "Обязателен",
+      cell: ({ row }) => (row.original.isRequired ? "Да" : "Нет"),
+    },
+    {
+      id: "responsibleCfo",
+      header: "Проверяет ЦФО",
+      cell: ({ row }) => (row.original.responsibleCfo ? row.original.responsibleCfo.name : "Все ЦФО маршрута"),
+    },
+    {
+      id: "currentVersion",
+      header: "Текущая версия",
+      cell: ({ row }) => <CurrentVersionCell slot={row.original} />,
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => <UploadSlotFileCell detail={detail} slot={row.original} />,
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
       <h2 className="text-base font-semibold">Комплектность пакета</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Элемент</TableHead>
-            <TableHead>Обязателен</TableHead>
-            <TableHead>Проверяет ЦФО</TableHead>
-            <TableHead>Текущая версия</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {detail.slots.map((slot) => (
-            <SlotRow key={slot.id} detail={detail} slot={slot} />
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable columns={columns} data={detail.slots} getRowId={(slot) => String(slot.id)} />
       <p className="text-xs text-muted-foreground">Замечание оставляется кнопкой в строке нужного элемента.</p>
     </div>
   );
