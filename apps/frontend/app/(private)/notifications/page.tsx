@@ -1,5 +1,5 @@
-import { NotificationsTable } from "./components/notifications-table";
+import { NotificationsContent } from "./components/notifications-content";
 
 export default function NotificationsPage() {
-  return <NotificationsTable />;
+  return <NotificationsContent />;
 }

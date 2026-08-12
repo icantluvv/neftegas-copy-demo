@@ -1,31 +1,10 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 
 import type { Notification } from '@/packages/api/base/codegen'
 
-function renderWithQueryClient(ui: React.ReactElement) {
-	const queryClient = new QueryClient()
-	return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
-}
-
-const useGetNotificationsMock = vi.hoisted(() => vi.fn())
-const useOpenNotificationMock = vi.hoisted(() => vi.fn())
-const useMarkAllNotificationsReadMock = vi.hoisted(() => vi.fn())
-
-vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('@/packages/api/base/codegen')>()
-
-	return {
-		...actual,
-		useGetNotifications: useGetNotificationsMock,
-		useOpenNotification: useOpenNotificationMock,
-		useMarkAllNotificationsRead: useMarkAllNotificationsReadMock,
-	}
-})
-
-const { NotificationsTable } = await import('./notifications-table')
+import { notificationsColumns } from './notifications-columns'
+import { NotificationsTable } from './notifications-table'
 
 function notification(overrides: Partial<Notification>): Notification {
 	return {
@@ -40,116 +19,64 @@ function notification(overrides: Partial<Notification>): Notification {
 	}
 }
 
-const state = {
-	notifications: [] as Notification[],
-	openMutateMock: vi.fn(),
-	markAllReadMutateMock: vi.fn(),
-}
-
-beforeEach(() => {
-	state.notifications = []
-	state.openMutateMock.mockClear()
-	state.markAllReadMutateMock.mockClear()
-
-	useGetNotificationsMock.mockImplementation(() => ({
-		data: state.notifications,
-		isPending: false,
-	}))
-	useOpenNotificationMock.mockImplementation(() => ({
-		mutate: state.openMutateMock,
-		isPending: false,
-	}))
-	useMarkAllNotificationsReadMock.mockImplementation(() => ({
-		mutate: state.markAllReadMutateMock,
-		isPending: false,
-	}))
-})
+const noop = () => {}
 
 describe('<NotificationsTable />', () => {
 	it('показывает колонки «Дата» и «Сообщение»', async () => {
-		state.notifications = [notification({ id: 1 })]
-		const view = await renderWithQueryClient(<NotificationsTable />)
+		const view = await render(
+			<NotificationsTable
+				data={[notification({ id: 1 })]}
+				columns={notificationsColumns}
+				sorting={[]}
+				onSortingChange={noop}
+				onOpen={noop}
+			/>,
+		)
 
 		await expect.element(view.getByText('Дата')).toBeVisible()
 		await expect.element(view.getByText('Сообщение')).toBeVisible()
 	})
 
 	it('выделяет непрочитанные строки жирным', async () => {
-		state.notifications = [
-			notification({ id: 1, text: 'Событие А', isRead: false }),
-			notification({ id: 2, text: 'Событие Б', isRead: true }),
-		]
-		const view = await renderWithQueryClient(<NotificationsTable />)
+		const view = await render(
+			<NotificationsTable
+				data={[
+					notification({ id: 1, text: 'Событие А', isRead: false }),
+					notification({ id: 2, text: 'Событие Б', isRead: true }),
+				]}
+				columns={notificationsColumns}
+				sorting={[]}
+				onSortingChange={noop}
+				onOpen={noop}
+			/>,
+		)
 
 		await expect.element(view.getByText('Событие А').element().closest('tr')!).toHaveClass(/font-bold/)
 		await expect.element(view.getByText('Событие Б').element().closest('tr')!).not.toHaveClass(/font-bold/)
 	})
 
 	it('показывает «Уведомлений нет» при пустом списке', async () => {
-		const view = await renderWithQueryClient(<NotificationsTable />)
+		const view = await render(
+			<NotificationsTable data={[]} columns={notificationsColumns} sorting={[]} onSortingChange={noop} onOpen={noop} />,
+		)
 
 		await expect.element(view.getByText('Уведомлений нет')).toBeVisible()
 	})
 
-	it('кнопка «Открыть» помечает запись прочитанной и переходит на корректировку', async () => {
-		state.notifications = [notification({ id: 7, correctionHumanId: 'COR-000002', text: 'Событие' })]
-		const view = await renderWithQueryClient(<NotificationsTable />)
+	it('кнопка «Открыть» вызывает onOpen с данными строки', async () => {
+		const onOpen = vi.fn()
+		const view = await render(
+			<NotificationsTable
+				data={[notification({ id: 7, correctionHumanId: 'COR-000002', text: 'Событие' })]}
+				columns={notificationsColumns}
+				sorting={[]}
+				onSortingChange={noop}
+				onOpen={onOpen}
+			/>,
+		)
 
 		await view.getByRole('button', { name: 'Открыть' }).click()
 
-		expect(state.openMutateMock).toHaveBeenCalledWith({ id: 7 }, expect.anything())
-		expect(useRouter().push).toHaveBeenCalledWith('/corrections/COR-000002')
-	})
-
-	it('фильтр «Только непрочитанные» скрывает прочитанные записи', async () => {
-		state.notifications = [
-			notification({ id: 1, text: 'Событие А', isRead: false }),
-			notification({ id: 2, text: 'Событие Б', isRead: true }),
-		]
-		const view = await renderWithQueryClient(<NotificationsTable />)
-
-		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
-		await view.getByRole('option', { name: 'Только непрочитанные' }).click()
-
-		await expect.element(view.getByText('Событие А')).toBeVisible()
-		await expect.element(view.getByText('Событие Б')).not.toBeInTheDocument()
-	})
-
-	it('фильтр «Только прочитанные» скрывает непрочитанные записи', async () => {
-		state.notifications = [
-			notification({ id: 1, text: 'Событие А', isRead: false }),
-			notification({ id: 2, text: 'Событие Б', isRead: true }),
-		]
-		const view = await renderWithQueryClient(<NotificationsTable />)
-
-		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
-		await view.getByRole('option', { name: 'Только прочитанные' }).click()
-
-		await expect.element(view.getByText('Событие Б')).toBeVisible()
-		await expect.element(view.getByText('Событие А')).not.toBeInTheDocument()
-	})
-
-	it('выключение фильтра возвращает полный список', async () => {
-		state.notifications = [
-			notification({ id: 1, text: 'Событие А', isRead: false }),
-			notification({ id: 2, text: 'Событие Б', isRead: true }),
-		]
-		const view = await renderWithQueryClient(<NotificationsTable />)
-
-		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
-		await view.getByRole('option', { name: 'Только непрочитанные' }).click()
-		await view.getByRole('combobox', { name: 'Фильтр по прочитанности' }).click()
-		await view.getByRole('option', { name: 'Все' }).click()
-
-		await expect.element(view.getByText('Событие Б')).toBeVisible()
-	})
-
-	it('«Отметить все прочитанными» вызывает массовую пометку', async () => {
-		state.notifications = [notification({ id: 1, isRead: false })]
-		const view = await renderWithQueryClient(<NotificationsTable />)
-
-		await view.getByRole('button', { name: 'Отметить все прочитанными' }).click()
-
-		expect(state.markAllReadMutateMock).toHaveBeenCalled()
+		expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 7 }))
 	})
 })
