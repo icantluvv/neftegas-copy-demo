@@ -99,7 +99,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
                         variant="ghost"
                         size='icon-lg'
                         aria-label="Выйти"
-                        className="shrink-0 text-sidebar-foreground hover:bg-white/10 hover:text-sidebar-foreground"
+                        className="text-sidebar-foreground hover:bg-white/10 hover:text-sidebar-foreground"
                         onClick={handleLogout}
                         disabled={logout.isPending}
                     >

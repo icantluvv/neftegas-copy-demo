@@ -18,7 +18,8 @@ import {
 
 import {Button, buttonVariants} from "#/components/ui/button";
 import {useDesktopNotifications} from "#/hooks/use-desktop-notifications";
-import {formatNotificationDateTime} from "#/utils/format-notification-date-time";
+
+import {NotificationPanelList} from "./notification-panel-list";
 
 const PANEL_LIMIT = 7;
 const POLL_INTERVAL_MS = 60_000;
@@ -95,29 +96,7 @@ export function NotificationBell() {
                                 </Button>
                             )}
                         </div>
-                        {panelItems.length === 0 ? (
-                            <p className="py-4 text-center text-sm text-muted-foreground">Новых уведомлений нет</p>
-                        ) : (
-                            <ul className="flex flex-col gap-1 max-h-100 overflow-y-auto">
-                                {panelItems.map((notification) => (
-                                    <li key={notification.id}>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleSelectNotification(notification)}
-                                            className={cn(
-                                                "flex w-full flex-col gap-0.5 rounded-lg p-4 text-left text-sm transition-colors duration-200 hover:bg-muted",
-                                                !notification.isRead && "font-bold",
-                                            )}
-                                        >
-                      <span className="text-xs text-muted-foreground">
-                        {formatNotificationDateTime(notification.createdAt)}
-                      </span>
-                                            <span>{notification.text}</span>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
+                        <NotificationPanelList notifications={panelItems} onSelect={handleSelectNotification}/>
                         <Link
                             href="/notifications"
                             className="mt-2 flex min-h-6 items-center justify-center text-center text-xs font-medium text-primary hover:underline"
