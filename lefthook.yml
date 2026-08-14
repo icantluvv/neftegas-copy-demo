@@ -19,12 +19,12 @@ pre-commit:
     - name: backend-lint
       run: npm run lint
       root: apps/backend/
-      glob: '*.ts'
+      glob: 'apps/backend/**/*.ts'
       stage_fixed: true
     - name: backend-test
       run: npm run test -- --silent
       root: apps/backend/
-      glob: '*.ts'
+      glob: 'apps/backend/**/*.ts'
 
 pre-push:
   parallel: true
@@ -32,6 +32,7 @@ pre-push:
     - name: backend-e2e
       run: npm run test:e2e
       root: apps/backend/
+      glob: 'apps/backend/**/*.ts'
 
 commit-msg:
   commands:
