@@ -5,17 +5,19 @@ import {useQueryClient} from "@tanstack/react-query";
 import {Bell} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 
 import {cn} from "@/lib/utils";
 import {
   getNotificationsQueryKey,
   type Notification,
   useGetNotifications,
+  useMarkAllNotificationsRead,
   useOpenNotification,
 } from "@/packages/api/base/codegen";
 
-import {buttonVariants} from "#/components/ui/button";
+import {Button, buttonVariants} from "#/components/ui/button";
+import {useDesktopNotifications} from "#/hooks/use-desktop-notifications";
 import {formatNotificationDateTime} from "#/utils/format-notification-date-time";
 
 const PANEL_LIMIT = 7;
@@ -30,20 +32,30 @@ export function NotificationBell() {
         query: {refetchInterval: POLL_INTERVAL_MS},
     });
     const openNotification = useOpenNotification();
+    const markAllRead = useMarkAllNotificationsRead();
 
     const notifications = notificationsQuery.data ?? [];
     const unreadCount = notifications.filter((n) => !n.isRead).length;
     const panelItems = notifications.slice(0, PANEL_LIMIT);
     const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
 
-    function invalidateNotifications() {
+    const invalidateNotifications = useCallback(() => {
         void queryClient.invalidateQueries({queryKey: getNotificationsQueryKey()});
-    }
+    }, [queryClient]);
 
-    function handleSelectNotification(notification: Notification) {
-        openNotification.mutate({id: notification.id}, {onSuccess: invalidateNotifications});
-        setOpen(false);
-        router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+    const handleSelectNotification = useCallback(
+        (notification: Notification) => {
+            openNotification.mutate({id: notification.id}, {onSuccess: invalidateNotifications});
+            setOpen(false);
+            router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+        },
+        [openNotification, invalidateNotifications, router],
+    );
+
+    useDesktopNotifications(notifications, handleSelectNotification);
+
+    function handleMarkAllRead() {
+        markAllRead.mutate(undefined, {onSuccess: invalidateNotifications});
     }
 
     return (
@@ -66,10 +78,22 @@ export function NotificationBell() {
                 <Popover.Positioner sideOffset={8} align="end">
                     <Popover.Popup
                         className="w-80 rounded-2xl border border-border bg-popover p-6 text-popover-foreground shadow-lg">
-                        <div className="pb-2">
+                        <div className="flex items-center justify-between gap-2 pb-2">
               <span className="text-sm font-semibold">
                 Уведомления{unreadCount > 0 ? ` (${unreadCount})` : ""}
               </span>
+                            {unreadCount > 0 && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-auto p-0 text-xs font-medium text-primary hover:bg-transparent hover:underline"
+                                    onClick={handleMarkAllRead}
+                                    disabled={markAllRead.isPending}
+                                >
+                                    Отметить все прочитанными
+                                </Button>
+                            )}
                         </div>
                         {panelItems.length === 0 ? (
                             <p className="py-4 text-center text-sm text-muted-foreground">Новых уведомлений нет</p>
