@@ -8,7 +8,7 @@ import {useCallback, useMemo, useState} from "react";
 import {
     getNotificationsQueryKey,
     type Notification,
-    useGetNotifications,
+    useGetNotificationsSuspense,
     useMarkAllNotificationsRead,
     useOpenNotification,
 } from "@/packages/api/base/codegen";
@@ -26,11 +26,11 @@ export function NotificationsContent() {
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    const notificationsQuery = useGetNotifications();
+    const notificationsQuery = useGetNotificationsSuspense();
     const openNotification = useOpenNotification();
     const markAllRead = useMarkAllNotificationsRead();
 
-    const notifications = useMemo(() => notificationsQuery.data ?? [], [notificationsQuery.data]);
+    const notifications = notificationsQuery.data;
 
     const visibleNotifications = useMemo(
         () =>

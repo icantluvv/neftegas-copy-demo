@@ -10,7 +10,7 @@ function renderWithQueryClient(ui: React.ReactElement) {
 	return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
 }
 
-const useGetNotificationsMock = vi.hoisted(() => vi.fn())
+const useGetNotificationsSuspenseMock = vi.hoisted(() => vi.fn())
 const useOpenNotificationMock = vi.hoisted(() => vi.fn())
 const useMarkAllNotificationsReadMock = vi.hoisted(() => vi.fn())
 
@@ -19,7 +19,7 @@ vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 
 	return {
 		...actual,
-		useGetNotifications: useGetNotificationsMock,
+		useGetNotificationsSuspense: useGetNotificationsSuspenseMock,
 		useOpenNotification: useOpenNotificationMock,
 		useMarkAllNotificationsRead: useMarkAllNotificationsReadMock,
 	}
@@ -51,7 +51,7 @@ beforeEach(() => {
 	state.openMutateMock.mockClear()
 	state.markAllReadMutateMock.mockClear()
 
-	useGetNotificationsMock.mockImplementation(() => ({
+	useGetNotificationsSuspenseMock.mockImplementation(() => ({
 		data: state.notifications,
 		isPending: false,
 	}))
