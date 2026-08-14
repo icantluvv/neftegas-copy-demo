@@ -3,7 +3,7 @@ import type { CorrectionDetail } from "@/packages/api/base/codegen";
 import { Badge } from "#/components/ui/badge";
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
-import { getCorrectionStatusLabel } from "../lib/status-labels";
+import { getCorrectionStatusLabel } from "../../../lib/status-labels";
 
 export function CorrectionHeader({ detail }: { detail: CorrectionDetail }) {
   const statusLabel = getCorrectionStatusLabel(detail.status);

@@ -28,7 +28,7 @@ import {
   canReturnAsDtoe,
   canSendToDtoe,
 } from "../lib/permissions";
-import { getRemarkStatusLabel } from "../lib/status-labels";
+import { getRemarkStatusLabel } from "../../../lib/status-labels";
 import { ReturnRemarkDialog } from "./return-remark-dialog";
 
 function slotLabel(detail: CorrectionDetail, slotId: number | null | undefined) {

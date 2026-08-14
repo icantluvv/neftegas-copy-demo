@@ -1,6 +1,7 @@
 import {getCorrectionStatsCfo} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsCfo";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
+import {CorrectionStatsGrid} from "./correction-stats-grid";
 
 function isForbiddenError(error: unknown): boolean {
     if (!(error instanceof Error)) return false;
@@ -15,8 +16,9 @@ function isUnauthorizedError(error: unknown): boolean {
 }
 
 export async function CfoDashboard() {
+    let stats: Awaited<ReturnType<typeof getCorrectionStatsCfo>>;
     try {
-        await getCorrectionStatsCfo();
+        stats = await getCorrectionStatsCfo();
     } catch (error) {
         if (isForbiddenError(error)) {
             return <AccessDeniedScreen/>;
@@ -32,8 +34,16 @@ export async function CfoDashboard() {
     }
 
     return (
-        <div className="flex flex-1 flex-col p-4 pt-5 md:p-8">
+        <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">ЦФО</h1>
+            <CorrectionStatsGrid
+                tiles={[
+                    {label: "Всего", value: stats.total},
+                    {label: "На проверке", value: stats.inReview},
+                    {label: "Возвращено на доработку", value: stats.returned},
+                    {label: "Согласовано", value: stats.approved},
+                ]}
+            />
         </div>
     );
 }

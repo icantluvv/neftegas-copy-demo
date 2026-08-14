@@ -1,6 +1,7 @@
 import {getCorrectionStatsDtoe} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsDtoe";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
+import {CorrectionStatsGrid} from "./correction-stats-grid";
 
 function isForbiddenError(error: unknown): boolean {
     if (!(error instanceof Error)) return false;
@@ -15,8 +16,9 @@ function isUnauthorizedError(error: unknown): boolean {
 }
 
 export async function DtoeDashboard() {
+    let stats: Awaited<ReturnType<typeof getCorrectionStatsDtoe>>;
     try {
-        await getCorrectionStatsDtoe();
+        stats = await getCorrectionStatsDtoe();
     } catch (error) {
         if (isForbiddenError(error)) {
             return <AccessDeniedScreen/>;
@@ -32,8 +34,18 @@ export async function DtoeDashboard() {
     }
 
     return (
-        <div className="flex flex-1 flex-col p-4 pt-5 md:p-8">
+        <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">ДТОиР</h1>
+            <CorrectionStatsGrid
+                tiles={[
+                    {label: "Всего корректировок", value: stats.total},
+                    {label: "На проверке у ЦФО", value: stats.inReview},
+                    {label: "Возвращено на доработку", value: stats.returned},
+                    {label: "Согласовано ДТОиР", value: stats.approved},
+                    {label: "На проверке у ДТОиР", value: stats.underReview ?? 0},
+                    {label: "Открытых замечаний", value: stats.openRemarks ?? 0},
+                ]}
+            />
         </div>
     );
 }

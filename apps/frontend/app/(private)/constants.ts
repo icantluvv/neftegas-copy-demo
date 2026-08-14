@@ -9,8 +9,16 @@ export const DASHBOARD_KIND_BY_ROLE: Partial<Record<AuthUser["role"], DashboardK
 };
 
 
-export const navItems: { href: string; label: string }[] = [
+export interface NavItem {
+    href: string;
+    label: string;
+    /** Отсутствие поля — пункт виден всем ролям. */
+    roles?: AuthUser["role"][];
+}
+
+export const navItems: NavItem[] = [
     {href: "/dashboard", label: "Рабочий стол"},
+    {href: "/corrections/create", label: "Создать корректировку", roles: ["FILIAL"]},
     {href: "/notifications", label: "Уведомления"},
 ];
 

@@ -63,7 +63,9 @@ export function SidebarNav({user}: { user: AuthUser }) {
                     </div>
 
                     <nav className="flex flex-col gap-1">
-                        {navItems.map((item) => {
+                        {navItems
+                            .filter((item) => !item.roles || item.roles.includes(user.role))
+                            .map((item) => {
                             const isActive = pathname === item.href;
                             return (
                                 <Link

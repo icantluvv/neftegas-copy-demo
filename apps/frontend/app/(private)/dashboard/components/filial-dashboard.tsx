@@ -1,6 +1,8 @@
 import {getCorrectionStatsFilial} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsFilial";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
+import {CorrectionStatsGrid} from "./correction-stats-grid";
+import {FilialCorrectionsOverview} from "./filial-corrections-overview";
 
 function isForbiddenError(error: unknown): boolean {
     if (!(error instanceof Error)) return false;
@@ -15,8 +17,9 @@ function isUnauthorizedError(error: unknown): boolean {
 }
 
 export async function FilialDashboard() {
+    let stats: Awaited<ReturnType<typeof getCorrectionStatsFilial>>;
     try {
-        await getCorrectionStatsFilial();
+        stats = await getCorrectionStatsFilial();
     } catch (error) {
         if (isForbiddenError(error)) {
             return <AccessDeniedScreen/>;
@@ -32,8 +35,17 @@ export async function FilialDashboard() {
     }
 
     return (
-        <div className="flex flex-1 flex-col p-4 pt-5 md:p-8">
-            <h1 className="text-2xl font-semibold">Филиал</h1>
+        <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
+            <h1 className="text-2xl font-semibold">Мои корректировки</h1>
+            <CorrectionStatsGrid
+                tiles={[
+                    {label: "Всего", value: stats.total},
+                    {label: "На проверке", value: stats.inReview, tone: "warning"},
+                    {label: "Возвращено", value: stats.returned, tone: "danger"},
+                    {label: "Согласовано ДТОиР", value: stats.approved, tone: "success"},
+                ]}
+            />
+            <FilialCorrectionsOverview/>
         </div>
     );
 }

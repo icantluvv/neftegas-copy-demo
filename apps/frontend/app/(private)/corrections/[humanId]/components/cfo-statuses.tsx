@@ -6,7 +6,7 @@ import { Badge } from "#/components/ui/badge";
 import { DataTable } from "#/components/ui/data-table";
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
-import { getCfoStatusLabel } from "../lib/status-labels";
+import { getCfoStatusLabel } from "../../../lib/status-labels";
 
 function DecidedByCell({ cfoStatus }: { cfoStatus: CorrectionCfoStatus2 }) {
   if (!cfoStatus.decidedBy || !cfoStatus.decidedAt) {
