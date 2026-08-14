@@ -51,6 +51,35 @@ const dataSource = new DataSource({
 
 const DEMO_PASSWORD = 'Password123';
 
+/** Транслит кода в латиницу для email-логина демо-аккаунта. */
+const FILIALS: Array<{ code: string; slug: string }> = [
+  { code: 'Донбассгаз', slug: 'donbassgaz' },
+  { code: 'Луганскгаз', slug: 'luganskgaz' },
+  { code: 'Запорожгаз', slug: 'zaporozhgaz' },
+  { code: 'Херсонгаз', slug: 'khersongaz' },
+];
+
+/** Полный справочник ЦФО (17) — см. глоссарий в корневом AGENTS.md. */
+const CFOS: Array<{ code: string; slug: string }> = [
+  { code: 'АНГНКС', slug: 'angnks' },
+  { code: 'Бухгалтерия', slug: 'buhgalteria' },
+  { code: 'ОГМ', slug: 'ogm' },
+  { code: 'ОГС', slug: 'ogs' },
+  { code: 'ОГЭ', slug: 'oge' },
+  { code: 'ОТЭОГС', slug: 'oteogs' },
+  { code: 'ПОА', slug: 'poa' },
+  { code: 'ПОЗК', slug: 'pozk' },
+  { code: 'ПОМО', slug: 'pomo' },
+  { code: 'ПОЭКС', slug: 'poeks' },
+  { code: 'ПОЭМГ', slug: 'poemg' },
+  { code: 'СИУС', slug: 'sius' },
+  { code: 'СКЗ', slug: 'skz' },
+  { code: 'СОРиСОФ', slug: 'sorisof' },
+  { code: 'СППБ', slug: 'sppb' },
+  { code: 'ТРО', slug: 'tro' },
+  { code: 'ХОСЭЗИС', slug: 'hosezis' },
+];
+
 async function main() {
   await dataSource.initialize();
 
@@ -69,18 +98,13 @@ async function main() {
     return;
   }
 
-  const filials = await filialRepo.save([
-    { code: 'Донбассгаз', name: 'Донбассгаз' },
-    { code: 'Луганскгаз', name: 'Луганскгаз' },
-    { code: 'Запорожгаз', name: 'Запорожгаз' },
-    { code: 'Херсонгаз', name: 'Херсонгаз' },
-  ]);
+  const filials = await filialRepo.save(
+    FILIALS.map(({ code }) => ({ code, name: code })),
+  );
 
-  const cfos = await cfoRepo.save([
-    { code: 'АНГНКС', name: 'АНГНКС' },
-    { code: 'ОГМ', name: 'ОГМ' },
-    { code: 'ОТЭОГС', name: 'ОТЭОГС' },
-  ]);
+  const cfos = await cfoRepo.save(
+    CFOS.map(({ code }) => ({ code, name: code })),
+  );
 
   for (const filial of filials) {
     for (const cfo of cfos) {
@@ -122,23 +146,28 @@ async function main() {
   ]);
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
+
+  const filialUsers = filials.map((filial, i) => ({
+    username: `filial.${FILIALS[i].slug}@demo.local`,
+    passwordHash,
+    role: Role.FILIAL,
+    filialId: filial.id,
+    firstName: 'Филиал',
+    lastName: FILIALS[i].code,
+  }));
+
+  const cfoUsers = cfos.map((cfo, i) => ({
+    username: `cfo.${CFOS[i].slug}@demo.local`,
+    passwordHash,
+    role: Role.CFO,
+    cfoId: cfo.id,
+    firstName: 'ЦФО',
+    lastName: CFOS[i].code,
+  }));
+
   await userRepo.save([
-    {
-      username: 'filial@demo.local',
-      passwordHash,
-      role: Role.FILIAL,
-      filialId: filials[0].id,
-      firstName: 'Филиал',
-      lastName: 'Демо',
-    },
-    {
-      username: 'cfo@demo.local',
-      passwordHash,
-      role: Role.CFO,
-      cfoId: cfos[0].id,
-      firstName: 'ЦФО',
-      lastName: 'Демо',
-    },
+    ...filialUsers,
+    ...cfoUsers,
     {
       username: 'dtoe@demo.local',
       passwordHash,
@@ -156,7 +185,10 @@ async function main() {
   ]);
 
   console.log(
-    `Сид завершён. Логины: filial@demo.local / cfo@demo.local / dtoe@demo.local / admin@demo.local, пароль для всех: ${DEMO_PASSWORD}`,
+    `Сид завершён. Аккаунтов: ${filialUsers.length} филиалов + ${cfoUsers.length} ЦФО + dtoe@demo.local + admin@demo.local. ` +
+      `Логины филиалов: ${filialUsers.map((u) => u.username).join(', ')}. ` +
+      `Логины ЦФО: ${cfoUsers.map((u) => u.username).join(', ')}. ` +
+      `Пароль для всех: ${DEMO_PASSWORD}`,
   );
   await dataSource.destroy();
 }

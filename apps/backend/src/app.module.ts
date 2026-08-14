@@ -9,6 +9,7 @@ import { SessionAuthGuard } from './common/guards/session-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { CorrectionsModule } from './corrections/corrections.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { OrgModule } from './org/org.module';
 import { RedisModule } from './redis/redis.module';
 import { UsersModule } from './users/users.module';
 
@@ -35,6 +36,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     CorrectionsModule,
     NotificationsModule,
+    OrgModule,
   ],
   controllers: [AppController],
   providers: [
