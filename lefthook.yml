@@ -4,19 +4,10 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: lint and format
-      group:
-        piped: true
-        jobs:
-          - name: lint
-            run: bun run lint --no-warn-ignored {staged_files}
-            root: apps/frontend/
-            glob: '*.{js,mjs,jsx,ts,mts,tsx,md,json,jsonc,yaml,yml,toml}'
-          - name: format
-            run: bun fmt --no-error-on-unmatched-pattern {staged_files}
-            root: apps/frontend/
-            glob: '*.{js,mjs,jsx,ts,mts,tsx,md,json,jsonc,yaml,yml,toml,html,css}'
-            stage_fixed: true
+    - name: lint
+      run: bun run lint --no-warn-ignored {staged_files}
+      root: apps/frontend/
+      glob: '*.{js,mjs,jsx,ts,mts,tsx,md,json,jsonc,yaml,yml,toml}'
     - name: typecheck
       run: bun typecheck
       root: apps/frontend/
@@ -25,19 +16,22 @@ pre-commit:
       run: bun run test --silent --reporter=minimal
       root: apps/frontend/
       glob: '*.{js,mjs,jsx,ts,mts,tsx}'
-    - name: backend-cs
-      glob: 'apps/backend/**/*.php'
-      run: make cs
-    - name: backend-phpstan
-      glob: 'apps/backend/**/*.php'
-      run: make phpstan
+    - name: backend-lint
+      run: npm run lint
+      root: apps/backend/
+      glob: '*.ts'
+      stage_fixed: true
+    - name: backend-test
+      run: npm run test -- --silent
+      root: apps/backend/
+      glob: '*.ts'
 
 pre-push:
   parallel: true
   jobs:
-    - name: backend-test
-      glob: 'apps/backend/**/*.php'
-      run: make test
+    - name: backend-e2e
+      run: npm run test:e2e
+      root: apps/backend/
 
 commit-msg:
   commands:
@@ -57,16 +51,3 @@ commit-msg:
           echo "  Удалите указанные выше строки и повторите коммит."
           exit 1
         fi
-
-prepare-commit-msg:
-  commands:
-    commitizen:
-      skip:
-        - merge
-        - rebase
-        - run: '[ -z "$(git diff --cached --name-only -- apps/frontend/)" ]'
-      interactive: true
-      run: bun cz --hook
-      root: apps/frontend/
-      env:
-        LEFTHOOK: '0'

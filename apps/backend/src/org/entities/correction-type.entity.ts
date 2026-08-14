@@ -1,4 +1,10 @@
-import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { PackageRequirement } from './package-requirement.entity';
 
@@ -21,7 +27,10 @@ export class CorrectionType {
   @Column({ default: true })
   isActive: boolean;
 
-  @OneToMany(() => PackageRequirement, (requirement) => requirement.correctionType)
+  @OneToMany(
+    () => PackageRequirement,
+    (requirement) => requirement.correctionType,
+  )
   requirements: PackageRequirement[];
 
   @OneToMany('Correction', 'correctionType')

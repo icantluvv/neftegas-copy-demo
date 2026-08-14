@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { User } from '../../users/entities/user.entity';
 import { Correction } from './correction.entity';
@@ -9,7 +16,9 @@ export class CorrectionHistoryEntry {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Correction, (correction) => correction.history, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Correction, (correction) => correction.history, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'correctionId' })
   correction: Correction;
 

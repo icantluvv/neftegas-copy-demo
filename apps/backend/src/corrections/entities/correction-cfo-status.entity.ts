@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 
 import { Cfo } from '../../org/entities/cfo.entity';
 import { User } from '../../users/entities/user.entity';
@@ -20,7 +27,9 @@ export class CorrectionCfoStatus {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Correction, (correction) => correction.cfoStatuses, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Correction, (correction) => correction.cfoStatuses, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'correctionId' })
   correction: Correction;
 
@@ -34,7 +43,11 @@ export class CorrectionCfoStatus {
   @Column()
   cfoId: number;
 
-  @Column({ type: 'enum', enum: CfoStatusValue, default: CfoStatusValue.PENDING })
+  @Column({
+    type: 'enum',
+    enum: CfoStatusValue,
+    default: CfoStatusValue.PENDING,
+  })
   status: CfoStatusValue;
 
   @Column({ default: true })

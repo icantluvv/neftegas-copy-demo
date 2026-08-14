@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { User } from '../../users/entities/user.entity';
 import { DocumentSlot } from './document-slot.entity';
@@ -10,7 +17,9 @@ export class FileVersion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => DocumentSlot, (slot) => slot.versions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => DocumentSlot, (slot) => slot.versions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'slotId' })
   slot: DocumentSlot;
 

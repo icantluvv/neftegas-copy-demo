@@ -17,9 +17,13 @@ export class FilesController {
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
   ) {
-    const { buffer, fileName, mimeType } = await this.service.downloadFileVersion(user, id);
+    const { buffer, fileName, mimeType } =
+      await this.service.downloadFileVersion(user, id);
     res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(fileName)}"`,
+    );
     res.send(buffer);
   }
 }

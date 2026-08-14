@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { PackageRequirement } from '../../org/entities/package-requirement.entity';
 import { Correction } from './correction.entity';
@@ -14,7 +21,9 @@ export class DocumentSlot {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Correction, (correction) => correction.slots, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Correction, (correction) => correction.slots, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'correctionId' })
   correction: Correction;
 

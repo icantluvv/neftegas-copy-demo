@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Cfo } from './cfo.entity';
 import { CorrectionType } from './correction-type.entity';
@@ -20,7 +26,9 @@ export class PackageRequirement {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => CorrectionType, (type) => type.requirements, { onDelete: 'CASCADE' })
+  @ManyToOne(() => CorrectionType, (type) => type.requirements, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'correctionTypeId' })
   correctionType: CorrectionType;
 

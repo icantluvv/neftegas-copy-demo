@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Cfo } from '../../org/entities/cfo.entity';
 import { User } from '../../users/entities/user.entity';
@@ -26,7 +34,9 @@ export class Remark {
   @Column()
   humanId: string;
 
-  @ManyToOne(() => Correction, (correction) => correction.remarks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Correction, (correction) => correction.remarks, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'correctionId' })
   correction: Correction;
 

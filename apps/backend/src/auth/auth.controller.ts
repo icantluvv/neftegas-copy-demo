@@ -48,7 +48,9 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    await this.authService.logout(req.cookies?.[SESSION_COOKIE], res);
+    const cookies = req.cookies as
+      Record<string, string | undefined> | undefined;
+    await this.authService.logout(cookies?.[SESSION_COOKIE], res);
   }
 
   @Post('logout-all')

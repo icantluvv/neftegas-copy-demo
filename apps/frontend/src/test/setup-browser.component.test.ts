@@ -9,7 +9,7 @@ describe('component test setup', () => {
 		try {
 			expect(
 				getComputedStyle(document.documentElement).getPropertyValue('--foreground').trim(),
-			).toBe('#171717')
+			).toBe('oklch(0.145 0 0)')
 		} finally {
 			probe.remove()
 		}

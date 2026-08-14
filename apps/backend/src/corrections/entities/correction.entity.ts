@@ -41,14 +41,18 @@ export class Correction {
   @Column()
   humanId: string;
 
-  @ManyToOne(() => Filial, (filial) => filial.corrections, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => Filial, (filial) => filial.corrections, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'filialId' })
   filial: Filial;
 
   @Column()
   filialId: number;
 
-  @ManyToOne(() => CorrectionType, (type) => type.corrections, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => CorrectionType, (type) => type.corrections, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'correctionTypeId' })
   correctionType: CorrectionType;
 
@@ -62,7 +66,11 @@ export class Correction {
   @Column()
   authorId: number;
 
-  @Column({ type: 'enum', enum: CorrectionStatus, default: CorrectionStatus.DRAFT })
+  @Column({
+    type: 'enum',
+    enum: CorrectionStatus,
+    default: CorrectionStatus.DRAFT,
+  })
   status: CorrectionStatus;
 
   @Column({ default: '' })

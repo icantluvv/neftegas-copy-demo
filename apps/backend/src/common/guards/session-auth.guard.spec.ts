@@ -87,7 +87,7 @@ describe('SessionAuthGuard', () => {
     const context = makeContext({ session_id: 'ok-id' });
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ user?: User }>();
     expect(request.user).toBe(user);
   });
 });

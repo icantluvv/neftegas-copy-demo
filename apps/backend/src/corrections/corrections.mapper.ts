@@ -7,14 +7,25 @@ import { CorrectionHistoryEntry } from './entities/correction-history-entry.enti
 import { Correction } from './entities/correction.entity';
 import { DocumentSlot } from './entities/document-slot.entity';
 import { FileVersion } from './entities/file-version.entity';
-import { Remark } from './entities/remark.entity';
+import { Remark, RemarkStatus } from './entities/remark.entity';
 
 export function toUserSummaryDto(user: User) {
-  return { id: user.id, username: user.username, fullName: user.fullName, role: user.role, position: user.position };
+  return {
+    id: user.id,
+    username: user.username,
+    fullName: user.fullName,
+    role: user.role,
+    position: user.position,
+  };
 }
 
 export function toFilialDto(filial: Filial) {
-  return { id: filial.id, code: filial.code, name: filial.name, isActive: filial.isActive };
+  return {
+    id: filial.id,
+    code: filial.code,
+    name: filial.name,
+    isActive: filial.isActive,
+  };
 }
 
 export function toCfoDto(cfo: Cfo) {
@@ -22,7 +33,13 @@ export function toCfoDto(cfo: Cfo) {
 }
 
 export function toCorrectionTypeDto(type: CorrectionType) {
-  return { id: type.id, code: type.code, name: type.name, description: type.description, isActive: type.isActive };
+  return {
+    id: type.id,
+    code: type.code,
+    name: type.name,
+    description: type.description,
+    isActive: type.isActive,
+  };
 }
 
 export function toFileVersionDto(version: FileVersion) {
@@ -43,7 +60,9 @@ export function toFileVersionDto(version: FileVersion) {
 export function toDocumentSlotDto(slot: DocumentSlot) {
   const versions = slot.versions ?? [];
   const current = versions.length
-    ? versions.reduce((latest, v) => (v.versionNumber > latest.versionNumber ? v : latest))
+    ? versions.reduce((latest, v) =>
+        v.versionNumber > latest.versionNumber ? v : latest,
+      )
     : null;
   return {
     id: slot.id,
@@ -52,7 +71,9 @@ export function toDocumentSlotDto(slot: DocumentSlot) {
     label: slot.label,
     isFilled: versions.length > 0,
     isRequired: slot.requirement ? slot.requirement.isRequired : true,
-    responsibleCfo: slot.requirement?.responsibleCfo ? toCfoDto(slot.requirement.responsibleCfo) : null,
+    responsibleCfo: slot.requirement?.responsibleCfo
+      ? toCfoDto(slot.requirement.responsibleCfo)
+      : null,
     currentVersion: current ? toFileVersionDto(current) : null,
   };
 }
@@ -105,7 +126,7 @@ export function toHistoryEntryDto(entry: CorrectionHistoryEntry) {
 }
 
 export function openRemarksCountOf(remarks: Remark[] | undefined): number {
-  return (remarks ?? []).filter((r) => r.status !== 'CLOSED').length;
+  return (remarks ?? []).filter((r) => r.status !== RemarkStatus.CLOSED).length;
 }
 
 export function toCorrectionBaseDto(correction: Correction) {
@@ -129,7 +150,9 @@ export function toCorrectionBaseDto(correction: Correction) {
 
 export function toCorrectionListItemDto(
   correction: Correction,
-  opts: { myCfoStatus?: (typeof correction.cfoStatuses)[number]['status'] | null } = {},
+  opts: {
+    myCfoStatus?: (typeof correction.cfoStatuses)[number]['status'] | null;
+  } = {},
 ) {
   return {
     ...toCorrectionBaseDto(correction),

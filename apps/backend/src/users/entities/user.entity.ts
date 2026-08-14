@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Cfo } from '../../org/entities/cfo.entity';
 import { Filial } from '../../org/entities/filial.entity';
@@ -36,14 +44,20 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.FILIAL })
   role: Role;
 
-  @ManyToOne(() => Filial, (filial) => filial.users, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Filial, (filial) => filial.users, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'filialId' })
   filial: Filial | null;
 
   @Column({ nullable: true })
   filialId: number | null;
 
-  @ManyToOne(() => Cfo, (cfo) => cfo.users, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Cfo, (cfo) => cfo.users, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'cfoId' })
   cfo: Cfo | null;
 

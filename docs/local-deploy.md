@@ -102,6 +102,19 @@ bun install
 bun run lefthook install   # если хук не подхватился автоматически через prepare-скрипт
 ```
 
+Хук `commit-msg` проверяет сообщение коммита через
+[commitlint](https://commitlint.js.org/) (`@commitlint/config-conventional`,
+конфиг — `apps/frontend/commitlint.config.mjs`): коммит, не соответствующий
+Conventional Commits (`тип(скоуп): короткое описание`), будет отклонён. Также
+обязателен трейлер `Change` (имя OpenSpec-change) в footer:
+
+```sh
+git commit -m 'fix(notify): исправить фильтр' -m 'Change: some-change'
+```
+
+Тот же хук блокирует AI-атрибуцию в сообщении (`Co-Authored-By: Claude` и т.п.).
+Правила формата — раздел «Формат коммита» в корневом `AGENTS.md`.
+
 ## Полезные команды
 
 ```sh

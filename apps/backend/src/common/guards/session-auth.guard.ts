@@ -30,7 +30,9 @@ export class SessionAuthGuard implements CanActivate {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest<Request>();
-    const sessionId = request.cookies?.[SESSION_COOKIE];
+    const cookies = request.cookies as
+      Record<string, string | undefined> | undefined;
+    const sessionId = cookies?.[SESSION_COOKIE];
     if (!sessionId) throw new UnauthorizedException();
 
     const session = await this.sessionService.validateAndTouch(sessionId);
