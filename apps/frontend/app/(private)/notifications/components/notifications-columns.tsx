@@ -1,4 +1,5 @@
 import type {ColumnDef} from "@tanstack/react-table";
+import {ArrowRight} from "lucide-react";
 
 import type {Notification} from "@/packages/api/base/codegen";
 
@@ -26,11 +27,12 @@ export const notificationsColumns: ColumnDef<Notification, unknown>[] = [
             <Button
                 type="button"
                 variant="outline"
-                size="sm"
-                className="min-h-12"
+                size="icon"
+                className="min-h-12 min-w-12"
+                aria-label="Открыть"
                 onClick={() => (table.options.meta as NotificationsTableMeta).onOpen(row.original)}
             >
-                Открыть
+                <ArrowRight />
             </Button>
         ),
     },

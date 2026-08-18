@@ -16,24 +16,29 @@ export function NotificationPanelList({notifications, onSelect}: NotificationPan
 
     return (
         <ul className="flex flex-col gap-1 max-h-100 overflow-y-auto">
-            {notifications.map((notification) => (
-                <li key={notification.id}>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => onSelect(notification)}
-                        className={cn(
-                            "h-auto w-full flex-col items-start justify-start gap-0.5 p-4 text-left font-normal whitespace-normal",
-                            !notification.isRead && "font-bold",
-                        )}
-                    >
-                        <span className="text-xs text-muted-foreground">
-                            {formatNotificationDateTime(notification.createdAt)}
-                        </span>
-                        <span>{notification.text}</span>
-                    </Button>
-                </li>
-            ))}
+            {notifications.map((notification) => {
+                const [datePart, timePart] = formatNotificationDateTime(notification.createdAt).split(" ");
+
+                return (
+                    <li key={notification.id}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => onSelect(notification)}
+                            className={cn(
+                                "h-auto rounded-none w-full flex-col items-start justify-start gap-0.5 p-4 text-left font-normal whitespace-normal",
+                                !notification.isRead && "font-bold",
+                            )}
+                        >
+                            <span className="flex gap-2 text-xs text-muted-foreground">
+                                <span>{datePart}</span>
+                                <span>{timePart}</span>
+                            </span>
+                            <span>{notification.text}</span>
+                        </Button>
+                    </li>
+                );
+            })}
         </ul>
     );
 }

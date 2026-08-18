@@ -12,11 +12,10 @@ import {
   getNotificationsQueryKey,
   type Notification,
   useGetNotifications,
-  useMarkAllNotificationsRead,
   useOpenNotification,
 } from "@/packages/api/base/codegen";
 
-import {Button, buttonVariants} from "#/components/ui/button";
+import {buttonVariants} from "#/components/ui/button";
 import {useDesktopNotifications} from "#/hooks/use-desktop-notifications";
 
 import {NotificationPanelList} from "./notification-panel-list";
@@ -33,7 +32,6 @@ export function NotificationBell() {
         query: {refetchInterval: POLL_INTERVAL_MS},
     });
     const openNotification = useOpenNotification();
-    const markAllRead = useMarkAllNotificationsRead();
 
     const notifications = notificationsQuery.data ?? [];
     const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -55,15 +53,11 @@ export function NotificationBell() {
 
     useDesktopNotifications(notifications, handleSelectNotification);
 
-    function handleMarkAllRead() {
-        markAllRead.mutate(undefined, {onSuccess: invalidateNotifications});
-    }
-
     return (
         <Popover.Root open={open} onOpenChange={setOpen}>
             <Popover.Trigger
                 aria-label="Уведомления"
-                className={cn(buttonVariants({variant: "ghost", size: 'icon-lg'}), "relative")}
+                className={cn(buttonVariants({variant: "ghost", size: 'icon-lg'}), "relative size-12")}
             >
                 <Bell className="size-5"/>
                 {unreadCount > 0 && (
@@ -78,32 +72,20 @@ export function NotificationBell() {
             <Popover.Portal>
                 <Popover.Positioner sideOffset={8} align="end">
                     <Popover.Popup
-                        className="w-80 rounded-2xl border border-border bg-popover p-6 text-popover-foreground shadow-lg">
-                        <div className="flex items-center justify-between gap-2 pb-2">
-              <span className="text-sm font-semibold">
-                Уведомления{unreadCount > 0 ? ` (${unreadCount})` : ""}
-              </span>
-                            {unreadCount > 0 && (
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-auto p-0 text-xs font-medium text-primary hover:bg-transparent hover:underline"
-                                    onClick={handleMarkAllRead}
-                                    disabled={markAllRead.isPending}
-                                >
-                                    Отметить все прочитанными
-                                </Button>
-                            )}
+                        className="w-80 overflow-hidden m-4 rounded-2xl border border-border bg-popover text-popover-foreground shadow-lg">
+                        <div className="px-4 mt-4 pb-2 border-border border-b">
+                            <span className="text-sm font-semibold">Уведомления</span>
                         </div>
                         <NotificationPanelList notifications={panelItems} onSelect={handleSelectNotification}/>
+                     <div className='border-t  border-border'>
                         <Link
                             href="/notifications"
-                            className="mt-2 flex min-h-6 items-center justify-center text-center text-xs font-medium text-primary hover:underline"
+                            className={cn(buttonVariants({variant: 'ghost'}), "rounded-none  min-h-12 w-full")}
                             onClick={() => setOpen(false)}
                         >
                             Все уведомления
                         </Link>
+                     </div>
                     </Popover.Popup>
                 </Popover.Positioner>
             </Popover.Portal>

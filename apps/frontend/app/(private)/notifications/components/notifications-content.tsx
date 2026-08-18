@@ -32,6 +32,8 @@ export function NotificationsContent() {
 
     const notifications = notificationsQuery.data;
 
+    const hasUnread = useMemo(() => notifications.some((n) => !n.isRead), [notifications]);
+
     const visibleNotifications = useMemo(
         () =>
             notifications.filter((n) => {
@@ -89,7 +91,7 @@ export function NotificationsContent() {
                         size="sm"
                         className="min-h-12"
                         onClick={handleMarkAllRead}
-                        disabled={markAllRead.isPending}
+                        disabled={markAllRead.isPending || !hasUnread}
                     >
                         Отметить все прочитанными
                     </Button>
