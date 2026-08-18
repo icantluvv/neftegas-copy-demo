@@ -1,3 +1,5 @@
+import {Bell, FilePlus, LayoutDashboard, type LucideIcon} from "lucide-react";
+
 import type {AuthUser} from "@/packages/api/base/codegen";
 
 export type DashboardKind = "filial" | "cfo" | "dtoe";
@@ -12,14 +14,15 @@ export const DASHBOARD_KIND_BY_ROLE: Partial<Record<AuthUser["role"], DashboardK
 export interface NavItem {
     href: string;
     label: string;
+    icon: LucideIcon;
     /** Отсутствие поля — пункт виден всем ролям. */
     roles?: AuthUser["role"][];
 }
 
 export const navItems: NavItem[] = [
-    {href: "/dashboard", label: "Рабочий стол"},
-    {href: "/corrections/create", label: "Создать корректировку", roles: ["FILIAL"]},
-    {href: "/notifications", label: "Уведомления"},
+    {href: "/dashboard", label: "Рабочий стол", icon: LayoutDashboard},
+    {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
+    {href: "/notifications", label: "Уведомления", icon: Bell},
 ];
 
 

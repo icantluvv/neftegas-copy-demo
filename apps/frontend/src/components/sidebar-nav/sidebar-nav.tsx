@@ -67,16 +67,18 @@ export function SidebarNav({user}: { user: AuthUser }) {
                             .filter((item) => !item.roles || item.roles.includes(user.role))
                             .map((item) => {
                             const isActive = pathname === item.href;
+                            const Icon = item.icon;
                             return (
                                 <Link
                                     key={item.href}
                                     href={item.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
-                                        "flex min-h-12 items-center rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-white/10",
+                                        "flex min-h-12 items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-white/10",
                                         isActive && "bg-white/10"
                                     )}
                                 >
+                                    <Icon className="size-5 shrink-0" aria-hidden="true"/>
                                     {item.label}
                                 </Link>
                             );
@@ -99,7 +101,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
                         variant="ghost"
                         size='icon-lg'
                         aria-label="Выйти"
-                        className="text-sidebar-foreground hover:bg-white/10 hover:text-sidebar-foreground"
+                        className="text-sidebar-foreground size-12 hover:bg-white/10 hover:text-sidebar-foreground"
                         onClick={handleLogout}
                         disabled={logout.isPending}
                     >
