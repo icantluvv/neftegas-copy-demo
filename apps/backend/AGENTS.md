@@ -5,7 +5,8 @@
 
 ## Стек
 
-Node.js, NestJS 11, TypeORM, PostgreSQL, Jest. Аутентификация — Passport + JWT
+Node.js, NestJS 11, TypeORM, PostgreSQL, Jest. Сборка и установка зависимостей — Bun
+(`bun install`, `bun run <script>`), lock-файл — `bun.lock`. Аутентификация — Passport + JWT
 (`src/auth`). Валидация DTO — `class-validator`/`class-transformer`. API-документация
 генерируется через `@nestjs/swagger`, но source of truth контракта — `api/src/openapi.yaml`
 (см. корневой `AGENTS.md`, правило contract-first).
@@ -22,7 +23,7 @@ Backend организован как домены в `src/<domain>/`:
 | `corrections`   | `src/corrections/`   | Корректировки, слоты документов, версии файлов, замечания, история |
 | `notifications` | `src/notifications/` | Уведомления пользователей                                          |
 | `common`        | `src/common/`        | Общие декораторы и guard'ы                                          |
-| `database`      | `src/database/`      | Подключение к БД, сидинг (`npm run seed`)                           |
+| `database`      | `src/database/`      | Подключение к БД, сидинг (`bun run seed`)                           |
 
 ## Модель данных
 
@@ -149,5 +150,6 @@ Backend организован как домены в `src/<domain>/`:
 
 ## Тесты
 
-`npm test` — юнит-тесты (Jest), `npm run test:e2e` — e2e (`test/jest-e2e.json`),
-`npm run test:cov` — с покрытием.
+`bun run test` — юнит-тесты (Jest; `bun test` без `run` запускает встроенный
+раннер Bun, а не скрипт `test` из `package.json` — не использовать),
+`bun run test:e2e` — e2e (`test/jest-e2e.json`), `bun run test:cov` — с покрытием.

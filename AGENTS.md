@@ -161,6 +161,6 @@
 
 ## Окружение
 
-Backend-команды (npm — NestJS, TypeORM, Jest) выполняются из `apps/backend`.
+Backend-команды (Bun — NestJS, TypeORM, Jest) выполняются из `apps/backend`.
 Frontend-команды — из `apps/frontend` (Bun). API-команды (`npm run lint`,
 `npm run bundle`) — из `api/`.
