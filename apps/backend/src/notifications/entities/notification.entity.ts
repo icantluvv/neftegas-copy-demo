@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 
 import { Correction } from '../../corrections/entities/correction.entity';
@@ -17,14 +18,14 @@ export class Notification {
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: Relation<User>;
 
   @Column()
   userId: number;
 
   @ManyToOne(() => Correction, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'correctionId' })
-  correction: Correction;
+  correction: Relation<Correction>;
 
   @Column()
   correctionId: number;

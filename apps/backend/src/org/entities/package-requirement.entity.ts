@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 
 import { Cfo } from './cfo.entity';
@@ -30,7 +31,7 @@ export class PackageRequirement {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'correctionTypeId' })
-  correctionType: CorrectionType;
+  correctionType: Relation<CorrectionType>;
 
   @Column()
   correctionTypeId: number;

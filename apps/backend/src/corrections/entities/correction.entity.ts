@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -45,7 +46,7 @@ export class Correction {
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'filialId' })
-  filial: Filial;
+  filial: Relation<Filial>;
 
   @Column()
   filialId: number;
@@ -54,14 +55,14 @@ export class Correction {
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'correctionTypeId' })
-  correctionType: CorrectionType;
+  correctionType: Relation<CorrectionType>;
 
   @Column()
   correctionTypeId: number;
 
   @ManyToOne(() => User, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'authorId' })
-  author: User;
+  author: Relation<User>;
 
   @Column()
   authorId: number;

@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 
 import { User } from '../../users/entities/user.entity';
@@ -21,7 +22,7 @@ export class FileVersion {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'slotId' })
-  slot: DocumentSlot;
+  slot: Relation<DocumentSlot>;
 
   @Column()
   slotId: number;
@@ -44,7 +45,7 @@ export class FileVersion {
 
   @ManyToOne(() => User, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'uploadedById' })
-  uploadedBy: User;
+  uploadedBy: Relation<User>;
 
   @Column()
   uploadedById: number;
@@ -54,7 +55,7 @@ export class FileVersion {
 
   @ManyToOne(() => Remark, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'remarkId' })
-  remark: Remark | null;
+  remark: Relation<Remark> | null;
 
   @Column({ nullable: true })
   remarkId: number | null;

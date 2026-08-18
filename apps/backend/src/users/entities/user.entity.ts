@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 
 import { Cfo } from '../../org/entities/cfo.entity';
@@ -49,7 +50,7 @@ export class User {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'filialId' })
-  filial: Filial | null;
+  filial: Relation<Filial> | null;
 
   @Column({ nullable: true })
   filialId: number | null;
@@ -59,7 +60,7 @@ export class User {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'cfoId' })
-  cfo: Cfo | null;
+  cfo: Relation<Cfo> | null;
 
   @Column({ nullable: true })
   cfoId: number | null;

@@ -207,7 +207,7 @@ async function main() {
     })),
   );
 
-  const [dtoeUser, adminUser] = await userRepo.save([
+  const [dtoeUser] = await userRepo.save([
     {
       username: 'dtoe@demo.local',
       passwordHash,

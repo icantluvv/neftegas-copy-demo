@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   Unique,
 } from 'typeorm';
 
@@ -19,14 +20,14 @@ export class FilialCfoLink {
 
   @ManyToOne(() => Filial, (filial) => filial.cfoLinks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'filialId' })
-  filial: Filial;
+  filial: Relation<Filial>;
 
   @Column()
   filialId: number;
 
   @ManyToOne(() => Cfo, (cfo) => cfo.filialLinks, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cfoId' })
-  cfo: Cfo;
+  cfo: Relation<Cfo>;
 
   @Column()
   cfoId: number;

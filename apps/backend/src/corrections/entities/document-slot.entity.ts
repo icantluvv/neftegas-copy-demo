@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 
 import { PackageRequirement } from '../../org/entities/package-requirement.entity';
@@ -25,14 +26,14 @@ export class DocumentSlot {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'correctionId' })
-  correction: Correction;
+  correction: Relation<Correction>;
 
   @Column()
   correctionId: number;
 
   @ManyToOne(() => PackageRequirement, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'requirementId' })
-  requirement: PackageRequirement | null;
+  requirement: Relation<PackageRequirement> | null;
 
   @Column({ nullable: true })
   requirementId: number | null;

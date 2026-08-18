@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 
 import { Cfo } from '../../org/entities/cfo.entity';
@@ -38,21 +39,21 @@ export class Remark {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'correctionId' })
-  correction: Correction;
+  correction: Relation<Correction>;
 
   @Column()
   correctionId: number;
 
   @ManyToOne(() => Cfo, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'cfoId' })
-  cfo: Cfo | null;
+  cfo: Relation<Cfo> | null;
 
   @Column({ nullable: true })
   cfoId: number | null;
 
   @ManyToOne(() => User, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'authorId' })
-  author: User;
+  author: Relation<User>;
 
   @Column()
   authorId: number;
@@ -62,14 +63,14 @@ export class Remark {
 
   @ManyToOne(() => DocumentSlot, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'relatedSlotId' })
-  relatedSlot: DocumentSlot | null;
+  relatedSlot: Relation<DocumentSlot> | null;
 
   @Column({ nullable: true })
   relatedSlotId: number | null;
 
   @ManyToOne(() => FileVersion, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'fileVersionId' })
-  fileVersion: FileVersion | null;
+  fileVersion: Relation<FileVersion> | null;
 
   @Column({ nullable: true })
   fileVersionId: number | null;
@@ -94,7 +95,7 @@ export class Remark {
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'closedById' })
-  closedBy: User | null;
+  closedBy: Relation<User> | null;
 
   @Column({ nullable: true })
   closedById: number | null;

@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   Unique,
 } from 'typeorm';
 
@@ -31,14 +32,14 @@ export class CorrectionCfoStatus {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'correctionId' })
-  correction: Correction;
+  correction: Relation<Correction>;
 
   @Column()
   correctionId: number;
 
   @ManyToOne(() => Cfo, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'cfoId' })
-  cfo: Cfo;
+  cfo: Relation<Cfo>;
 
   @Column()
   cfoId: number;
@@ -55,7 +56,7 @@ export class CorrectionCfoStatus {
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'decidedById' })
-  decidedBy: User | null;
+  decidedBy: Relation<User> | null;
 
   @Column({ nullable: true })
   decidedById: number | null;
