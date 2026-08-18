@@ -5,7 +5,7 @@
 | Компонент              | Технология                              |
 | ---------------------- | --------------------------------------- |
 | Backend                | Node.js, NestJS 11, TypeORM, PostgreSQL |
-| Frontend               | Next.js 16, React 19, TypeScript        |
+| Frontend               | Next.js 16, React 19, TypeScript, Tailwind 4 |
 | API-контракт           | OpenAPI 3.0.2 (yaml)                    |
 | Codegen бэк            | По контракту OpenAPI, инструмент отдельно |
 | Codegen фронт          | По контракту OpenAPI, инструмент отдельно |
@@ -33,7 +33,7 @@ GasDashboard/
 ├── apps/
 │   ├── backend/                  # Node.js, NestJS 11, TypeORM, PostgreSQL
 │   │   └── AGENTS.md            # Контекст для AI-агентов
-│   └── frontend/                 # Next.js 16, React 19, TypeScript
+│   └── frontend/                 # Next.js 16, React 19, TypeScript, Tailwind 4
 │       └── CLAUDE.md            # Контекст для AI-агентов
 ├── openspec/                     # Спецификации фич (spec-driven development)
 │   ├── config.yaml
