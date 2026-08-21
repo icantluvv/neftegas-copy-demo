@@ -4,7 +4,6 @@
 */
 
 import type { CorrectionDetail } from "../CorrectionDetail";
-import type { RemarkCreateInput } from "../RemarkCreateInput";
 
 export interface ReturnCorrectionByDtoePathParams {
     /**
@@ -18,13 +17,10 @@ export interface ReturnCorrectionByDtoePathParams {
 */
 export type ReturnCorrectionByDtoe200 = CorrectionDetail;
 
-export type ReturnCorrectionByDtoeMutationRequest = RemarkCreateInput;
-
 export type ReturnCorrectionByDtoeMutationResponse = ReturnCorrectionByDtoe200;
 
 export type ReturnCorrectionByDtoeMutation = {
     Response: ReturnCorrectionByDtoe200;
-    Request: ReturnCorrectionByDtoeMutationRequest;
     PathParams: ReturnCorrectionByDtoePathParams;
     Errors: any;
 };

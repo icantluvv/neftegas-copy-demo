@@ -5,8 +5,8 @@
 
 import fetch from "../../../client";
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { ReturnCorrectionByDtoeMutationRequest, ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "../../types/correctionsController/ReturnCorrectionByDtoe";
-import { returnCorrectionByDtoeMutationResponseSchema, returnCorrectionByDtoeMutationRequestSchema } from "../../zod/correctionsController/returnCorrectionByDtoeSchema";
+import type { ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "../../types/correctionsController/ReturnCorrectionByDtoe";
+import { returnCorrectionByDtoeMutationResponseSchema } from "../../zod/correctionsController/returnCorrectionByDtoeSchema";
 
 function getReturnCorrectionByDtoeUrl({ humanId }: { humanId: ReturnCorrectionByDtoePathParams["humanId"] }) {
   const res = { method: 'POST', url: `/corrections/${humanId}/dtoe-return` as const }
@@ -14,15 +14,18 @@ function getReturnCorrectionByDtoeUrl({ humanId }: { humanId: ReturnCorrectionBy
 }
 
 /**
- * @description Роль DTOE. Создаёт замечание (cfo=null) и возвращает на доработку.
- * @summary Вернуть на доработку от лица ДТОиР (с замечанием)
+ * @description Роль DTOE. Переводит корректировку в «Возвращено ДТОиР». Требует, чтобы
+ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
+(`POST /corrections/{humanId}/remarks`) — иначе `400`.
+
+ * @summary Финализировать возврат на доработку от лица ДТОиР
  * {@link /corrections/:humanId/dtoe-return}
  */
-export async function returnCorrectionByDtoe({ humanId, data }: { humanId: ReturnCorrectionByDtoePathParams["humanId"]; data: ReturnCorrectionByDtoeMutationRequest }, config: Partial<RequestConfig<ReturnCorrectionByDtoeMutationRequest>> & { client?: Client } = {}) {
+export async function returnCorrectionByDtoe({ humanId }: { humanId: ReturnCorrectionByDtoePathParams["humanId"] }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = returnCorrectionByDtoeMutationRequestSchema.parse(data)
 
-  const res = await request<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, ReturnCorrectionByDtoeMutationRequest>({ method : "POST", url : getReturnCorrectionByDtoeUrl({ humanId }).url.toString(), data : requestData, ... requestConfig })
+
+  const res = await request<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, unknown>({ method : "POST", url : getReturnCorrectionByDtoeUrl({ humanId }).url.toString(), ... requestConfig })
   return returnCorrectionByDtoeMutationResponseSchema.parse(res.data)
 }

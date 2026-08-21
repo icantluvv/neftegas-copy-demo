@@ -23,13 +23,12 @@ import {
   canApproveAsCfo,
   canApproveAsDtoe,
   canDeleteRemark,
+  canFinalizeReturnAsCfo,
+  canFinalizeReturnAsDtoe,
   canMarkRemarkFixed,
-  canReturnAsCfo,
-  canReturnAsDtoe,
   canSendToDtoe,
 } from "../lib/permissions";
 import { getRemarkStatusLabel } from "../../../lib/status-labels";
-import { ReturnRemarkDialog } from "./return-remark-dialog";
 
 function slotLabel(detail: CorrectionDetail, slotId: number | null | undefined) {
   return detail.slots.find((slot) => slot.id === slotId)?.label ?? "—";
@@ -101,12 +100,15 @@ function RemarksActionBar({ detail }: { detail: CorrectionDetail }) {
           Согласовать
         </Button>
       )}
-      {canReturnAsCfo(detail) && (
-        <ReturnRemarkDialog
-          triggerLabel="Вернуть на доработку"
-          isSubmitting={returnAsCfo.isPending}
-          onSubmit={(data) => returnAsCfo.mutate({ humanId: detail.humanId, data })}
-        />
+      {canFinalizeReturnAsCfo(detail) && (
+        <Button
+          type="button"
+          variant="destructive"
+          disabled={returnAsCfo.isPending}
+          onClick={() => returnAsCfo.mutate({ humanId: detail.humanId })}
+        >
+          Вернуть на доработку
+        </Button>
       )}
       {canSendToDtoe(detail) && (
         <Button
@@ -126,12 +128,15 @@ function RemarksActionBar({ detail }: { detail: CorrectionDetail }) {
           Согласовать (ДТОиР)
         </Button>
       )}
-      {canReturnAsDtoe(detail) && (
-        <ReturnRemarkDialog
-          triggerLabel="Вернуть на доработку (ДТОиР)"
-          isSubmitting={returnAsDtoe.isPending}
-          onSubmit={(data) => returnAsDtoe.mutate({ humanId: detail.humanId, data })}
-        />
+      {canFinalizeReturnAsDtoe(detail) && (
+        <Button
+          type="button"
+          variant="destructive"
+          disabled={returnAsDtoe.isPending}
+          onClick={() => returnAsDtoe.mutate({ humanId: detail.humanId })}
+        >
+          Вернуть на доработку (ДТОиР)
+        </Button>
       )}
     </div>
   );

@@ -461,10 +461,36 @@ export class CorrectionsService {
     return this.toDetailDto(await this.loadDetail(correction.id), user);
   }
 
-  async cfoReturn(user: User, humanId: string, dto: RemarkCreateDto) {
+  /**
+   * Создаёт замечание к элементу пакета, не меняя статус корректировки/ЦФО —
+   * проверяющий (ЦФО или ДТОиР) может оставить несколько замечаний к разным
+   * элементам за один заход, прежде чем финализировать возврат отдельным
+   * действием (`cfoReturn`/`dtoeReturn`).
+   */
+  async leaveRemark(user: User, humanId: string, dto: RemarkCreateDto) {
     const correction = await this.findByHumanIdOrThrow(humanId);
-    const myStatus = correction.cfoStatuses.find((s) => s.cfoId === user.cfoId);
-    if (!(user.role === Role.CFO && myStatus)) {
+    let cfoId: number | null = null;
+    let issuerLabel = 'ДТОиР';
+
+    if (user.role === Role.CFO) {
+      const myStatus = correction.cfoStatuses.find(
+        (s) => s.cfoId === user.cfoId,
+      );
+      if (!myStatus) throw new ForbiddenException();
+      if (myStatus.status !== CfoStatusValue.PENDING) {
+        throw new BadRequestException(
+          'Решение по этой корректировке уже принято этим ЦФО.',
+        );
+      }
+      cfoId = user.cfoId!;
+      issuerLabel = myStatus.cfo?.code ?? 'ЦФО';
+    } else if (user.role === Role.DTOE) {
+      if (correction.status !== CorrectionStatus.UNDER_DTOE_REVIEW) {
+        throw new BadRequestException(
+          'Корректировка сейчас не находится на проверке ДТОиР.',
+        );
+      }
+    } else {
       throw new ForbiddenException();
     }
 
@@ -473,7 +499,7 @@ export class CorrectionsService {
       const remark = await manager.getRepository(Remark).save({
         humanId: humanIdForRemark,
         correctionId: correction.id,
-        cfoId: user.cfoId!,
+        cfoId,
         authorId: user.id,
         description: dto.description,
         requiredAction: dto.requiredAction,
@@ -483,6 +509,41 @@ export class CorrectionsService {
         relatedSlotId: dto.relatedSlotId ?? null,
         fileVersionId: dto.fileVersionId ?? null,
       });
+      const slotNote = dto.relatedSlotId
+        ? ` (элемент: «${correction.slots.find((s) => s.id === dto.relatedSlotId)?.label ?? ''}»)`
+        : '';
+      await this.log(
+        manager,
+        correction.id,
+        user,
+        `${issuerLabel} оставил замечание ${remark.humanId}${slotNote}.`,
+      );
+    });
+
+    return this.toDetailDto(await this.loadDetail(correction.id), user);
+  }
+
+  async cfoReturn(user: User, humanId: string) {
+    const correction = await this.findByHumanIdOrThrow(humanId);
+    const myStatus = correction.cfoStatuses.find((s) => s.cfoId === user.cfoId);
+    if (!(user.role === Role.CFO && myStatus)) {
+      throw new ForbiddenException();
+    }
+    if (myStatus.status !== CfoStatusValue.PENDING) {
+      throw new BadRequestException(
+        'Решение по этой корректировке уже принято этим ЦФО.',
+      );
+    }
+    const openRemarks = correction.remarks.filter(
+      (r) => r.cfoId === user.cfoId && r.status === RemarkStatus.OPEN,
+    );
+    if (openRemarks.length === 0) {
+      throw new BadRequestException(
+        'Нельзя вернуть на доработку без ни одного оставленного замечания.',
+      );
+    }
+
+    await this.dataSource.transaction(async (manager) => {
       await manager.getRepository(CorrectionCfoStatus).update(myStatus.id, {
         status: CfoStatusValue.RETURNED,
         decidedById: user.id,
@@ -495,21 +556,19 @@ export class CorrectionsService {
       const cfoLabel =
         correction.cfoStatuses.find((s) => s.id === myStatus.id)?.cfo?.code ??
         'ЦФО';
-      const slotNote = dto.relatedSlotId
-        ? ` (элемент: «${correction.slots.find((s) => s.id === dto.relatedSlotId)?.label ?? ''}»)`
-        : '';
+      const remarksList = openRemarks.map((r) => r.humanId).join(', ');
       const filialUsers = await this.filialUsers(manager, correction.filialId);
       await this.notifyUsers(
         manager,
         filialUsers,
         correction.id,
-        `${cfoLabel} вернуло корректировку ${correction.humanId} на доработку. Замечание ${remark.humanId}${slotNote}. ${dto.requiredAction}`,
+        `${cfoLabel} вернуло корректировку ${correction.humanId} на доработку. Замечания: ${remarksList}.`,
       );
       await this.log(
         manager,
         correction.id,
         user,
-        `${cfoLabel} создал замечание ${remark.humanId}${slotNote} и вернул на доработку.`,
+        `${cfoLabel} вернул на доработку (замечания: ${remarksList}).`,
       );
     });
 
@@ -718,44 +777,41 @@ export class CorrectionsService {
     return this.toDetailDto(await this.loadDetail(correction.id), user);
   }
 
-  async dtoeReturn(user: User, humanId: string, dto: RemarkCreateDto) {
+  async dtoeReturn(user: User, humanId: string) {
     const correction = await this.findByHumanIdOrThrow(humanId);
     if (user.role !== Role.DTOE) throw new ForbiddenException();
+    if (correction.status !== CorrectionStatus.UNDER_DTOE_REVIEW) {
+      throw new BadRequestException(
+        'Корректировка сейчас не находится на проверке ДТОиР.',
+      );
+    }
+    const openRemarks = correction.remarks.filter(
+      (r) => r.cfoId === null && r.status === RemarkStatus.OPEN,
+    );
+    if (openRemarks.length === 0) {
+      throw new BadRequestException(
+        'Нельзя вернуть на доработку без ни одного оставленного замечания.',
+      );
+    }
 
     await this.dataSource.transaction(async (manager) => {
-      const humanIdForRemark = await this.nextRemarkHumanId(manager);
-      const remark = await manager.getRepository(Remark).save({
-        humanId: humanIdForRemark,
-        correctionId: correction.id,
-        cfoId: null,
-        authorId: user.id,
-        description: dto.description,
-        requiredAction: dto.requiredAction,
-        sheetName: dto.sheetName ?? '',
-        rowRef: dto.rowRef ?? '',
-        cellRef: dto.cellRef ?? '',
-        relatedSlotId: dto.relatedSlotId ?? null,
-        fileVersionId: dto.fileVersionId ?? null,
-      });
       await manager
         .getRepository(Correction)
         .update(correction.id, { status: CorrectionStatus.RETURNED_BY_DTOE });
 
-      const slotNote = dto.relatedSlotId
-        ? ` (элемент: «${correction.slots.find((s) => s.id === dto.relatedSlotId)?.label ?? ''}»)`
-        : '';
+      const remarksList = openRemarks.map((r) => r.humanId).join(', ');
       const filialUsers = await this.filialUsers(manager, correction.filialId);
       await this.notifyUsers(
         manager,
         filialUsers,
         correction.id,
-        `ДТОиР вернуло корректировку ${correction.humanId} на доработку. Замечание ${remark.humanId}${slotNote}. ${dto.requiredAction}`,
+        `ДТОиР вернуло корректировку ${correction.humanId} на доработку. Замечания: ${remarksList}.`,
       );
       await this.log(
         manager,
         correction.id,
         user,
-        `ДТОиР создало замечание ${remark.humanId}${slotNote} и вернуло на доработку.`,
+        `ДТОиР вернуло на доработку (замечания: ${remarksList}).`,
       );
     });
 

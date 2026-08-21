@@ -1,0 +1,24 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Оставить замечание к элементу пакета
+  operationId: leaveRemark
+  tags: [Corrections]
+  description: |
+    Роли CFO и DTOE. Создаёт замечание, привязанное к элементу пакета
+    (`relatedSlotId`), не меняя статус корректировки и статус проверяющего —
+    проверяющий может оставить несколько замечаний к разным элементам за один
+    заход. Возврат пакета на доработку — отдельное действие
+    (`POST /corrections/{humanId}/cfo-return` или `.../dtoe-return`),
+    требующее хотя бы одного открытого замечания.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/remark.yaml#/RemarkCreateInput' }
+  responses:
+    '200':
+      description: Замечание создано
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }

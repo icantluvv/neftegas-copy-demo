@@ -162,4 +162,32 @@ describe("<RemarksList />", () => {
 
 		await expect.element(view.getByRole("button", { name: "Направить в ДТОиР" })).toBeVisible();
 	});
+
+	it("показывает «Вернуть на доработку» ЦФО, когда есть его открытое замечание", async () => {
+		const view = await renderWithClient(
+			makeDetail({
+				isCfoReviewer: true,
+				isFilialOwner: false,
+				myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedBy: null, decidedAt: null },
+				remarks: [makeRemark({ cfoId: 2, status: "OPEN" })],
+			}),
+		);
+
+		await expect.element(view.getByRole("button", { name: "Вернуть на доработку" })).toBeVisible();
+	});
+
+	it("скрывает «Вернуть на доработку» ЦФО, пока не оставлено ни одного замечания", async () => {
+		const view = await renderWithClient(
+			makeDetail({
+				isCfoReviewer: true,
+				isFilialOwner: false,
+				myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedBy: null, decidedAt: null },
+				remarks: [],
+			}),
+		);
+
+		await expect
+			.element(view.getByRole("button", { name: "Вернуть на доработку", includeHidden: true }))
+			.not.toBeInTheDocument();
+	});
 });

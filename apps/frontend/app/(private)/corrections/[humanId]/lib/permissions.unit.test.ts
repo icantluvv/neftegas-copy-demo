@@ -6,11 +6,13 @@ import {
   canApproveAsCfo,
   canApproveAsDtoe,
   canDeleteRemark,
+  canFinalizeReturnAsCfo,
+  canFinalizeReturnAsDtoe,
+  canLeaveRemarkAsCfo,
+  canLeaveRemarkAsDtoe,
   canMarkRemarkFixed,
   canResubmit,
   canResubmitToDtoe,
-  canReturnAsCfo,
-  canReturnAsDtoe,
   canSendForReview,
   canSendToDtoe,
   canUploadSlotFile,
@@ -108,15 +110,15 @@ describe("canSendForReview", () => {
   });
 });
 
-describe("canApproveAsCfo / canReturnAsCfo", () => {
-  it("разрешает согласование/возврат, пока статус ЦФО PENDING", () => {
+describe("canApproveAsCfo / canLeaveRemarkAsCfo", () => {
+  it("разрешает согласование/оставление замечания, пока статус ЦФО PENDING", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
       myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedAt: null },
     });
 
     expect(canApproveAsCfo(detail)).toBe(true);
-    expect(canReturnAsCfo(detail)).toBe(true);
+    expect(canLeaveRemarkAsCfo(detail)).toBe(true);
   });
 
   it("запрещает повторное согласование, если статус ЦФО уже APPROVED", () => {
@@ -128,13 +130,52 @@ describe("canApproveAsCfo / canReturnAsCfo", () => {
     expect(canApproveAsCfo(detail)).toBe(false);
   });
 
-  it("запрещает возврат, если статус ЦФО уже RETURNED", () => {
+  it("запрещает оставление замечания, если статус ЦФО уже RETURNED", () => {
     const detail = makeDetail({
       isCfoReviewer: true,
       myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "RETURNED", isRequired: true, decidedById: 9, decidedAt: "2026-08-01T00:00:00.000Z" },
     });
 
-    expect(canReturnAsCfo(detail)).toBe(false);
+    expect(canLeaveRemarkAsCfo(detail)).toBe(false);
+  });
+});
+
+describe("canFinalizeReturnAsCfo", () => {
+  const pendingCfoStatus = {
+    id: 1,
+    correctionId: 1,
+    cfoId: 2,
+    cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true },
+    status: "PENDING" as const,
+    isRequired: true,
+    decidedById: null,
+    decidedAt: null,
+  };
+
+  it("запрещает финализировать возврат, пока не оставлено ни одного замечания", () => {
+    const detail = makeDetail({ isCfoReviewer: true, myCfoStatus: pendingCfoStatus, remarks: [] });
+
+    expect(canFinalizeReturnAsCfo(detail)).toBe(false);
+  });
+
+  it("разрешает финализировать возврат, когда этот ЦФО оставил открытое замечание", () => {
+    const detail = makeDetail({
+      isCfoReviewer: true,
+      myCfoStatus: pendingCfoStatus,
+      remarks: [makeRemark({ cfoId: 2, status: "OPEN" })],
+    });
+
+    expect(canFinalizeReturnAsCfo(detail)).toBe(true);
+  });
+
+  it("игнорирует замечания других ЦФО", () => {
+    const detail = makeDetail({
+      isCfoReviewer: true,
+      myCfoStatus: pendingCfoStatus,
+      remarks: [makeRemark({ cfoId: 99, status: "OPEN" })],
+    });
+
+    expect(canFinalizeReturnAsCfo(detail)).toBe(false);
   });
 });
 
@@ -160,19 +201,47 @@ describe("canSendToDtoe", () => {
   });
 });
 
-describe("canApproveAsDtoe / canReturnAsDtoe", () => {
-  it("разрешает финальное согласование/возврат только в UNDER_DTOE_REVIEW", () => {
+describe("canApproveAsDtoe / canLeaveRemarkAsDtoe", () => {
+  it("разрешает финальное согласование/оставление замечания только в UNDER_DTOE_REVIEW", () => {
     const detail = makeDetail({ isDtoe: true, status: "UNDER_DTOE_REVIEW" });
 
     expect(canApproveAsDtoe(detail)).toBe(true);
-    expect(canReturnAsDtoe(detail)).toBe(true);
+    expect(canLeaveRemarkAsDtoe(detail)).toBe(true);
   });
 
   it("запрещает вне UNDER_DTOE_REVIEW", () => {
     const detail = makeDetail({ isDtoe: true, status: "ALL_CFO_APPROVED" });
 
     expect(canApproveAsDtoe(detail)).toBe(false);
-    expect(canReturnAsDtoe(detail)).toBe(false);
+    expect(canLeaveRemarkAsDtoe(detail)).toBe(false);
+  });
+});
+
+describe("canFinalizeReturnAsDtoe", () => {
+  it("запрещает финализировать возврат, пока не оставлено ни одного замечания ДТОиР", () => {
+    const detail = makeDetail({ isDtoe: true, status: "UNDER_DTOE_REVIEW", remarks: [] });
+
+    expect(canFinalizeReturnAsDtoe(detail)).toBe(false);
+  });
+
+  it("разрешает финализировать возврат, когда ДТОиР оставил открытое замечание", () => {
+    const detail = makeDetail({
+      isDtoe: true,
+      status: "UNDER_DTOE_REVIEW",
+      remarks: [makeRemark({ cfoId: null, status: "OPEN" })],
+    });
+
+    expect(canFinalizeReturnAsDtoe(detail)).toBe(true);
+  });
+
+  it("игнорирует замечания от ЦФО (cfoId не null)", () => {
+    const detail = makeDetail({
+      isDtoe: true,
+      status: "UNDER_DTOE_REVIEW",
+      remarks: [makeRemark({ cfoId: 2, status: "OPEN" })],
+    });
+
+    expect(canFinalizeReturnAsDtoe(detail)).toBe(false);
   });
 });
 

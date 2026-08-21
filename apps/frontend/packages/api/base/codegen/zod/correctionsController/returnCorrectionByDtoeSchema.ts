@@ -5,7 +5,6 @@
 
 import * as z from "zod/mini";
 import { correctionDetailSchema } from "../correctionDetailSchema";
-import { remarkCreateInputSchema } from "../remarkCreateInputSchema";
 
 export const returnCorrectionByDtoePathParamsSchema = z.object({
     "humanId": z.string()
@@ -15,7 +14,5 @@ export const returnCorrectionByDtoePathParamsSchema = z.object({
  * @description Возвращено ДТОиР на доработку
  */
 export const returnCorrectionByDtoe200Schema = z.lazy(() => correctionDetailSchema)
-
-export const returnCorrectionByDtoeMutationRequestSchema = z.lazy(() => remarkCreateInputSchema)
 
 export const returnCorrectionByDtoeMutationResponseSchema = z.lazy(() => returnCorrectionByDtoe200Schema)

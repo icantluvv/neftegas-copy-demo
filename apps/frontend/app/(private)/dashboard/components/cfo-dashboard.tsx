@@ -1,6 +1,7 @@
 import {getCorrectionStatsCfo} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsCfo";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
+import {CfoCorrectionsOverview} from "./cfo-corrections-overview";
 import {CorrectionStatsGrid} from "./correction-stats-grid";
 
 function isForbiddenError(error: unknown): boolean {
@@ -35,15 +36,16 @@ export async function CfoDashboard() {
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
-            <h1 className="text-2xl font-semibold">ЦФО</h1>
+            <h1 className="text-2xl font-semibold">Кабинет ЦФО</h1>
             <CorrectionStatsGrid
                 tiles={[
-                    {label: "Всего", value: stats.total},
-                    {label: "На проверке", value: stats.inReview},
-                    {label: "Возвращено на доработку", value: stats.returned},
-                    {label: "Согласовано", value: stats.approved},
+                    {label: "Всего направлено", value: stats.total},
+                    {label: "На проверке у нас", value: stats.inReview, tone: "warning"},
+                    {label: "Мы вернули", value: stats.returned, tone: "danger"},
+                    {label: "Мы согласовали", value: stats.approved, tone: "success"},
                 ]}
             />
+            <CfoCorrectionsOverview/>
         </div>
     );
 }

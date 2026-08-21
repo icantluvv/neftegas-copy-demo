@@ -4,7 +4,7 @@
 */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { ReturnCorrectionByDtoeMutationRequest, ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "../../types/correctionsController/ReturnCorrectionByDtoe";
+import type { ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "../../types/correctionsController/ReturnCorrectionByDtoe";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { returnCorrectionByDtoe } from "../../clients/correctionsController/returnCorrectionByDtoe";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
@@ -13,27 +13,30 @@ export const returnCorrectionByDtoeMutationKey = () => [{ url: '/corrections/:hu
 
 export type ReturnCorrectionByDtoeMutationKey = ReturnType<typeof returnCorrectionByDtoeMutationKey>
 
-export function returnCorrectionByDtoeMutationOptions<TContext = unknown>(config: Partial<RequestConfig<ReturnCorrectionByDtoeMutationRequest>> & { client?: Client } = {}) {
+export function returnCorrectionByDtoeMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const mutationKey = returnCorrectionByDtoeMutationKey()
-        return mutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"], data: ReturnCorrectionByDtoeMutationRequest}, TContext>({
+        return mutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>({
           mutationKey,
-          mutationFn: async({ humanId, data }) => {
-            return returnCorrectionByDtoe({ humanId, data }, config)
+          mutationFn: async({ humanId }) => {
+            return returnCorrectionByDtoe({ humanId }, config)
           },
         })
 
 }
 
 /**
- * @description Роль DTOE. Создаёт замечание (cfo=null) и возвращает на доработку.
- * @summary Вернуть на доработку от лица ДТОиР (с замечанием)
+ * @description Роль DTOE. Переводит корректировку в «Возвращено ДТОиР». Требует, чтобы
+ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
+(`POST /corrections/{humanId}/remarks`) — иначе `400`.
+
+ * @summary Финализировать возврат на доработку от лица ДТОиР
  * {@link /corrections/:humanId/dtoe-return}
  */
-export function useReturnCorrectionByDtoe<TContext>(options: 
+export function useReturnCorrectionByDtoe<TContext>(options:
 {
-  mutation?: UseMutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"], data: ReturnCorrectionByDtoeMutationRequest}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<ReturnCorrectionByDtoeMutationRequest>> & { client?: Client },
+  mutation?: UseMutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext> & { client?: QueryClient },
+  client?: Partial<RequestConfig> & { client?: Client },
 }
  = {}) {
 
@@ -41,13 +44,13 @@ export function useReturnCorrectionByDtoe<TContext>(options:
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? returnCorrectionByDtoeMutationKey()
 
-          const baseOptions = returnCorrectionByDtoeMutationOptions(config) as UseMutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"], data: ReturnCorrectionByDtoeMutationRequest}, TContext>
-          
+          const baseOptions = returnCorrectionByDtoeMutationOptions(config) as UseMutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>
 
-          return useMutation<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"], data: ReturnCorrectionByDtoeMutationRequest}, TContext>({
+
+          return useMutation<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"], data: ReturnCorrectionByDtoeMutationRequest}, TContext>
-      
+          }, queryClient) as UseMutationResult<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>
+
 }

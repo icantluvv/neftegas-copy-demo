@@ -95,6 +95,8 @@ paths:
     $ref: './paths/corrections-human-id-dtoe-approve.yaml'
   /corrections/{humanId}/dtoe-return:
     $ref: './paths/corrections-human-id-dtoe-return.yaml'
+  /corrections/{humanId}/remarks:
+    $ref: './paths/corrections-human-id-remarks.yaml'
   /corrections/{humanId}/remarks/{remarkId}/fix:
     $ref: './paths/corrections-human-id-remarks-remark-id-fix.yaml'
   /corrections/{humanId}/remarks/{remarkId}/reopen:

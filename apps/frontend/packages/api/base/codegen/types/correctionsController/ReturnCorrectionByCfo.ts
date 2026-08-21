@@ -4,7 +4,6 @@
 */
 
 import type { CorrectionDetail } from "../CorrectionDetail";
-import type { RemarkCreateInput } from "../RemarkCreateInput";
 
 export interface ReturnCorrectionByCfoPathParams {
     /**
@@ -14,17 +13,14 @@ export interface ReturnCorrectionByCfoPathParams {
 }
 
 /**
- * @description Возвращено на доработку, замечание создано
+ * @description Возвращено на доработку
 */
 export type ReturnCorrectionByCfo200 = CorrectionDetail;
-
-export type ReturnCorrectionByCfoMutationRequest = RemarkCreateInput;
 
 export type ReturnCorrectionByCfoMutationResponse = ReturnCorrectionByCfo200;
 
 export type ReturnCorrectionByCfoMutation = {
     Response: ReturnCorrectionByCfo200;
-    Request: ReturnCorrectionByCfoMutationRequest;
     PathParams: ReturnCorrectionByCfoPathParams;
     Errors: any;
 };

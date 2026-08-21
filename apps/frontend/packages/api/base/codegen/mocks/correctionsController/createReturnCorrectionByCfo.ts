@@ -3,9 +3,8 @@
 * Do not edit manually.
 */
 
-import type { ReturnCorrectionByCfo200, ReturnCorrectionByCfoMutationRequest, ReturnCorrectionByCfoMutationResponse, ReturnCorrectionByCfoPathParams } from "../../types/correctionsController/ReturnCorrectionByCfo";
+import type { ReturnCorrectionByCfo200, ReturnCorrectionByCfoMutationResponse, ReturnCorrectionByCfoPathParams } from "../../types/correctionsController/ReturnCorrectionByCfo";
 import { createCorrectionDetail } from "../createCorrectionDetail";
-import { createRemarkCreateInput } from "../createRemarkCreateInput";
 import { faker } from "@faker-js/faker";
 
 export function createReturnCorrectionByCfoPathParams(data?: Partial<ReturnCorrectionByCfoPathParams>): ReturnCorrectionByCfoPathParams {
@@ -17,16 +16,11 @@ export function createReturnCorrectionByCfoPathParams(data?: Partial<ReturnCorre
 }
 
 /**
- * @description Возвращено на доработку, замечание создано
+ * @description Возвращено на доработку
  */
 export function createReturnCorrectionByCfo200(data?: Partial<ReturnCorrectionByCfo200>): ReturnCorrectionByCfo200 {
 
   return createCorrectionDetail(data)
-}
-
-export function createReturnCorrectionByCfoMutationRequest(data?: Partial<ReturnCorrectionByCfoMutationRequest>): ReturnCorrectionByCfoMutationRequest {
-
-  return createRemarkCreateInput(data)
 }
 
 export function createReturnCorrectionByCfoMutationResponse(data?: Partial<ReturnCorrectionByCfoMutationResponse>): ReturnCorrectionByCfoMutationResponse {

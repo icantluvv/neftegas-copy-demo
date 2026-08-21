@@ -39,7 +39,7 @@ export function CreateCorrectionForm() {
             value={correctionTypeId != null ? String(correctionTypeId) : null}
             onValueChange={(value) => setCorrectionTypeId(value ? Number(value) : null)}
           >
-            <SelectTrigger id="correction-type" aria-label="Тип корректировки" className="h-12 min-h-12 w-full">
+            <SelectTrigger id="correction-type" aria-label="Тип корректировки" className="w-full">
               <SelectValue placeholder="Выберите тип корректировки" />
             </SelectTrigger>
             <SelectContent>

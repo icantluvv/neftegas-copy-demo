@@ -149,7 +149,7 @@ export function FilialCorrectionsOverview() {
     return (
       <div className="flex flex-col items-center gap-4 rounded-lg border border-border py-16 text-center">
         <p className="text-sm text-muted-foreground">У вас пока нет корректировок</p>
-        <Link href="/corrections/create" className={buttonVariants({className: "min-h-12"})}>
+        <Link href="/corrections/create" className={buttonVariants()}>
           Создать первую корректировку
         </Link>
       </div>
@@ -167,7 +167,7 @@ export function FilialCorrectionsOverview() {
 
       <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
         <Select value={filterValue} onValueChange={(value) => value && setFilterValue(value)}>
-          <SelectTrigger aria-label="Фильтр по статусу" className="h-12 min-h-12 w-full sm:w-80">
+          <SelectTrigger aria-label="Фильтр по статусу" className="w-full sm:w-80">
             <SelectValue>
               {(value: string) => {
                 if (value === "all") return "— все статусы —";
@@ -188,7 +188,7 @@ export function FilialCorrectionsOverview() {
           </SelectContent>
         </Select>
 
-        <Link href="/corrections/create" className={buttonVariants({className: "min-h-12"})}>
+        <Link href="/corrections/create" className={buttonVariants()}>
           + Создать корректировку
         </Link>
       </div>

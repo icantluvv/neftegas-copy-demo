@@ -128,14 +128,20 @@ export class CorrectionsController {
     return this.service.cfoApprove(user, humanId);
   }
 
-  @Roles(Role.CFO)
-  @Post(':humanId/cfo-return')
-  cfoReturn(
+  @Roles(Role.CFO, Role.DTOE)
+  @Post(':humanId/remarks')
+  leaveRemark(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
     @Body() dto: RemarkCreateDto,
   ) {
-    return this.service.cfoReturn(user, humanId, dto);
+    return this.service.leaveRemark(user, humanId, dto);
+  }
+
+  @Roles(Role.CFO)
+  @Post(':humanId/cfo-return')
+  cfoReturn(@CurrentUser() user: User, @Param('humanId') humanId: string) {
+    return this.service.cfoReturn(user, humanId);
   }
 
   @Roles(Role.DTOE)
@@ -146,12 +152,8 @@ export class CorrectionsController {
 
   @Roles(Role.DTOE)
   @Post(':humanId/dtoe-return')
-  dtoeReturn(
-    @CurrentUser() user: User,
-    @Param('humanId') humanId: string,
-    @Body() dto: RemarkCreateDto,
-  ) {
-    return this.service.dtoeReturn(user, humanId, dto);
+  dtoeReturn(@CurrentUser() user: User, @Param('humanId') humanId: string) {
+    return this.service.dtoeReturn(user, humanId);
   }
 
   @Roles(Role.FILIAL)

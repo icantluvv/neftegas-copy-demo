@@ -23,9 +23,12 @@ interface ReturnRemarkDialogProps {
   triggerLabel: string;
   isSubmitting: boolean;
   onSubmit: (data: RemarkCreateInput) => void;
+  /** Элемент пакета, к которому привязывается замечание — фиксируется кнопкой в строке, пользователь его не выбирает. */
+  slotId?: number;
+  slotLabel?: string;
 }
 
-export function ReturnRemarkDialog({ triggerLabel, isSubmitting, onSubmit }: ReturnRemarkDialogProps) {
+export function ReturnRemarkDialog({ triggerLabel, isSubmitting, onSubmit, slotId, slotLabel }: ReturnRemarkDialogProps) {
   const {
     register,
     handleSubmit,
@@ -36,7 +39,7 @@ export function ReturnRemarkDialog({ triggerLabel, isSubmitting, onSubmit }: Ret
   });
 
   function handleFormSubmit(data: RemarkCreateInput) {
-    onSubmit(data);
+    onSubmit(slotId == null ? data : { ...data, relatedSlotId: slotId });
     reset();
   }
 
@@ -45,7 +48,7 @@ export function ReturnRemarkDialog({ triggerLabel, isSubmitting, onSubmit }: Ret
       <DialogTrigger render={<Button type="button" variant="destructive" size="sm" />}>{triggerLabel}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Вернуть на доработку</DialogTitle>
+          <DialogTitle>{slotLabel ? `Замечание к элементу: ${slotLabel}` : "Вернуть на доработку"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
@@ -75,7 +78,7 @@ export function ReturnRemarkDialog({ triggerLabel, isSubmitting, onSubmit }: Ret
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline" />}>Отмена</DialogClose>
             <Button type="submit" disabled={isSubmitting}>
-              Вернуть на доработку
+              {slotLabel ? "Сохранить замечание" : "Вернуть на доработку"}
             </Button>
           </DialogFooter>
         </form>

@@ -17,16 +17,31 @@ export function canApproveAsCfo(detail: CorrectionDetail): boolean {
   return detail.isCfoReviewer && detail.myCfoStatus?.status === "PENDING";
 }
 
-export function canReturnAsCfo(detail: CorrectionDetail): boolean {
+/** Пока статус этого ЦФО = PENDING, можно оставлять замечания к элементам пакета — сколько угодно за один заход. */
+export function canLeaveRemarkAsCfo(detail: CorrectionDetail): boolean {
   return detail.isCfoReviewer && detail.myCfoStatus?.status === "PENDING";
+}
+
+/** Финализирует возврат — доступно, только когда этот ЦФО уже оставил хотя бы одно открытое замечание. */
+export function canFinalizeReturnAsCfo(detail: CorrectionDetail): boolean {
+  const cfoId = detail.myCfoStatus?.cfoId;
+  if (!canLeaveRemarkAsCfo(detail) || cfoId == null) return false;
+  return detail.remarks.some((remark) => remark.cfoId === cfoId && remark.status === "OPEN");
 }
 
 export function canApproveAsDtoe(detail: CorrectionDetail): boolean {
   return detail.isDtoe && detail.status === "UNDER_DTOE_REVIEW";
 }
 
-export function canReturnAsDtoe(detail: CorrectionDetail): boolean {
+/** Пока корректировка на проверке ДТОиР, можно оставлять замечания к элементам пакета — сколько угодно за один заход. */
+export function canLeaveRemarkAsDtoe(detail: CorrectionDetail): boolean {
   return detail.isDtoe && detail.status === "UNDER_DTOE_REVIEW";
+}
+
+/** Финализирует возврат — доступно, только когда ДТОиР уже оставил хотя бы одно открытое замечание. */
+export function canFinalizeReturnAsDtoe(detail: CorrectionDetail): boolean {
+  if (!canLeaveRemarkAsDtoe(detail)) return false;
+  return detail.remarks.some((remark) => remark.cfoId === null && remark.status === "OPEN");
 }
 
 export function canSendToDtoe(detail: CorrectionDetail): boolean {

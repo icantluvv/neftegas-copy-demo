@@ -5,8 +5,8 @@
 
 import fetch from "../../../client";
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { ReturnCorrectionByCfoMutationRequest, ReturnCorrectionByCfoMutationResponse, ReturnCorrectionByCfoPathParams } from "../../types/correctionsController/ReturnCorrectionByCfo";
-import { returnCorrectionByCfoMutationResponseSchema, returnCorrectionByCfoMutationRequestSchema } from "../../zod/correctionsController/returnCorrectionByCfoSchema";
+import type { ReturnCorrectionByCfoMutationResponse, ReturnCorrectionByCfoPathParams } from "../../types/correctionsController/ReturnCorrectionByCfo";
+import { returnCorrectionByCfoMutationResponseSchema } from "../../zod/correctionsController/returnCorrectionByCfoSchema";
 
 function getReturnCorrectionByCfoUrl({ humanId }: { humanId: ReturnCorrectionByCfoPathParams["humanId"] }) {
   const res = { method: 'POST', url: `/corrections/${humanId}/cfo-return` as const }
@@ -14,15 +14,19 @@ function getReturnCorrectionByCfoUrl({ humanId }: { humanId: ReturnCorrectionByC
 }
 
 /**
- * @description Роль CFO. Создаёт замечание и возвращает пакет на доработку.
- * @summary Вернуть на доработку от лица ЦФО (с замечанием)
+ * @description Роль CFO. Переводит корректировку в «Возвращено на доработку», а статус
+этого ЦФО — в «Возвращено». Требует, чтобы у этого ЦФО уже было оставлено
+хотя бы одно открытое замечание по этой корректировке
+(`POST /corrections/{humanId}/remarks`) — иначе `400`.
+
+ * @summary Финализировать возврат на доработку от лица ЦФО
  * {@link /corrections/:humanId/cfo-return}
  */
-export async function returnCorrectionByCfo({ humanId, data }: { humanId: ReturnCorrectionByCfoPathParams["humanId"]; data: ReturnCorrectionByCfoMutationRequest }, config: Partial<RequestConfig<ReturnCorrectionByCfoMutationRequest>> & { client?: Client } = {}) {
+export async function returnCorrectionByCfo({ humanId }: { humanId: ReturnCorrectionByCfoPathParams["humanId"] }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = returnCorrectionByCfoMutationRequestSchema.parse(data)
 
-  const res = await request<ReturnCorrectionByCfoMutationResponse, ResponseErrorConfig<Error>, ReturnCorrectionByCfoMutationRequest>({ method : "POST", url : getReturnCorrectionByCfoUrl({ humanId }).url.toString(), data : requestData, ... requestConfig })
+
+  const res = await request<ReturnCorrectionByCfoMutationResponse, ResponseErrorConfig<Error>, unknown>({ method : "POST", url : getReturnCorrectionByCfoUrl({ humanId }).url.toString(), ... requestConfig })
   return returnCorrectionByCfoMutationResponseSchema.parse(res.data)
 }

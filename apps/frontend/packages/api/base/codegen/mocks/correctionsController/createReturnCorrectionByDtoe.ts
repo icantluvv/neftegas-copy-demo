@@ -3,9 +3,8 @@
 * Do not edit manually.
 */
 
-import type { ReturnCorrectionByDtoe200, ReturnCorrectionByDtoeMutationRequest, ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "../../types/correctionsController/ReturnCorrectionByDtoe";
+import type { ReturnCorrectionByDtoe200, ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "../../types/correctionsController/ReturnCorrectionByDtoe";
 import { createCorrectionDetail } from "../createCorrectionDetail";
-import { createRemarkCreateInput } from "../createRemarkCreateInput";
 import { faker } from "@faker-js/faker";
 
 export function createReturnCorrectionByDtoePathParams(data?: Partial<ReturnCorrectionByDtoePathParams>): ReturnCorrectionByDtoePathParams {
@@ -22,11 +21,6 @@ export function createReturnCorrectionByDtoePathParams(data?: Partial<ReturnCorr
 export function createReturnCorrectionByDtoe200(data?: Partial<ReturnCorrectionByDtoe200>): ReturnCorrectionByDtoe200 {
 
   return createCorrectionDetail(data)
-}
-
-export function createReturnCorrectionByDtoeMutationRequest(data?: Partial<ReturnCorrectionByDtoeMutationRequest>): ReturnCorrectionByDtoeMutationRequest {
-
-  return createRemarkCreateInput(data)
 }
 
 export function createReturnCorrectionByDtoeMutationResponse(data?: Partial<ReturnCorrectionByDtoeMutationResponse>): ReturnCorrectionByDtoeMutationResponse {

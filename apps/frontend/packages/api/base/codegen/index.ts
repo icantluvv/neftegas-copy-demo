@@ -21,6 +21,7 @@ export type { GetCorrectionStatsSuspenseQueryKey } from "./hooks/correctionsCont
 export type { GetCorrectionSuspenseQueryKey } from "./hooks/correctionsController/useGetCorrectionSuspense";
 export type { GetCorrectionsQueryKey } from "./hooks/correctionsController/useGetCorrections";
 export type { GetCorrectionsSuspenseQueryKey } from "./hooks/correctionsController/useGetCorrectionsSuspense";
+export type { LeaveRemarkMutationKey } from "./hooks/correctionsController/useLeaveRemark";
 export type { MarkRemarkFixedMutationKey } from "./hooks/correctionsController/useMarkRemarkFixed";
 export type { ReopenRemarkMutationKey } from "./hooks/correctionsController/useReopenRemark";
 export type { ResubmitCorrectionMutationKey } from "./hooks/correctionsController/useResubmitCorrection";
@@ -129,12 +130,13 @@ export type { GetCorrectionStatsCfo200, GetCorrectionStatsCfo403, GetCorrectionS
 export type { GetCorrectionStatsDtoe200, GetCorrectionStatsDtoe403, GetCorrectionStatsDtoeQuery, GetCorrectionStatsDtoeQueryResponse } from "./types/correctionsController/GetCorrectionStatsDtoe";
 export type { GetCorrectionStatsFilial200, GetCorrectionStatsFilial403, GetCorrectionStatsFilialQuery, GetCorrectionStatsFilialQueryResponse } from "./types/correctionsController/GetCorrectionStatsFilial";
 export type { GetCorrections200, GetCorrectionsQuery, GetCorrectionsQueryParams, GetCorrectionsQueryResponse } from "./types/correctionsController/GetCorrections";
+export type { LeaveRemark200, LeaveRemarkMutation, LeaveRemarkMutationRequest, LeaveRemarkMutationResponse, LeaveRemarkPathParams } from "./types/correctionsController/LeaveRemark";
 export type { MarkRemarkFixed200, MarkRemarkFixedMutation, MarkRemarkFixedMutationResponse, MarkRemarkFixedPathParams } from "./types/correctionsController/MarkRemarkFixed";
 export type { ReopenRemark200, ReopenRemarkMutation, ReopenRemarkMutationRequest, ReopenRemarkMutationResponse, ReopenRemarkPathParams } from "./types/correctionsController/ReopenRemark";
 export type { ResubmitCorrection200, ResubmitCorrectionMutation, ResubmitCorrectionMutationRequest, ResubmitCorrectionMutationResponse, ResubmitCorrectionPathParams } from "./types/correctionsController/ResubmitCorrection";
 export type { ResubmitCorrectionToDtoe200, ResubmitCorrectionToDtoeMutation, ResubmitCorrectionToDtoeMutationResponse, ResubmitCorrectionToDtoePathParams } from "./types/correctionsController/ResubmitCorrectionToDtoe";
-export type { ReturnCorrectionByCfo200, ReturnCorrectionByCfoMutation, ReturnCorrectionByCfoMutationRequest, ReturnCorrectionByCfoMutationResponse, ReturnCorrectionByCfoPathParams } from "./types/correctionsController/ReturnCorrectionByCfo";
-export type { ReturnCorrectionByDtoe200, ReturnCorrectionByDtoeMutation, ReturnCorrectionByDtoeMutationRequest, ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "./types/correctionsController/ReturnCorrectionByDtoe";
+export type { ReturnCorrectionByCfo200, ReturnCorrectionByCfoMutation, ReturnCorrectionByCfoMutationResponse, ReturnCorrectionByCfoPathParams } from "./types/correctionsController/ReturnCorrectionByCfo";
+export type { ReturnCorrectionByDtoe200, ReturnCorrectionByDtoeMutation, ReturnCorrectionByDtoeMutationResponse, ReturnCorrectionByDtoePathParams } from "./types/correctionsController/ReturnCorrectionByDtoe";
 export type { SendCorrection200, SendCorrection400, SendCorrectionMutation, SendCorrectionMutationRequest, SendCorrectionMutationResponse, SendCorrectionPathParams } from "./types/correctionsController/SendCorrection";
 export type { SendCorrectionToDtoe200, SendCorrectionToDtoe400, SendCorrectionToDtoeMutation, SendCorrectionToDtoeMutationResponse, SendCorrectionToDtoePathParams } from "./types/correctionsController/SendCorrectionToDtoe";
 export type { UploadFileVersion201, UploadFileVersionMutation, UploadFileVersionMutationRequest, UploadFileVersionMutationResponse, UploadFileVersionPathParams } from "./types/correctionsController/UploadFileVersion";
@@ -180,6 +182,7 @@ export { getCorrectionStatsCfo } from "./clients/correctionsController/getCorrec
 export { getCorrectionStatsDtoe } from "./clients/correctionsController/getCorrectionStatsDtoe";
 export { getCorrectionStatsFilial } from "./clients/correctionsController/getCorrectionStatsFilial";
 export { getCorrections } from "./clients/correctionsController/getCorrections";
+export { leaveRemark } from "./clients/correctionsController/leaveRemark";
 export { markRemarkFixed } from "./clients/correctionsController/markRemarkFixed";
 export { reopenRemark } from "./clients/correctionsController/reopenRemark";
 export { resubmitCorrection } from "./clients/correctionsController/resubmitCorrection";
@@ -285,6 +288,9 @@ export { useGetCorrections } from "./hooks/correctionsController/useGetCorrectio
 export { getCorrectionsSuspenseQueryKey } from "./hooks/correctionsController/useGetCorrectionsSuspense";
 export { getCorrectionsSuspenseQueryOptions } from "./hooks/correctionsController/useGetCorrectionsSuspense";
 export { useGetCorrectionsSuspense } from "./hooks/correctionsController/useGetCorrectionsSuspense";
+export { leaveRemarkMutationKey } from "./hooks/correctionsController/useLeaveRemark";
+export { leaveRemarkMutationOptions } from "./hooks/correctionsController/useLeaveRemark";
+export { useLeaveRemark } from "./hooks/correctionsController/useLeaveRemark";
 export { markRemarkFixedMutationKey } from "./hooks/correctionsController/useMarkRemarkFixed";
 export { markRemarkFixedMutationOptions } from "./hooks/correctionsController/useMarkRemarkFixed";
 export { useMarkRemarkFixed } from "./hooks/correctionsController/useMarkRemarkFixed";
@@ -450,12 +456,13 @@ export { getCorrectionStatsDtoe200Schema, getCorrectionStatsDtoe403Schema, getCo
 export { getCorrectionStatsFilial200Schema, getCorrectionStatsFilial403Schema, getCorrectionStatsFilialQueryResponseSchema } from "./zod/correctionsController/getCorrectionStatsFilialSchema";
 export { getCorrectionStats200Schema, getCorrectionStatsQueryResponseSchema } from "./zod/correctionsController/getCorrectionStatsSchema";
 export { getCorrections200Schema, getCorrectionsQueryParamsSchema, getCorrectionsQueryResponseSchema } from "./zod/correctionsController/getCorrectionsSchema";
+export { leaveRemark200Schema, leaveRemarkMutationRequestSchema, leaveRemarkMutationResponseSchema, leaveRemarkPathParamsSchema } from "./zod/correctionsController/leaveRemarkSchema";
 export { markRemarkFixed200Schema, markRemarkFixedMutationResponseSchema, markRemarkFixedPathParamsSchema } from "./zod/correctionsController/markRemarkFixedSchema";
 export { reopenRemark200Schema, reopenRemarkMutationRequestSchema, reopenRemarkMutationResponseSchema, reopenRemarkPathParamsSchema } from "./zod/correctionsController/reopenRemarkSchema";
 export { resubmitCorrection200Schema, resubmitCorrectionMutationRequestSchema, resubmitCorrectionMutationResponseSchema, resubmitCorrectionPathParamsSchema } from "./zod/correctionsController/resubmitCorrectionSchema";
 export { resubmitCorrectionToDtoe200Schema, resubmitCorrectionToDtoeMutationResponseSchema, resubmitCorrectionToDtoePathParamsSchema } from "./zod/correctionsController/resubmitCorrectionToDtoeSchema";
-export { returnCorrectionByCfo200Schema, returnCorrectionByCfoMutationRequestSchema, returnCorrectionByCfoMutationResponseSchema, returnCorrectionByCfoPathParamsSchema } from "./zod/correctionsController/returnCorrectionByCfoSchema";
-export { returnCorrectionByDtoe200Schema, returnCorrectionByDtoeMutationRequestSchema, returnCorrectionByDtoeMutationResponseSchema, returnCorrectionByDtoePathParamsSchema } from "./zod/correctionsController/returnCorrectionByDtoeSchema";
+export { returnCorrectionByCfo200Schema, returnCorrectionByCfoMutationResponseSchema, returnCorrectionByCfoPathParamsSchema } from "./zod/correctionsController/returnCorrectionByCfoSchema";
+export { returnCorrectionByDtoe200Schema, returnCorrectionByDtoeMutationResponseSchema, returnCorrectionByDtoePathParamsSchema } from "./zod/correctionsController/returnCorrectionByDtoeSchema";
 export { sendCorrection200Schema, sendCorrection400Schema, sendCorrectionMutationRequestSchema, sendCorrectionMutationResponseSchema, sendCorrectionPathParamsSchema } from "./zod/correctionsController/sendCorrectionSchema";
 export { sendCorrectionToDtoe200Schema, sendCorrectionToDtoe400Schema, sendCorrectionToDtoeMutationResponseSchema, sendCorrectionToDtoePathParamsSchema } from "./zod/correctionsController/sendCorrectionToDtoeSchema";
 export { uploadFileVersion201Schema, uploadFileVersionMutationRequestSchema, uploadFileVersionMutationResponseSchema, uploadFileVersionPathParamsSchema } from "./zod/correctionsController/uploadFileVersionSchema";

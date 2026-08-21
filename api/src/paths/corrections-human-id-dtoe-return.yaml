@@ -1,15 +1,13 @@
 parameters:
   - { name: humanId, in: path, required: true, schema: { type: string } }
 post:
-  summary: Вернуть на доработку от лица ДТОиР (с замечанием)
+  summary: Финализировать возврат на доработку от лица ДТОиР
   operationId: returnCorrectionByDtoe
   tags: [Corrections]
-  description: Роль DTOE. Создаёт замечание (cfo=null) и возвращает на доработку.
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema: { $ref: '../components/schemas/remark.yaml#/RemarkCreateInput' }
+  description: |
+    Роль DTOE. Переводит корректировку в «Возвращено ДТОиР». Требует, чтобы
+    ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
+    (`POST /corrections/{humanId}/remarks`) — иначе `400`.
   responses:
     '200':
       description: Возвращено ДТОиР на доработку

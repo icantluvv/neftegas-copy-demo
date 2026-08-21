@@ -7,6 +7,7 @@ import type { CorrectionDetail } from "@/packages/api/base/codegen";
 import { PackageCompleteness } from "./package-completeness";
 
 const useUploadFileVersionMock = vi.hoisted(() => vi.fn());
+const useLeaveRemarkMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@/packages/api/base/codegen", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("@/packages/api/base/codegen")>();
@@ -14,6 +15,7 @@ vi.mock("@/packages/api/base/codegen", async (importOriginal) => {
 	return {
 		...actual,
 		useUploadFileVersion: useUploadFileVersionMock,
+		useLeaveRemark: useLeaveRemarkMock,
 	};
 });
 
@@ -76,6 +78,7 @@ function renderWithClient(detail: CorrectionDetail) {
 describe("<PackageCompleteness />", () => {
 	beforeEach(() => {
 		useUploadFileVersionMock.mockReturnValue({ mutate: vi.fn(), isPending: false });
+		useLeaveRemarkMock.mockReturnValue({ mutate: vi.fn(), isPending: false });
 	});
 
 	it("отображает слот, обязательность и проверяющий ЦФО", async () => {
@@ -107,5 +110,109 @@ describe("<PackageCompleteness />", () => {
 		await expect
 			.element(view.getByRole("button", { name: "Загрузить версию", includeHidden: true }))
 			.not.toBeInTheDocument();
+	});
+
+	it("показывает «Оставить замечание к элементу» ЦФО, пока его статус PENDING", async () => {
+		const view = await renderWithClient(
+			makeDetail({
+				isFilialOwner: false,
+				isCfoReviewer: true,
+				myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedBy: null, decidedAt: null },
+			}),
+		);
+
+		await expect.element(view.getByRole("button", { name: "Оставить замечание к элементу" })).toBeVisible();
+	});
+
+	it("скрывает «Оставить замечание к элементу» филиалу", async () => {
+		const view = await renderWithClient(makeDetail({ isFilialOwner: true }));
+
+		await expect
+			.element(view.getByRole("button", { name: "Оставить замечание к элементу", includeHidden: true }))
+			.not.toBeInTheDocument();
+	});
+
+	it("отправляет relatedSlotId строки при сохранении замечания", async () => {
+		const mutate = vi.fn();
+		useLeaveRemarkMock.mockReturnValue({ mutate, isPending: false });
+		const view = await renderWithClient(
+			makeDetail({
+				isFilialOwner: false,
+				isCfoReviewer: true,
+				myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedBy: null, decidedAt: null },
+			}),
+		);
+
+		await view.getByRole("button", { name: "Оставить замечание к элементу" }).click();
+		await view.getByLabelText("Описание").fill("Не хватает счёта");
+		await view.getByLabelText("Что исправить").fill("Приложить счёт");
+		await view.getByRole("button", { name: "Сохранить замечание" }).click();
+
+		expect(mutate).toHaveBeenCalledWith(
+			expect.objectContaining({
+				humanId: "COR-000002",
+				data: expect.objectContaining({ relatedSlotId: 10 }),
+			}),
+		);
+	});
+
+	it("не скрывает кнопку после уже оставленного замечания — можно оставить ещё одно за тот же заход", async () => {
+		const view = await renderWithClient(
+			makeDetail({
+				isFilialOwner: false,
+				isCfoReviewer: true,
+				myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedBy: null, decidedAt: null },
+				remarks: [
+					{
+						id: 1,
+						humanId: "REM-000001",
+						correctionId: 1,
+						cfoId: 2,
+						authorId: 20,
+						createdAt: "2026-08-01T00:00:00.000Z",
+						relatedSlotId: 10,
+						fileVersionId: null,
+						sheetName: "",
+						rowRef: "",
+						cellRef: "",
+						description: "Уже оставленное замечание",
+						requiredAction: "Исправить",
+						status: "OPEN",
+						closedById: null,
+						closedAt: null,
+						issuerLabel: "ОГМ",
+					},
+				],
+			}),
+		);
+
+		await expect.element(view.getByRole("button", { name: "Оставить замечание к элементу" })).toBeVisible();
+	});
+
+	it("скрывает кнопку по галочке «Проверено» и возвращает при снятии", async () => {
+		const view = await renderWithClient(
+			makeDetail({
+				isFilialOwner: false,
+				isCfoReviewer: true,
+				myCfoStatus: { id: 1, correctionId: 1, cfoId: 2, cfo: { id: 2, code: "ОГМ", name: "ОГМ", isActive: true }, status: "PENDING", isRequired: true, decidedById: null, decidedBy: null, decidedAt: null },
+			}),
+		);
+
+		const checkbox = view.getByRole("checkbox", { name: /Excel корректировка/ });
+		await expect.element(view.getByRole("button", { name: "Оставить замечание к элементу" })).toBeVisible();
+
+		await checkbox.click();
+		await expect
+			.element(view.getByRole("button", { name: "Оставить замечание к элементу", includeHidden: true }))
+			.not.toBeInTheDocument();
+
+		await checkbox.click();
+		await expect.element(view.getByRole("button", { name: "Оставить замечание к элементу" })).toBeVisible();
+	});
+
+	it("скрывает столбец «Проверено» для филиала", async () => {
+		const view = await renderWithClient(makeDetail({ isFilialOwner: true, isCfoReviewer: false, isDtoe: false }));
+
+		await expect.element(view.getByText("Проверено", { exact: true })).not.toBeInTheDocument();
 	});
 });

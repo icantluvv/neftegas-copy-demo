@@ -5,17 +5,14 @@
 
 import * as z from "zod/mini";
 import { correctionDetailSchema } from "../correctionDetailSchema";
-import { remarkCreateInputSchema } from "../remarkCreateInputSchema";
 
 export const returnCorrectionByCfoPathParamsSchema = z.object({
     "humanId": z.string()
     })
 
 /**
- * @description Возвращено на доработку, замечание создано
+ * @description Возвращено на доработку
  */
 export const returnCorrectionByCfo200Schema = z.lazy(() => correctionDetailSchema)
-
-export const returnCorrectionByCfoMutationRequestSchema = z.lazy(() => remarkCreateInputSchema)
 
 export const returnCorrectionByCfoMutationResponseSchema = z.lazy(() => returnCorrectionByCfo200Schema)
