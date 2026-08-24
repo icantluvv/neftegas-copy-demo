@@ -17,6 +17,7 @@ const nextScriptMock = fileURLToPath(new URL('./src/test/mocks/next-script.tsx',
 const nextImageMock = fileURLToPath(new URL('./src/test/mocks/next-image.tsx', import.meta.url))
 const nextLinkMock = fileURLToPath(new URL('./src/test/mocks/next-link.tsx', import.meta.url))
 const dotEnvPath = new URL('./.env', import.meta.url)
+const appRoot = fileURLToPath(new URL('./', import.meta.url))
 
 const testExclude = [
 	'**/.next/**',
@@ -41,11 +42,24 @@ const testEnvironmentKeys = [
 	'NEXT_PUBLIC_MOCK_MODE',
 ] as const
 
+// Фолбэк для прогона без локального .env (свежий клон, CI): схемы в
+// src/env/*.ts валидируются на импорте, и без значений падает любой тест,
+// который тянет клиент codegen. Реальные process.env и .env имеют приоритет.
+const testEnvironmentFallback: Partial<Record<(typeof testEnvironmentKeys)[number], string>> = {
+	BACK_INTERNAL_URL: 'http://localhost:4000',
+	MOCK_MODE: 'false',
+	NEXT_PUBLIC_APP_NAME: 'Дэшборд Нефтегаз',
+	NEXT_PUBLIC_FRONT_URL: 'http://localhost:3000',
+	NEXT_PUBLIC_BFF_PATH: '/api',
+	NEXT_PUBLIC_BACK_URL: 'http://localhost:4000',
+	NEXT_PUBLIC_MOCK_MODE: 'false',
+}
+
 const dotEnvEnvironment = existsSync(dotEnvPath) ? parseEnv(readFileSync(dotEnvPath, 'utf8')) : {}
 
 const testEnvironment = Object.fromEntries(
 	testEnvironmentKeys.flatMap((key) => {
-		const value = process.env[key] ?? dotEnvEnvironment[key]
+		const value = process.env[key] ?? dotEnvEnvironment[key] ?? testEnvironmentFallback[key]
 
 		return value === undefined ? [] : [[key, value]]
 	}),
@@ -111,6 +125,10 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: [
+			// tsconfigPaths резолвит "@/..." для самих модулей, но не для мокера
+			// vitest: importOriginal() внутри vi.mock падает на "Cannot resolve".
+			// Явный алиас закрывает оба пути резолва.
+			{ find: /^@\//, replacement: appRoot },
 			{ find: /^next\/navigation$/, replacement: nextNavigationMock },
 			{ find: /^next\/script$/, replacement: nextScriptMock },
 			{ find: /^next\/image$/, replacement: nextImageMock },
