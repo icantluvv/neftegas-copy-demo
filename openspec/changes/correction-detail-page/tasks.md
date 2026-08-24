@@ -22,7 +22,16 @@
 
 ## 2. Backend
 
-_(нет задач)_
+- [x] 2.1 [backend] Обнаружен и исправлен пробел в Requirement «Возврат
+  корректировки с замечанием» / Scenario «Второй проверяющий не может
+  отправить решение поверх уже принятого» (`specs/correction-detail-page/spec.md`):
+  `cfoReturn` (`corrections.service.ts`) не проверял `myStatus.status ===
+  PENDING` — guard добавлен в рамках `cfo-cabinet` (см. этот change
+  `tasks.md`/`design.md`).
+- [x] 2.2 [backend] Тот же пробел обнаружен в `cfoApprove` (Requirement
+  «Согласование корректировки ЦФО») — guard добавлен в рамках
+  `correction-review-safeguards` (см. этот change `tasks.md`, 2.2,
+  `corrections.service.spec.ts`).
 
 ## 3. Frontend
 

@@ -1,4 +1,4 @@
-import type { CorrectionDetail, Remark } from "@/packages/api/base/codegen";
+import type { CorrectionDetail, CorrectionStatus2, Remark } from "@/packages/api/base/codegen";
 
 /**
  * Guard-условия дублируют бэкенд для UX (apps/frontend/AGENTS.md) — реальная
@@ -46,6 +46,19 @@ export function canFinalizeReturnAsDtoe(detail: CorrectionDetail): boolean {
 
 export function canSendToDtoe(detail: CorrectionDetail): boolean {
   return detail.isCfoReviewer && detail.status === "ALL_CFO_APPROVED" && detail.myCfoStatus?.status === "APPROVED";
+}
+
+/**
+ * Отменяет собственное решение этого ЦФО (согласовал/вернул) обратно в PENDING —
+ * страховка от случайного клика. Оставленные замечания не трогает (часть истории),
+ * меняет только статус ЦФО. Недоступно, если корректировка уже ушла в ДТОиР —
+ * там отменять уже нечего на уровне ЦФО.
+ */
+export function canCancelCfoDecision(detail: CorrectionDetail): boolean {
+  if (!detail.isCfoReviewer) return false;
+  if (detail.myCfoStatus?.status !== "APPROVED" && detail.myCfoStatus?.status !== "RETURNED") return false;
+  const lockedStatuses: CorrectionStatus2[] = ["UNDER_DTOE_REVIEW", "RETURNED_BY_DTOE", "APPROVED_BY_DTOE"];
+  return !lockedStatuses.includes(detail.status);
 }
 
 export function showResubmitPanel(detail: CorrectionDetail): boolean {

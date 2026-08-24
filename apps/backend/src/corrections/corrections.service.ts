@@ -277,6 +277,37 @@ export class CorrectionsService {
     return this.toDetailDto(await this.loadDetail(id), user);
   }
 
+  /**
+   * Удаляет корректировку целиком — доступно только для `DRAFT`. Ни у одного
+   * ЦФО не может быть строки статуса по `DRAFT`-корректировке (они создаются
+   * только в `send()`), поэтому удаление черновика не требует уведомления
+   * проверяющих. Слоты/версии файлов/замечания/статусы ЦФО/история/уведомления
+   * удаляются каскадом на уровне БД (`onDelete: 'CASCADE'` во всех entity);
+   * физические файлы версий дополнительно удаляются с диска.
+   */
+  async deleteCorrection(user: User, humanId: string) {
+    const correction = await this.findByHumanIdOrThrow(humanId);
+    if (!(user.role === Role.FILIAL && user.filialId === correction.filialId)) {
+      throw new ForbiddenException();
+    }
+    if (correction.status !== CorrectionStatus.DRAFT) {
+      throw new BadRequestException(
+        'Удалить можно только корректировку в статусе «Черновик».',
+      );
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(Correction).delete(correction.id);
+    });
+
+    const storagePaths = correction.slots.flatMap(
+      (slot) => slot.versions?.map((version) => version.storagePath) ?? [],
+    );
+    await Promise.all(
+      storagePaths.map((storagePath) => fs.unlink(storagePath).catch(() => undefined)),
+    );
+  }
+
   async uploadFileVersion(
     user: User,
     humanId: string,
@@ -342,6 +373,11 @@ export class CorrectionsService {
     );
     if (!(await this.checkAccess(user, correction))) {
       throw new ForbiddenException();
+    }
+    if (!(user.role === Role.CFO || user.role === Role.DTOE)) {
+      throw new ForbiddenException(
+        'Скачивание файлов доступно только ЦФО и ДТОиР.',
+      );
     }
     const buffer = await fs.readFile(version.storagePath);
     return {
@@ -422,6 +458,11 @@ export class CorrectionsService {
     const myStatus = correction.cfoStatuses.find((s) => s.cfoId === user.cfoId);
     if (!(user.role === Role.CFO && myStatus)) {
       throw new ForbiddenException();
+    }
+    if (myStatus.status !== CfoStatusValue.PENDING) {
+      throw new BadRequestException(
+        'Решение по этой корректировке уже принято этим ЦФО.',
+      );
     }
 
     await this.dataSource.transaction(async (manager) => {
@@ -570,6 +611,55 @@ export class CorrectionsService {
         user,
         `${cfoLabel} вернул на доработку (замечания: ${remarksList}).`,
       );
+    });
+
+    return this.toDetailDto(await this.loadDetail(correction.id), user);
+  }
+
+  /**
+   * Страховка от случайного клика: откатывает собственное решение этого ЦФО
+   * (APPROVED/RETURNED → PENDING). Замечания не трогает — они часть истории
+   * согласования (apps/backend/AGENTS.md). Недоступно, если корректировка уже
+   * передана в ДТОиР, — там отменять на уровне ЦФО уже нечего.
+   */
+  async cancelCfoDecision(user: User, humanId: string) {
+    const correction = await this.findByHumanIdOrThrow(humanId);
+    const myStatus = correction.cfoStatuses.find((s) => s.cfoId === user.cfoId);
+    if (!(user.role === Role.CFO && myStatus)) {
+      throw new ForbiddenException();
+    }
+    if (myStatus.status === CfoStatusValue.PENDING) {
+      throw new BadRequestException(
+        'Решение по этой корректировке ещё не принято — отменять нечего.',
+      );
+    }
+    const lockedStatuses: CorrectionStatus[] = [
+      CorrectionStatus.UNDER_DTOE_REVIEW,
+      CorrectionStatus.RETURNED_BY_DTOE,
+      CorrectionStatus.APPROVED_BY_DTOE,
+    ];
+    if (lockedStatuses.includes(correction.status)) {
+      throw new BadRequestException(
+        'Корректировка уже передана в ДТОиР — отменить решение ЦФО нельзя.',
+      );
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      const cfoLabel =
+        correction.cfoStatuses.find((s) => s.id === myStatus.id)?.cfo?.code ??
+        'ЦФО';
+      await manager.getRepository(CorrectionCfoStatus).update(myStatus.id, {
+        status: CfoStatusValue.PENDING,
+        decidedById: null,
+        decidedAt: null,
+      });
+      await this.log(
+        manager,
+        correction.id,
+        user,
+        `${cfoLabel} отменил своё решение по корректировке — статус возвращён в «На проверке».`,
+      );
+      await this.recomputeStatusAfterCfoAction(manager, correction.id);
     });
 
     return this.toDetailDto(await this.loadDetail(correction.id), user);

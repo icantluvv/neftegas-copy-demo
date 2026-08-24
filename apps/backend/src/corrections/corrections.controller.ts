@@ -71,6 +71,13 @@ export class CorrectionsController {
   }
 
   @Roles(Role.FILIAL)
+  @Delete(':humanId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteCorrection(@CurrentUser() user: User, @Param('humanId') humanId: string) {
+    return this.service.deleteCorrection(user, humanId);
+  }
+
+  @Roles(Role.FILIAL)
   @UseInterceptors(FileInterceptor('file'))
   @Post(':humanId/slots/:slotId/files')
   uploadFile(
@@ -142,6 +149,12 @@ export class CorrectionsController {
   @Post(':humanId/cfo-return')
   cfoReturn(@CurrentUser() user: User, @Param('humanId') humanId: string) {
     return this.service.cfoReturn(user, humanId);
+  }
+
+  @Roles(Role.CFO)
+  @Post(':humanId/cfo-cancel')
+  cfoCancel(@CurrentUser() user: User, @Param('humanId') humanId: string) {
+    return this.service.cancelCfoDecision(user, humanId);
   }
 
   @Roles(Role.DTOE)

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import type { CorrectionListItem, CorrectionStatus2 } from "@/packages/api/base/codegen";
-import { useGetCorrections } from "@/packages/api/base/codegen";
+import { getCorrectionsQueryKey, useDeleteCorrection, useGetCorrections } from "@/packages/api/base/codegen";
 
 import { Badge } from "#/components/ui/badge";
 import { buttonVariants } from "#/components/ui/button";
@@ -27,6 +28,31 @@ function correctionMatchesFilter(status: CorrectionStatus2, filterValue: string)
     return groupKeyOfStatus(status) === filterValue.slice("group:".length);
   }
   return true;
+}
+
+function DeleteDraftCorrectionCell({ humanId }: { humanId: string }) {
+  const queryClient = useQueryClient();
+  const deleteCorrection = useDeleteCorrection({
+    mutation: {
+      onSuccess: () =>
+        void queryClient.invalidateQueries({ queryKey: getCorrectionsQueryKey({ pageSize: 100 }) }),
+    },
+  });
+
+  return (
+    <button
+      type="button"
+      aria-label={`Удалить корректировку ${humanId}`}
+      title="Удалить черновик"
+      disabled={deleteCorrection.isPending}
+      onClick={() => deleteCorrection.mutate({ humanId })}
+      className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-50"
+    >
+      <svg viewBox="0 0 16 16" fill="none" className="size-4" aria-hidden="true">
+        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </button>
+  );
 }
 
 const columns: ColumnDef<CorrectionListItem, unknown>[] = [
@@ -55,9 +81,12 @@ const columns: ColumnDef<CorrectionListItem, unknown>[] = [
     id: "actions",
     header: "",
     cell: ({ row }) => (
-      <Link href={`/corrections/${row.original.humanId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
-        Открыть
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link href={`/corrections/${row.original.humanId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+          Открыть
+        </Link>
+        {row.original.status === "DRAFT" && <DeleteDraftCorrectionCell humanId={row.original.humanId} />}
+      </div>
     ),
   },
 ];

@@ -4,6 +4,7 @@ import type { CorrectionDetail } from "@/packages/api/base/codegen";
 import {
   useApproveCorrectionByCfo,
   useApproveCorrectionByDtoe,
+  useCancelCfoDecision,
   useReturnCorrectionByCfo,
   useReturnCorrectionByDtoe,
   useSendCorrectionToDtoe,
@@ -14,6 +15,7 @@ import { Button } from "#/components/ui/button";
 import {
   canApproveAsCfo,
   canApproveAsDtoe,
+  canCancelCfoDecision,
   canFinalizeReturnAsCfo,
   canFinalizeReturnAsDtoe,
   canSendToDtoe,
@@ -26,6 +28,7 @@ export function RemarksActionBar({ detail }: { detail: CorrectionDetail }) {
 
   const approveAsCfo = useApproveCorrectionByCfo({ mutation: { onSuccess: invalidate } });
   const returnAsCfo = useReturnCorrectionByCfo({ mutation: { onSuccess: invalidate } });
+  const cancelCfoDecision = useCancelCfoDecision({ mutation: { onSuccess: invalidate } });
   const sendToDtoe = useSendCorrectionToDtoe({ mutation: { onSuccess: invalidate } });
   const approveAsDtoe = useApproveCorrectionByDtoe({ mutation: { onSuccess: invalidate } });
   const returnAsDtoe = useReturnCorrectionByDtoe({ mutation: { onSuccess: invalidate } });
@@ -49,6 +52,16 @@ export function RemarksActionBar({ detail }: { detail: CorrectionDetail }) {
           onClick={() => returnAsCfo.mutate({ humanId: detail.humanId })}
         >
           Вернуть на доработку
+        </Button>
+      )}
+      {canCancelCfoDecision(detail) && (
+        <Button
+          type="button"
+          variant="outline"
+          disabled={cancelCfoDecision.isPending}
+          onClick={() => cancelCfoDecision.mutate({ humanId: detail.humanId })}
+        >
+          Отменить решение
         </Button>
       )}
       {canSendToDtoe(detail) && (

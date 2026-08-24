@@ -91,6 +91,8 @@ paths:
     $ref: './paths/corrections-human-id-cfo-approve.yaml'
   /corrections/{humanId}/cfo-return:
     $ref: './paths/corrections-human-id-cfo-return.yaml'
+  /corrections/{humanId}/cfo-cancel:
+    $ref: './paths/corrections-human-id-cfo-cancel.yaml'
   /corrections/{humanId}/dtoe-approve:
     $ref: './paths/corrections-human-id-dtoe-approve.yaml'
   /corrections/{humanId}/dtoe-return:

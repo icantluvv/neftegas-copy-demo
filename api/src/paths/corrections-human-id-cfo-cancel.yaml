@@ -1,0 +1,24 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Отменить собственное решение ЦФО
+  operationId: cancelCfoDecision
+  tags: [Corrections]
+  description: |
+    Роль CFO. Возвращает статус этого ЦФО (APPROVED или RETURNED) обратно в
+    PENDING — страховка от случайного клика по «Согласовать»/«Вернуть на
+    доработку». Оставленные замечания не удаляются и не меняются, это часть
+    истории — откатывается только статус ЦФО. Недоступно, если корректировка
+    уже передана в ДТОиР (`UNDER_DTOE_REVIEW`/`RETURNED_BY_DTOE`/`APPROVED_BY_DTOE`)
+    — тогда `400`.
+  responses:
+    '200':
+      description: Решение ЦФО отменено, статус возвращён в PENDING
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }
+    '400':
+      description: Нечего отменять или корректировка уже вне зоны ответственности ЦФО
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

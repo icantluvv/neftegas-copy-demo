@@ -7,6 +7,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { CorrectionDetail, DocumentSlot2, RemarkCreateInput } from "@/packages/api/base/codegen";
 import { getCorrectionSuspenseQueryKey } from "@/packages/api/base/codegen/hooks/correctionsController/useGetCorrectionSuspense";
 import { useLeaveRemark, useUploadFileVersion } from "@/packages/api/base/codegen";
+import { clientEnvironment } from "#/env/client";
 import { cn } from "@/lib/utils";
 
 import { Button } from "#/components/ui/button";
@@ -42,15 +43,42 @@ function openRemarkForSlot(detail: CorrectionDetail, slotId: number) {
   return detail.remarks.find((remark) => remark.relatedSlotId === slotId && remark.status !== "CLOSED");
 }
 
-function CurrentVersionCell({ slot }: { slot: DocumentSlot2 }) {
+function SlotLabelCell({ slot, canDownload }: { slot: DocumentSlot2; canDownload: boolean }) {
+  if (!canDownload || !slot.currentVersion) {
+    return <>{slot.label}</>;
+  }
+
+  return (
+    <a
+      href={`${clientEnvironment.NEXT_PUBLIC_BACK_URL}/files/${slot.currentVersion.id}/download`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary underline-offset-4 hover:underline"
+    >
+      {slot.label}
+    </a>
+  );
+}
+
+function CurrentVersionCell({ slot, canDownload }: { slot: DocumentSlot2; canDownload: boolean }) {
   if (!slot.currentVersion) {
     return <span className="text-muted-foreground">Нет версий</span>;
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-1">
       <span>Версия {slot.currentVersion.versionNumber}</span>
       <span className="text-xs text-muted-foreground">{formatNotificationDateTime(slot.currentVersion.uploadedAt)}</span>
+      {canDownload && (
+        <a
+          href={`${clientEnvironment.NEXT_PUBLIC_BACK_URL}/files/${slot.currentVersion.id}/download`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-fit text-xs text-primary underline-offset-4 hover:underline"
+        >
+          Открыть / скачать
+        </a>
+      )}
     </div>
   );
 }
@@ -161,7 +189,11 @@ export function PackageCompleteness({ detail }: { detail: CorrectionDetail }) {
           } satisfies ColumnDef<DocumentSlot2, unknown>,
         ]
       : []),
-    { accessorKey: "label", header: "Элемент" },
+    {
+      accessorKey: "label",
+      header: "Элемент",
+      cell: ({ row }) => <SlotLabelCell slot={row.original} canDownload={isReviewer} />,
+    },
     {
       id: "isRequired",
       header: "Обязателен",
@@ -175,7 +207,7 @@ export function PackageCompleteness({ detail }: { detail: CorrectionDetail }) {
     {
       id: "currentVersion",
       header: "Текущая версия",
-      cell: ({ row }) => <CurrentVersionCell slot={row.original} />,
+      cell: ({ row }) => <CurrentVersionCell slot={row.original} canDownload={isReviewer} />,
     },
     {
       id: "actions",

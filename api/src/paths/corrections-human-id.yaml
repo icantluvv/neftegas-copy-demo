@@ -20,3 +20,33 @@ get:
       content:
         application/json:
           schema: { $ref: '../components/schemas/error-response.yaml' }
+delete:
+  summary: Удалить корректировку
+  operationId: deleteCorrection
+  tags: [Corrections]
+  description: |
+    Роль FILIAL, только автор/владелец. Доступно только для корректировки в
+    статусе `DRAFT` — направленную (любой другой статус) удалить нельзя,
+    `400`. Удаляет корректировку целиком: слоты, версии файлов, замечания,
+    статусы ЦФО, историю и уведомления по каскаду. `DRAFT`-корректировка не
+    может иметь ни одного статуса ЦФО (они создаются только `POST
+    .../send`), поэтому удаление черновика не затрагивает решений
+    проверяющих и не требует их уведомления.
+  responses:
+    '204':
+      description: Корректировка удалена
+    '400':
+      description: Корректировка не в статусе «Черновик»
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа (не автор/не владелец филиала)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: Не найдено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

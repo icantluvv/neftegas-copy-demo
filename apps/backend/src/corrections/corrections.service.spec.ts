@@ -19,6 +19,8 @@ function buildCorrection(
     myStatus?: { id: number; cfoId: number; status: CfoStatusValue };
     status?: CorrectionStatus;
     remarks?: { cfoId: number | null; status: RemarkStatus }[];
+    filialId?: number;
+    slots?: { versions?: { storagePath: string }[] }[];
   } = {},
 ): Correction {
   return {
@@ -27,6 +29,8 @@ function buildCorrection(
     status: overrides.status ?? CorrectionStatus.UNDER_CFO_REVIEW,
     cfoStatuses: overrides.myStatus ? [overrides.myStatus] : [],
     remarks: overrides.remarks ?? [],
+    filialId: overrides.filialId ?? 1,
+    slots: overrides.slots ?? [],
   } as unknown as Correction;
 }
 
@@ -143,5 +147,188 @@ describe('CorrectionsService — leaveRemark (замечание без неме
       } as never),
     ).rejects.toThrow(ForbiddenException);
     expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+});
+
+jest.mock('node:fs/promises', () => ({
+  readFile: jest.fn().mockResolvedValue(Buffer.from('content')),
+  unlink: jest.fn().mockResolvedValue(undefined),
+}));
+
+describe('CorrectionsService — downloadFileVersion (доступ только ЦФО и ДТОиР)', () => {
+  function buildServiceWithFileVersion(correction: Correction) {
+    const correctionsRepo = { findOne: jest.fn().mockResolvedValue(correction) };
+    const fileVersionsRepo = {
+      findOne: jest.fn().mockResolvedValue({
+        id: 1,
+        storagePath: '/tmp/does-not-matter.txt',
+        fileName: 'file.txt',
+        mimeType: 'text/plain',
+        slot: { correction },
+      }),
+    };
+    const cfoStatusesRepo = { exist: jest.fn().mockResolvedValue(false) };
+    const dataSource = { transaction: jest.fn() };
+    const noop = {} as never;
+
+    const service = new CorrectionsService(
+      dataSource as never,
+      correctionsRepo as never,
+      noop,
+      fileVersionsRepo as never,
+      cfoStatusesRepo as never,
+      noop,
+      noop,
+      noop,
+      noop,
+      noop,
+      noop,
+      noop,
+    );
+
+    return { service };
+  }
+
+  it('разрешает ДТОиР скачать файл', async () => {
+    const correction = buildCorrection({ status: CorrectionStatus.UNDER_DTOE_REVIEW });
+    const { service } = buildServiceWithFileVersion(correction);
+
+    await expect(service.downloadFileVersion(buildUser(Role.DTOE), 1)).resolves.toMatchObject({
+      fileName: 'file.txt',
+    });
+  });
+
+  it('отказывает ЦФО без доступа к этой корректировке (403)', async () => {
+    const correction = buildCorrection();
+    const { service } = buildServiceWithFileVersion(correction);
+
+    await expect(service.downloadFileVersion(buildCfoUser(999), 1)).rejects.toThrow(ForbiddenException);
+  });
+
+  it('отказывает филиалу-владельцу — скачивание доступно только ЦФО и ДТОиР', async () => {
+    const correction = buildCorrection();
+    (correction as unknown as { filialId: number }).filialId = 7;
+    const { service } = buildServiceWithFileVersion(correction);
+    const filialUser = buildUser(Role.FILIAL, { filialId: 7 } as Partial<User>);
+
+    await expect(service.downloadFileVersion(filialUser, 1)).rejects.toThrow(ForbiddenException);
+  });
+});
+
+describe('CorrectionsService — cancelCfoDecision (отмена собственного решения ЦФО)', () => {
+  it('отклоняет отмену, если статус этого ЦФО уже PENDING — нечего отменять', async () => {
+    const correction = buildCorrection({ myStatus: { id: 10, cfoId: 5, status: CfoStatusValue.PENDING } });
+    const { service, dataSource } = buildService(correction);
+
+    await expect(service.cancelCfoDecision(buildCfoUser(5), 'COR-000001')).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет отмену, если корректировка уже передана в ДТОиР', async () => {
+    const correction = buildCorrection({
+      myStatus: { id: 10, cfoId: 5, status: CfoStatusValue.APPROVED },
+      status: CorrectionStatus.UNDER_DTOE_REVIEW,
+    });
+    const { service, dataSource } = buildService(correction);
+
+    await expect(service.cancelCfoDecision(buildCfoUser(5), 'COR-000001')).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет отмену для ЦФО без строки статуса по этой корректировке (403, не 400)', async () => {
+    const correction = buildCorrection({ myStatus: { id: 10, cfoId: 5, status: CfoStatusValue.APPROVED } });
+    const { service } = buildService(correction);
+
+    await expect(service.cancelCfoDecision(buildCfoUser(999), 'COR-000001')).rejects.toThrow(ForbiddenException);
+  });
+
+  it('отклоняет роль FILIAL', async () => {
+    const correction = buildCorrection({ myStatus: { id: 10, cfoId: 5, status: CfoStatusValue.APPROVED } });
+    const { service, dataSource } = buildService(correction);
+
+    await expect(
+      service.cancelCfoDecision(buildUser(Role.FILIAL, { filialId: 1 } as Partial<User>), 'COR-000001'),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('проходит guard-проверки и входит в транзакцию для APPROVED вне статусов ДТОиР', async () => {
+    const correction = buildCorrection({
+      myStatus: { id: 10, cfoId: 5, status: CfoStatusValue.APPROVED },
+      status: CorrectionStatus.ALL_CFO_APPROVED,
+    });
+    const { service, dataSource } = buildService(correction);
+    dataSource.transaction.mockResolvedValue(undefined);
+
+    // toDetailDto/loadDetail за пределами guard-логики не мокается в этом лёгком
+    // сетапе (см. комментарий у buildService) — здесь важно только то, что guard
+    // не блокирует APPROVED-статус вне UNDER_DTOE_REVIEW/RETURNED_BY_DTOE/APPROVED_BY_DTOE
+    // и что выполнение доходит до транзакции.
+    await service.cancelCfoDecision(buildCfoUser(5), 'COR-000001').catch(() => undefined);
+
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('проходит guard-проверки и входит в транзакцию для RETURNED вне статусов ДТОиР', async () => {
+    const correction = buildCorrection({
+      myStatus: { id: 10, cfoId: 5, status: CfoStatusValue.RETURNED },
+      status: CorrectionStatus.RETURNED_FOR_REVISION,
+    });
+    const { service, dataSource } = buildService(correction);
+    dataSource.transaction.mockResolvedValue(undefined);
+
+    await service.cancelCfoDecision(buildCfoUser(5), 'COR-000001').catch(() => undefined);
+
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+  });
+});
+
+function buildFilialUser(filialId: number): User {
+  return buildUser(Role.FILIAL, { filialId } as Partial<User>);
+}
+
+describe('CorrectionsService — deleteCorrection (удаление только DRAFT)', () => {
+  it('отклоняет удаление, если статус не DRAFT', async () => {
+    const correction = buildCorrection({ status: CorrectionStatus.UNDER_CFO_REVIEW, filialId: 1 });
+    const { service, dataSource } = buildService(correction);
+
+    await expect(service.deleteCorrection(buildFilialUser(1), 'COR-000001')).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет удаление корректировки чужого филиала (403)', async () => {
+    const correction = buildCorrection({ status: CorrectionStatus.DRAFT, filialId: 1 });
+    const { service, dataSource } = buildService(correction);
+
+    await expect(service.deleteCorrection(buildFilialUser(2), 'COR-000001')).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет роль CFO', async () => {
+    const correction = buildCorrection({ status: CorrectionStatus.DRAFT, filialId: 1 });
+    const { service, dataSource } = buildService(correction);
+
+    await expect(service.deleteCorrection(buildCfoUser(1), 'COR-000001')).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('удаляет DRAFT-корректировку своего филиала и физические версии файлов', async () => {
+    const correction = buildCorrection({
+      status: CorrectionStatus.DRAFT,
+      filialId: 1,
+      slots: [{ versions: [{ storagePath: '/tmp/a.pdf' }] }, { versions: [] }],
+    });
+    const { service, dataSource } = buildService(correction);
+    const deleteFn = jest.fn().mockResolvedValue(undefined);
+    dataSource.transaction.mockImplementation(async (fn: (manager: unknown) => Promise<void>) => {
+      const correctionRepo = { delete: deleteFn };
+      const manager = { getRepository: jest.fn().mockReturnValue(correctionRepo) };
+      await fn(manager);
+    });
+
+    await service.deleteCorrection(buildFilialUser(1), 'COR-000001');
+
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+    expect(deleteFn).toHaveBeenCalledWith(1);
   });
 });
