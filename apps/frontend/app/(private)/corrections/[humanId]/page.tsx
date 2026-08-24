@@ -9,18 +9,13 @@ import { CorrectionDetailView } from "./components/correction-detail-view";
 import { CorrectionDetailSkeleton } from "./components/correction-detail-skeleton";
 import { NotFoundScreen } from "./not-found-screen";
 import { getQueryClient } from "#/utils/get-query-client";
+import { isHttpError } from "#/utils/http-error";
 
 export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ humanId: string }>;
 };
-
-function isHttpError(error: unknown, status: number): boolean {
-  if (!(error instanceof Error)) return false;
-  const cause = error.cause as { status?: number } | undefined;
-  return cause?.status === status;
-}
 
 export default async function CorrectionPage({ params }: PageProps) {
   const { humanId } = await params;

@@ -3,15 +3,16 @@ import {redirect} from "next/navigation";
 
 import {NotificationBell} from "#/components/notification-bell";
 import {SidebarNav} from "#/components/sidebar-nav";
+import {getHttpErrorStatus} from "#/utils/http-error";
 
 export const dynamic = "force-dynamic";
 
 const REDIRECT_TO_LOGIN_STATUSES = new Set([401, 403, 413]);
 
 function isRedirectToLoginError(error: unknown): boolean {
-    if (!(error instanceof Error)) return false;
-    const cause = error.cause as { status?: number } | undefined;
-    return cause?.status != null && REDIRECT_TO_LOGIN_STATUSES.has(cause.status);
+    const status = getHttpErrorStatus(error);
+
+    return status != null && REDIRECT_TO_LOGIN_STATUSES.has(status);
 }
 
 export default async function PrivateLayout({children}: { children: React.ReactNode }) {

@@ -1,20 +1,10 @@
 import {getCorrectionStatsFilial} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsFilial";
 
+import {isForbiddenError, isUnauthorizedError} from "#/utils/http-error";
+
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
 import {CorrectionStatsGrid} from "./correction-stats-grid";
 import {FilialCorrectionsOverview} from "./filial-corrections-overview";
-
-function isForbiddenError(error: unknown): boolean {
-    if (!(error instanceof Error)) return false;
-    const cause = error.cause as { status?: number } | undefined;
-    return cause?.status === 403;
-}
-
-function isUnauthorizedError(error: unknown): boolean {
-    if (!(error instanceof Error)) return false;
-    const cause = error.cause as { status?: number } | undefined;
-    return cause?.status === 401;
-}
 
 export async function FilialDashboard() {
     let stats: Awaited<ReturnType<typeof getCorrectionStatsFilial>>;
