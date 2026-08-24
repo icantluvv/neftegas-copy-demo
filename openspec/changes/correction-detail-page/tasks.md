@@ -41,7 +41,11 @@ _(нет задач)_
 
 - [x] 3.3.1 [frontend] `apps/frontend/app/(private)/corrections/[humanId]/page.tsx`: `getMe()` (роль + `currentUserId`), `fetchQuery(getCorrectionSuspenseQueryOptions({ humanId }))` с try/catch на 403/404, `dehydrate` + `HydrationBoundary` по паттерну `docs/adr/frontend-data-fetching.md`.
 - [x] 3.3.2 [frontend] `.../components/correction-detail-view.tsx` (`"use client"`), читает `useGetCorrectionSuspense({ humanId })` и компонует все блоки.
-- [x] 3.3.3 [frontend] Каждый блок-мутатор инвалидирует `getCorrectionSuspenseQueryKey({ humanId })` в своём `onSuccess` (без отдельного файла `use-correction-mutations.ts` — оставлено локально по месту использования: `package-completeness.tsx`, `send-for-review-form.tsx`, `remarks-list.tsx`, `resubmit-panel.tsx`).
+- [x] 3.3.3 [frontend] Каждый блок-мутатор инвалидирует `getCorrectionSuspenseQueryKey({ humanId })` в своём `onSuccess` (без отдельного файла `use-correction-mutations.ts` — оставлено локально по месту использования: `package-completeness.tsx`, `send-for-review-form.tsx`, `remarks-list/`, `resubmit-panel.tsx`).
+
+      Повторяющийся вызов вынесен в хук `.../lib/use-invalidate-correction.ts`;
+      на него переведён блок «Замечания» (см. 3.7.5), остальные блоки-мутаторы
+      пока оставлены как есть.
 
 ### 3.4 Блок «Шапка корректировки»
 
@@ -62,6 +66,7 @@ _(нет задач)_
 - [x] 3.7.2 [frontend] Failing component-тест `return-remark-dialog.component.test.tsx` на форму возврата с замечанием (ЦФО и ДТОиР), `RemarkCreateInput` → реализовать `return-remark-dialog.tsx` (dialog + react-hook-form) → green.
 - [x] 3.7.3 [frontend] Failing component-тест `remarks-list.component.test.tsx`: «Отметить исправленным»/«Удалить» guard-условия → реализовать `remarks-list.tsx` → green (7 тестов).
 - [x] 3.7.4 [frontend] Failing component-тест на финальное согласование/возврат ДТОиР и направление в ДТОиР → реализовать в `remarks-list.tsx` (`RemarksActionBar`) → green.
+- [x] 3.7.5 [frontend] Рефакторинг без изменения поведения: `remarks-list.tsx` (187 строк, три компонента в одном файле) разнесён в каталог `remarks-list/` — `remarks-list.tsx`, `remarks-columns.tsx`, `remark-actions-cell.tsx`, `remarks-action-bar.tsx`, `index.ts`. Тест `remarks-list.component.test.tsx` перенесён в тот же каталог без правок — 9/9 зелёные, что и подтверждает сохранение поведения. Импорт в `correction-detail-view.tsx` не менялся.
 
 ### 3.8 Блок «Повторное направление»
 
@@ -81,7 +86,23 @@ _(нет задач)_
 
 - [x] 3.11.1 [frontend] `npx tsc --noEmit -p tsconfig.json` — чисто (нет отдельного скрипта `typecheck` в `package.json`).
 - [x] 3.11.2 [frontend] `bun run lint` — без ошибок в коде фичи (устранены `no-explicit-any` в `DataTable`/column defs); часть pre-existing ошибок/варнингов в сгенерированном `packages/api/base/codegen/**` и несвязанных файлах вне scope этой фичи.
-- [x] 3.11.3 [frontend] `bun run test` (unit + component) — 117/118 зелёные; единственный красный (`setup-browser.component.test.ts`, сравнение `oklch` vs `#171717`) — pre-existing, воспроизводится на `dev` без изменений этой фичи.
+- [x] 3.11.3 [frontend] `bun run test` (unit + component) — 145/145 зелёные (28 файлов).
+
+      Раньше здесь фиксировался pre-existing красный тест. К моменту 3.7.5 сюита
+      падала целиком: все пять тестов с `vi.mock("@/packages/api/base/codegen",
+      importOriginal)` рушились с `[vitest] There was an error when mocking a
+      module`, а unhandled rejection обрывал прогон до сводки. Две причины,
+      обе в `apps/frontend/vitest.config.ts`, обе исправлены:
+      1. Переменные окружения брались только из `process.env` и локального
+         `.env`. Файла `.env` (и `.env.example`) для фронта в репозитории нет,
+         поэтому `src/env/client.ts` падал на импорте с `Invalid environment
+         variables`, а вместе с ним — любой тест, тянущий codegen-клиент.
+         Добавлен фолбэк `testEnvironmentFallback`; реальные `process.env` и
+         `.env` сохраняют приоритет.
+      2. Алиас `@/` резолвился только через `tsconfigPaths`, которого не видит
+         мокер vitest: `importOriginal()` внутри `vi.mock` падал с
+         `Cannot resolve "@/packages/api/base/codegen"`. Добавлен явный
+         `resolve.alias` для `@/`.
 - [x] 3.11.4 [frontend] `bun run build` — успешно, `/corrections/[humanId]` в дереве маршрутов.
 - [ ] 3.11.5 [frontend] Прогнать `apps/frontend/e2e/correction-detail.e2e.spec.ts` — блокируется 3.10.
 - [ ] 3.11.6 [openspec] Обновить `test-plan.md` (статусы строк покрытия) и выполнить `openspec validate correction-detail-page --strict --no-interactive`

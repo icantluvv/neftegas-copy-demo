@@ -156,9 +156,17 @@ codegen-командой Kubb (без ручного редактировани�
 - `apps/frontend/app/(private)/corrections/[id]/components/correction-detail-view.tsx`
   — `"use client"`, компонует блоки, читает `useGetCorrectionSuspense`.
 - `.../components/correction-header.tsx`, `package-completeness.tsx`,
-  `cfo-statuses.tsx`, `remarks-list.tsx`, `resubmit-panel.tsx`, `history-log.tsx`.
+  `cfo-statuses.tsx`, `remarks-list/`, `resubmit-panel.tsx`, `history-log.tsx`.
+- `.../components/remarks-list/` — блок «Замечания» разнесён по файлам, так как
+  один файл совмещал три независимых компонента: `remarks-list.tsx` (композиция
+  блока), `remarks-columns.tsx` (фабрика колонок `DataTable`),
+  `remark-actions-cell.tsx` (действия над одним замечанием),
+  `remarks-action-bar.tsx` (решения ЦФО и ДТОиР), `index.ts` (реэкспорт —
+  импортёры продолжают писать `./remarks-list`).
 - `.../lib/permissions.ts` — чистые функции видимости блоков/активности кнопок по
   роли и статусам (описаны в Decisions).
+- `.../lib/use-invalidate-correction.ts` — общий хук инвалидации
+  `getCorrectionSuspenseQueryKey({ humanId })` для блоков-мутаторов.
 - `.../lib/status-labels.ts` — маппинг статусов корректировки/ЦФО/замечания на
   текст и цвет бейджа (используется в `correction-header.tsx`, `cfo-statuses.tsx`,
   `remarks-list.tsx`).
