@@ -87,7 +87,7 @@ const CFOS: Array<{ code: string; slug: string }> = [
   { code: 'ПОЭМГ', slug: 'poemg' },
   { code: 'СИУС', slug: 'sius' },
   { code: 'СКЗ', slug: 'skz' },
-  { code: 'СОРиСОФ', slug: 'sorisof' },
+  { code: 'СОВОФ', slug: 'sovof' },
   { code: 'СППБ', slug: 'sppb' },
   { code: 'ТРО', slug: 'tro' },
   { code: 'ХОСЭЗИС', slug: 'hosezis' },
