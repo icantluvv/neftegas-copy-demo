@@ -14,7 +14,10 @@ import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { Cfo } from '../org/entities/cfo.entity';
 import { CorrectionType } from '../org/entities/correction-type.entity';
 import { FilialCfoLink } from '../org/entities/filial-cfo-link.entity';
-import { PackageRequirementKind } from '../org/entities/package-requirement.entity';
+import {
+  PackageRequirement,
+  PackageRequirementKind,
+} from '../org/entities/package-requirement.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { Role, User } from '../users/entities/user.entity';
 import { CfoSelectionDto } from './dto/cfo-selection.dto';
@@ -45,6 +48,7 @@ import {
 const DETAIL_RELATIONS = [
   'filial',
   'correctionType',
+  'correctionType.requirements',
   'author',
   'slots',
   'slots.requirement',
@@ -400,7 +404,7 @@ export class CorrectionsService {
     }
     const allowedIds = await this.linkedCfoIds(
       this.dataSource.manager,
-      correction.filialId,
+      correction.filialId!,
     );
     for (const cfoId of dto.cfoIds) {
       if (!allowedIds.includes(cfoId)) {
@@ -435,7 +439,7 @@ export class CorrectionsService {
           manager,
           cfoUsers,
           correction.id,
-          `Новая корректировка от филиала «${correction.filial.code}». ID: ${correction.humanId}. Статус: На проверке.`,
+          `Новая корректировка от филиала «${correction.filial!.code}». ID: ${correction.humanId}. Статус: На проверке.`,
         );
       }
       await manager.getRepository(Correction).update(correction.id, {
@@ -598,7 +602,7 @@ export class CorrectionsService {
         correction.cfoStatuses.find((s) => s.id === myStatus.id)?.cfo?.code ??
         'ЦФО';
       const remarksList = openRemarks.map((r) => r.humanId).join(', ');
-      const filialUsers = await this.filialUsers(manager, correction.filialId);
+      const filialUsers = await this.filialUsers(manager, correction.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
@@ -687,7 +691,7 @@ export class CorrectionsService {
           manager,
           cfoUsers,
           correction.id,
-          `Филиал «${correction.filial.code}» повторно направил ${correction.humanId}. Проверьте исправления.`,
+          `Филиал «${correction.filial!.code}» повторно направил ${correction.humanId}. Проверьте исправления.`,
         );
       }
       await manager
@@ -739,7 +743,7 @@ export class CorrectionsService {
       });
 
       const cfoLabel = remark.cfo?.code ?? 'ЦФО';
-      const filialUsers = await this.filialUsers(manager, correction.filialId);
+      const filialUsers = await this.filialUsers(manager, correction.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
@@ -832,7 +836,7 @@ export class CorrectionsService {
         manager,
         dtoeUsers,
         correction.id,
-        `Корректировка ${correction.humanId} полностью проверена и согласована всеми ЦФО. Филиал: ${correction.filial.code}.`,
+        `Корректировка ${correction.humanId} полностью проверена и согласована всеми ЦФО. Филиал: ${correction.filial!.code}.`,
       );
       await this.log(manager, correction.id, user, 'Отправлено в ДТОиР.');
     });
@@ -849,7 +853,7 @@ export class CorrectionsService {
         status: CorrectionStatus.APPROVED_BY_DTOE,
         decidedAt: new Date(),
       });
-      const filialUsers = await this.filialUsers(manager, correction.filialId);
+      const filialUsers = await this.filialUsers(manager, correction.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
@@ -890,7 +894,7 @@ export class CorrectionsService {
         .update(correction.id, { status: CorrectionStatus.RETURNED_BY_DTOE });
 
       const remarksList = openRemarks.map((r) => r.humanId).join(', ');
-      const filialUsers = await this.filialUsers(manager, correction.filialId);
+      const filialUsers = await this.filialUsers(manager, correction.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
@@ -925,7 +929,7 @@ export class CorrectionsService {
         manager,
         dtoeUsers,
         correction.id,
-        `Филиал «${correction.filial.code}» повторно направил ${correction.humanId} после замечаний ДТОиР.`,
+        `Филиал «${correction.filial!.code}» повторно направил ${correction.humanId} после замечаний ДТОиР.`,
       );
       await this.log(
         manager,
@@ -1052,14 +1056,35 @@ export class CorrectionsService {
     if (!mainSlot || (mainSlot.versions?.length ?? 0) === 0) {
       missing.push('Excel корректировка');
     }
+
     const requiredReqs =
       correction.correctionType.requirements?.filter((r) => r.isRequired) ?? [];
+    const slotFor = (reqId: number) =>
+      correction.slots.find((s) => s.requirementId === reqId);
+    const isFilled = (req: PackageRequirement) => {
+      const slot = slotFor(req.id);
+      return !!slot && (slot.versions?.length ?? 0) > 0;
+    };
+
+    const groups = new Map<string, PackageRequirement[]>();
     for (const req of requiredReqs) {
-      const slot = correction.slots.find((s) => s.requirementId === req.id);
-      if (!slot || (slot.versions?.length ?? 0) === 0) {
-        missing.push(req.name);
+      if (!req.choiceGroupKey) {
+        if (!isFilled(req)) missing.push(req.name);
+        continue;
+      }
+      groups.set(req.choiceGroupKey, [
+        ...(groups.get(req.choiceGroupKey) ?? []),
+        req,
+      ]);
+    }
+    for (const reqs of groups.values()) {
+      if (!reqs.some(isFilled)) {
+        missing.push(
+          `${reqs[0].groupLabel} (один из: ${reqs.map((r) => r.name).join(' / ')})`,
+        );
       }
     }
+
     return { complete: missing.length === 0, missing };
   }
 
@@ -1081,7 +1106,7 @@ export class CorrectionsService {
       .map((s) => s.cfo);
     const availableCfoIds = await this.linkedCfoIds(
       this.dataSource.manager,
-      correction.filialId,
+      correction.filialId!,
     );
     const availableCfos = await this.cfos.find({
       where: { id: In(availableCfoIds.length ? availableCfoIds : [-1]) },
@@ -1090,10 +1115,10 @@ export class CorrectionsService {
     return {
       ...toCorrectionBaseDto(correction),
       filial: {
-        id: correction.filial.id,
-        code: correction.filial.code,
-        name: correction.filial.name,
-        isActive: correction.filial.isActive,
+        id: correction.filial!.id,
+        code: correction.filial!.code,
+        name: correction.filial!.name,
+        isActive: correction.filial!.isActive,
       },
       correctionType: {
         id: correction.correctionType.id,
@@ -1152,7 +1177,7 @@ export class CorrectionsService {
       const correction = await manager
         .getRepository(Correction)
         .findOneOrFail({ where: { id: correctionId } });
-      const filialUsers = await this.filialUsers(manager, correction.filialId);
+      const filialUsers = await this.filialUsers(manager, correction.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,

@@ -10,6 +10,7 @@ import {
   CfoStatusValue,
   CorrectionCfoStatus,
 } from '../corrections/entities/correction-cfo-status.entity';
+import { CorrectionFilialStatus } from '../corrections/entities/correction-filial-status.entity';
 import { CorrectionHistoryEntry } from '../corrections/entities/correction-history-entry.entity';
 import {
   Correction,
@@ -54,6 +55,7 @@ const dataSource = new DataSource({
     DocumentSlot,
     FileVersion,
     CorrectionCfoStatus,
+    CorrectionFilialStatus,
     Remark,
     CorrectionHistoryEntry,
     Notification,
@@ -158,30 +160,43 @@ async function main() {
     name: 'Стандартная корректировка',
     description: 'Базовый тип корректировки для демо-данных',
   });
+  const MTR_CHOICE_GROUP = 'mtr_package';
+  const MTR_GROUP_LABEL = 'Перечень комплекта МТР (ХС)';
   const requirements = await reqRepo.save([
     {
       correctionTypeId: correctionType.id,
-      kind: PackageRequirementKind.EXCEL_SHEET,
-      name: 'D-листы',
+      kind: PackageRequirementKind.DOCUMENT,
+      name: 'Согласованная служебная записка',
       isRequired: true,
       order: 1,
     },
     {
       correctionTypeId: correctionType.id,
       kind: PackageRequirementKind.DOCUMENT,
-      name: 'ДОО',
+      name: 'Пакет обосновывающих документов',
       isRequired: true,
       order: 2,
     },
     {
       correctionTypeId: correctionType.id,
       kind: PackageRequirementKind.DOCUMENT,
-      name: 'Дефектная ведомость',
-      isRequired: false,
+      name: 'Локальный сметный расчёт (ПД)',
+      isRequired: true,
       order: 3,
+      choiceGroupKey: MTR_CHOICE_GROUP,
+      groupLabel: MTR_GROUP_LABEL,
+    },
+    {
+      correctionTypeId: correctionType.id,
+      kind: PackageRequirementKind.DOCUMENT,
+      name: 'ХЗ-х ТКП',
+      isRequired: true,
+      order: 4,
+      choiceGroupKey: MTR_CHOICE_GROUP,
+      groupLabel: MTR_GROUP_LABEL,
     },
   ]);
-  const [reqExcelSheet, reqDoo] = requirements;
+  const [reqNote, reqPackage, reqLsr, reqTkp] = requirements;
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
 
@@ -313,15 +328,28 @@ async function main() {
       requirementId: null,
       label: 'Excel корректировка',
     });
-    const excelSheetSlot = await slotRepo.save({
+    const noteSlot = await slotRepo.save({
       correctionId: correction.id,
-      requirementId: reqExcelSheet.id,
-      label: reqExcelSheet.name,
+      requirementId: reqNote.id,
+      label: reqNote.name,
     });
-    const dooSlot = await slotRepo.save({
+    const packageSlot = await slotRepo.save({
       correctionId: correction.id,
-      requirementId: reqDoo.id,
-      label: reqDoo.name,
+      requirementId: reqPackage.id,
+      label: reqPackage.name,
+    });
+    const lsrSlot = await slotRepo.save({
+      correctionId: correction.id,
+      requirementId: reqLsr.id,
+      label: reqLsr.name,
+    });
+    // ХЗ-х ТКП (reqTkp) получает слот, как и полагается create(), но
+    // намеренно без файла — группа МТР считается укомплектованной по
+    // reqLsr одному, это демонстрирует правило «выбери один из группы».
+    await slotRepo.save({
+      correctionId: correction.id,
+      requirementId: reqTkp.id,
+      label: reqTkp.name,
     });
 
     await historyRepo.save({
@@ -341,16 +369,23 @@ async function main() {
         daysAgo(daysBase),
       );
       await addFileVersion(
-        excelSheetSlot,
+        noteSlot,
         1,
-        'd-listy.xlsx',
+        'sluzhebnaya-zapiska.pdf',
         filialUser,
         daysAgo(daysBase),
       );
       await addFileVersion(
-        dooSlot,
+        packageSlot,
         1,
-        'doo.pdf',
+        'obosnovanie.pdf',
+        filialUser,
+        daysAgo(daysBase),
+      );
+      await addFileVersion(
+        lsrSlot,
+        1,
+        'lokalny-smetny-raschet.pdf',
         filialUser,
         daysAgo(daysBase),
       );
@@ -366,16 +401,23 @@ async function main() {
       daysAgo(daysBase, 1),
     );
     await addFileVersion(
-      excelSheetSlot,
+      noteSlot,
       1,
-      'd-listy.xlsx',
+      'sluzhebnaya-zapiska.pdf',
       filialUser,
       daysAgo(daysBase, 1),
     );
     await addFileVersion(
-      dooSlot,
+      packageSlot,
       1,
-      'doo.pdf',
+      'obosnovanie.pdf',
+      filialUser,
+      daysAgo(daysBase, 1),
+    );
+    await addFileVersion(
+      lsrSlot,
+      1,
+      'lokalny-smetny-raschet.pdf',
       filialUser,
       daysAgo(daysBase, 1),
     );
@@ -453,10 +495,11 @@ async function main() {
       correctionId: correction.id,
       cfoId: cfoB.id,
       authorId: cfoBUser.id,
-      description: 'В файле «ДОО» не совпадают суммы с Excel-корректировкой.',
+      description:
+        'В «Пакете обосновывающих документов» не совпадают суммы с Excel-корректировкой.',
       requiredAction:
         'Приведите суммы в соответствие и перезагрузите документ.',
-      relatedSlotId: dooSlot.id,
+      relatedSlotId: packageSlot.id,
       status: RemarkStatus.OPEN,
       createdAt: daysAgo(daysBase, 4),
     });
@@ -471,7 +514,7 @@ async function main() {
     await notificationRepo.save({
       userId: filialUser.id,
       correctionId: correction.id,
-      text: `${cfoB.code} вернуло корректировку ${humanId} на доработку. Замечание ${remarkHumanId} (элемент: «${dooSlot.label}»). ${remark.requiredAction}`,
+      text: `${cfoB.code} вернуло корректировку ${humanId} на доработку. Замечание ${remarkHumanId} (элемент: «${packageSlot.label}»). ${remark.requiredAction}`,
       isRead: status !== CorrectionStatus.RETURNED_FOR_REVISION,
       createdAt: daysAgo(daysBase, 4),
     });
@@ -479,16 +522,16 @@ async function main() {
       correctionId: correction.id,
       userId: cfoBUser.id,
       timestamp: daysAgo(daysBase, 4),
-      text: `${cfoB.code} создал замечание ${remarkHumanId} (элемент: «${dooSlot.label}») и вернул на доработку.`,
+      text: `${cfoB.code} создал замечание ${remarkHumanId} (элемент: «${packageSlot.label}») и вернул на доработку.`,
     });
 
     if (status === CorrectionStatus.RETURNED_FOR_REVISION) return;
 
     // Филиал исправляет и отмечает замечание исправленным, повторно направляет B — RESUBMITTED.
     await addFileVersion(
-      dooSlot,
+      packageSlot,
       2,
-      'doo-ispravlennyj.pdf',
+      'obosnovanie-ispravlenny.pdf',
       filialUser,
       daysAgo(daysBase, 5),
       remark.id,

@@ -332,3 +332,106 @@ describe('CorrectionsService — deleteCorrection (удаление только
     expect(deleteFn).toHaveBeenCalledWith(1);
   });
 });
+
+type CheckPackageComplete = (correction: Correction) => {
+  complete: boolean;
+  missing: string[];
+};
+
+function buildRequirement(overrides: {
+  id: number;
+  name: string;
+  isRequired?: boolean;
+  choiceGroupKey?: string | null;
+  groupLabel?: string;
+}) {
+  return {
+    isRequired: true,
+    choiceGroupKey: null,
+    groupLabel: '',
+    ...overrides,
+  };
+}
+
+/** Корректировка с основным Excel-слотом (заполнен) + переданными требованиями/слотами. */
+function buildCorrectionForPackageCheck(
+  requirements: ReturnType<typeof buildRequirement>[],
+  slotsByRequirementId: Record<number, { versions: unknown[] } | undefined>,
+): Correction {
+  return {
+    slots: [
+      { requirementId: null, versions: [{ id: 1 }] },
+      ...requirements.map((req) => ({
+        requirementId: req.id,
+        versions: slotsByRequirementId[req.id]?.versions ?? [],
+      })),
+    ],
+    correctionType: { requirements },
+  } as unknown as Correction;
+}
+
+describe('CorrectionsService — checkPackageComplete (группа «выбери один из альтернатив»)', () => {
+  const lsr = buildRequirement({
+    id: 10,
+    name: 'Локальный сметный расчёт (ПД)',
+    choiceGroupKey: 'mtr_package',
+    groupLabel: 'Перечень комплекта МТР (ХС)',
+  });
+  const tkp = buildRequirement({
+    id: 11,
+    name: 'ХЗ-х ТКП',
+    choiceGroupKey: 'mtr_package',
+    groupLabel: 'Перечень комплекта МТР (ХС)',
+  });
+
+  function check(correction: Correction) {
+    const { service } = buildService(correction);
+    return (
+      service as unknown as { checkPackageComplete: CheckPackageComplete }
+    ).checkPackageComplete(correction);
+  }
+
+  it('пакет неполон, если ни один вариант группы не заполнен', () => {
+    const correction = buildCorrectionForPackageCheck([lsr, tkp], {});
+
+    const result = check(correction);
+
+    expect(result.complete).toBe(false);
+    expect(result.missing).toEqual([
+      'Перечень комплекта МТР (ХС) (один из: Локальный сметный расчёт (ПД) / ХЗ-х ТКП)',
+    ]);
+  });
+
+  it('пакет полон, если заполнен только один вариант группы', () => {
+    const correction = buildCorrectionForPackageCheck([lsr, tkp], {
+      10: { versions: [{ id: 1 }] },
+    });
+
+    const result = check(correction);
+
+    expect(result.complete).toBe(true);
+    expect(result.missing).toEqual([]);
+  });
+
+  it('пакет полон, если заполнены оба варианта группы', () => {
+    const correction = buildCorrectionForPackageCheck([lsr, tkp], {
+      10: { versions: [{ id: 1 }] },
+      11: { versions: [{ id: 2 }] },
+    });
+
+    const result = check(correction);
+
+    expect(result.complete).toBe(true);
+    expect(result.missing).toEqual([]);
+  });
+
+  it('независимые (негрупповые) обязательные требования продолжают работать как раньше', () => {
+    const note = buildRequirement({ id: 20, name: 'Согласованная служебная записка' });
+    const correction = buildCorrectionForPackageCheck([note], {});
+
+    const result = check(correction);
+
+    expect(result.complete).toBe(false);
+    expect(result.missing).toEqual(['Согласованная служебная записка']);
+  });
+});

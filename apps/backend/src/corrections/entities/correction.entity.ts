@@ -74,7 +74,7 @@ export class Correction {
   @JoinColumn({ name: 'filialId' })
   filial: Relation<Filial> | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   filialId: number | null;
 
   @Column({
@@ -85,14 +85,14 @@ export class Correction {
   initiatorKind: InitiatorKind;
 
   /** Заполнен только при initiatorKind = FILIAL (дублирует filialId по смыслу). */
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   initiatorFilialId: number | null;
 
   @ManyToOne(() => Cfo, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'initiatorCfoId' })
   initiatorCfo: Relation<Cfo> | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   initiatorCfoId: number | null;
 
   /** Куда ЦФО-инициатор направил корректировку — FILIAL или DTOE. Null, пока не направлено. */

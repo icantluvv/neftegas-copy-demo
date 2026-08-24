@@ -75,6 +75,8 @@ export function toDocumentSlotDto(slot: DocumentSlot) {
       ? toCfoDto(slot.requirement.responsibleCfo)
       : null,
     currentVersion: current ? toFileVersionDto(current) : null,
+    choiceGroupKey: slot.requirement?.choiceGroupKey ?? null,
+    groupLabel: slot.requirement?.groupLabel || null,
   };
 }
 
@@ -156,7 +158,7 @@ export function toCorrectionListItemDto(
 ) {
   return {
     ...toCorrectionBaseDto(correction),
-    filial: toFilialDto(correction.filial),
+    filial: toFilialDto(correction.filial!),
     correctionType: toCorrectionTypeDto(correction.correctionType),
     author: toUserSummaryDto(correction.author),
     myCfoStatus: opts.myCfoStatus ?? null,

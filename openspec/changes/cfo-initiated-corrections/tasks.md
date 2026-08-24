@@ -20,19 +20,31 @@
 
 ### 2.1 Модель данных
 
-- [ ] 2.1.1 [backend] `entities/correction.entity.ts`: добавить `InitiatorKind`,
+- [x] 2.1.1 [backend] `entities/correction.entity.ts`: добавить `InitiatorKind`,
       `TargetKind`, поля `initiatorKind`, `initiatorFilialId`,
       `initiatorCfoId`/`initiatorCfo`, `targetKind`; сделать `filialId`/`filial`
       nullable; добавить relation `filialStatuses`; добавить 5 новых значений
-      `CorrectionStatus`. *(Сделано в этой сессии — сверить с `design.md` перед
-      продолжением.)*
-- [ ] 2.1.2 [backend] Новая `entities/correction-filial-status.entity.ts`
-      (зеркало `correction-cfo-status.entity.ts`). *(Файл уже создан в этой
-      сессии — сверить.)*
-- [ ] 2.1.3 [backend] `entities/remark.entity.ts`: добавить `filialId`/`filial`,
-      обновить `issuerLabel`. *(Сделано в этой сессии — сверить.)*
-- [ ] 2.1.4 [backend] `corrections.module.ts`: зарегистрировать
+      `CorrectionStatus`. Подтверждено при работе над `revise-package-requirements`:
+      backend компилируется (`tsc --noEmit` чисто), контейнер стабильно
+      стартует (`synchronize` применил схему), `bun run test` 40/40 green.
+      Nullable-числовые колонки (`filialId`/`initiatorFilialId`/
+      `initiatorCfoId`) потребовали явного `type: 'int'` — без него TypeORM
+      падал на `Object` type.
+- [x] 2.1.2 [backend] Новая `entities/correction-filial-status.entity.ts`
+      (зеркало `correction-cfo-status.entity.ts`). Подтверждено — компилируется
+      и синхронизируется с БД (таблица `correction_filial_statuses` создана).
+- [x] 2.1.3 [backend] `entities/remark.entity.ts`: добавить `filialId`/`filial`,
+      обновить `issuerLabel`. Подтверждено компиляцией и тестами.
+- [x] 2.1.4 [backend] `corrections.module.ts`: зарегистрировать
       `CorrectionFilialStatus` в `TypeOrmModule.forFeature([...])`.
+      *(Выполнено попутно при работе над `revise-package-requirements` —
+      отсутствие регистрации ронялo backend-контейнер в цикл рестарта при
+      перезапуске: `Entity metadata for Correction#filialStatuses was not
+      found`. Заодно зарегистрирована в `database/seed.ts`, и добавлен явный
+      `type: 'int'` для `Correction.filialId`/`initiatorFilialId`/
+      `initiatorCfoId` — без него TypeORM видел design:type как `Object` для
+      nullable-числовых колонок и падал на `synchronize`. Подтверждено:
+      backend-контейнер стабильно стартует, `bun run test` — 40/40 green.)*
 - [ ] 2.1.5 [backend] `database/seed.ts`: добавить 18-ю строку `cfos` —
       `{ code: 'ДТОиР', slug: 'dtoe' }`; исключить её из цикла создания
       `FilialCfoLink`; добавить минимум одну демо-корректировку с
@@ -117,6 +129,17 @@
       `resubmitToDtoe`/`recomputeStatusAfterCfoAction`) → реализовать
       `initiatorLabel()`/`initiatorUsers()` helper и заменить прямые
       обращения к `correction.filial.code` → green.
+
+      *(Промежуточный шаг сделан при работе над `revise-package-requirements`,
+      чтобы вернуть backend к компилируемому состоянию: на всех 15
+      затронутых обращениях к `correction.filial`/`correction.filialId`
+      расставлены non-null assertions (`!`) — компилируется и работает
+      корректно для текущего единственного реального пути (`initiatorKind`
+      всегда `FILIAL`, т.к. `create()` для роли `CFO` ещё не реализован).
+      Это НЕ отменяет эту задачу — `!` лишь временная заглушка типов, при
+      реализации `sendAsCfo`/`create()` для CFO эти же 15 мест упадут в
+      рантайме на `null`, если их не заменить на `initiatorLabel()`/
+      `initiatorUsers()` до включения ветки CFO.)*
 - [ ] 2.4.7 [backend] `deleteCorrection()`: failing тест — автор-ЦФО удаляет
       собственный черновик → реализовать расширение guard → green.
 

@@ -60,4 +60,15 @@ export class PackageRequirement {
 
   @Column({ default: 0 })
   order: number;
+
+  /**
+   * Общий ключ для альтернативных требований («выбери один из группы») —
+   * null означает независимое требование, проверяется как раньше.
+   */
+  @Column({ type: 'varchar', nullable: true })
+  choiceGroupKey: string | null;
+
+  /** Заголовок группы для UI, заполнен на каждой строке группы. */
+  @Column({ default: '' })
+  groupLabel: string;
 }
