@@ -14,55 +14,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
 import { getCorrectionStatusLabel } from "../../lib/status-labels";
+import { STAGE_GROUPS } from "../constants";
 import { DonutChart, type DonutSegment } from "./donut-chart";
-
-interface StageGroup {
-  key: string;
-  label: string;
-  statuses: CorrectionStatus2[];
-  strokeClassName: string;
-  dotClassName: string;
-}
-
-// Пять групп — укрупнение десяти системных статусов (ЧТЗ «Кабинет Филиала», 2.2):
-// филиалу не нужны различия между этапами, где действие не на его стороне.
-const STAGE_GROUPS: StageGroup[] = [
-  {
-    key: "draft",
-    label: "Черновик",
-    statuses: ["DRAFT"],
-    strokeClassName: "stroke-gray-400",
-    dotClassName: "bg-gray-400",
-  },
-  {
-    key: "in_progress",
-    label: "В работе",
-    statuses: [
-      "UNDER_CFO_REVIEW",
-      "PARTIALLY_APPROVED",
-      "RESUBMITTED",
-      "UNDER_DTOE_REVIEW",
-      "ALL_CFO_APPROVED",
-      "SENT_TO_DTOE",
-    ],
-    strokeClassName: "stroke-sky-500",
-    dotClassName: "bg-sky-500",
-  },
-  {
-    key: "returned",
-    label: "Возвращено",
-    statuses: ["RETURNED_FOR_REVISION", "RETURNED_BY_DTOE"],
-    strokeClassName: "stroke-red-500",
-    dotClassName: "bg-red-500",
-  },
-  {
-    key: "approved",
-    label: "Согласовано",
-    statuses: ["APPROVED_BY_DTOE"],
-    strokeClassName: "stroke-emerald-500",
-    dotClassName: "bg-emerald-500",
-  },
-];
 
 function groupKeyOfStatus(status: CorrectionStatus2): string {
   return STAGE_GROUPS.find((group) => group.statuses.includes(status))?.key ?? "draft";

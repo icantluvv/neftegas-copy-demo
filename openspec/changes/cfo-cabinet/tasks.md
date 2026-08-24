@@ -48,6 +48,12 @@
   Ручная HTTP-проверка выполнена вместо автотеста (см. 5.3) — покрывает данные,
   не покрывает поведение фильтров/клика по графику в браузере.
 
+- [x] 3.1.4 [frontend] Константы группировки статусов вынесены из компонентов в
+  `app/(private)/dashboard/constants.ts`: `CFO_STATUS_GROUPS` (+ тип
+  `CfoStatusGroup`) из `cfo-corrections-overview.tsx` и `STAGE_GROUPS`
+  (+ тип `StageGroup`) из `filial-corrections-overview.tsx` — поведение не
+  меняется, комментарии со ссылками на ЧТЗ перенесены вместе с константами.
+
 ### 3.2 Кнопка «Оставить замечание к элементу» — перенос в строку пакета
 
 _(формально относится к уже открытому change `correction-detail-page`, см.
@@ -141,6 +147,28 @@ _(формально относится к `correction-detail-page`, см. `prop
   `PENDING`); финализация без единого замечания → `400` («Нельзя вернуть на
   доработку без ни одного оставленного замечания»); финализация после двух
   замечаний → `RETURNED_FOR_REVISION`/`RETURNED`.
+
+## 3.4 Общая утилита проверки HTTP-статуса ошибки (рефакторинг, поведение не меняется)
+
+_(по запросу пользователя: одинаковые локальные хелперы `isForbiddenError`/
+`isUnauthorizedError` были продублированы в трёх дашбордах, ещё два варианта
+той же проверки жили в `layout.tsx` и на странице корректировки.)_
+
+- [x] 3.4.1 [frontend] Новый модуль `src/utils/http-error.ts`: `getHttpErrorStatus`
+  (единственное место, где разбирается `error.cause.status` ошибки Kubb-клиента),
+  `isHttpError(error, status)` и обёртки `isUnauthorizedError` / `isForbiddenError` /
+  `isNotFoundError`.
+- [x] 3.4.2 [frontend] Дубли удалены: `filial-dashboard.tsx`, `cfo-dashboard.tsx`,
+  `dtoe-dashboard.tsx` (по две копии хелперов в каждом), `corrections/[humanId]/page.tsx`
+  (локальный `isHttpError`); `layout.tsx` — `isRedirectToLoginError` оставлен на месте
+  (свой набор статусов 401/403/413), но построен на `getHttpErrorStatus`.
+- [x] 3.4.3 [frontend] `src/utils/http-error.unit.test.ts` — 8 unit-тестов
+  (статус из `cause`, ошибка без `cause`, значение не-`Error`, совпадение/несовпадение
+  статуса, по одному на каждую обёртку). Уровень P2 по `openspec/config.yaml`:
+  чистый рефакторинг без изменения наблюдаемого поведения.
+- [x] 3.4.4 [root] Проверки во frontend: `bun run typecheck` (0 ошибок),
+  `bun run lint` по затронутым файлам (0), `bunx vitest run` без незакоммиченного
+  WIP-теста `remarks-list/` — 28/28 файлов, 145/145 тестов green.
 
 ## 4. Документация
 

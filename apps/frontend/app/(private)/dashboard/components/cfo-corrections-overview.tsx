@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import type { CfoStatusValue2, CorrectionListItem } from "@/packages/api/base/codegen";
+import type { CorrectionListItem } from "@/packages/api/base/codegen";
 import { useGetCorrections } from "@/packages/api/base/codegen";
 
 import { Badge } from "#/components/ui/badge";
@@ -14,23 +14,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
 import { getCfoStatusLabel, getCorrectionStatusLabel } from "../../lib/status-labels";
+import { CFO_STATUS_GROUPS } from "../constants";
 import { DonutChart, type DonutSegment } from "./donut-chart";
-
-interface CfoStatusGroup {
-  key: CfoStatusValue2;
-  label: string;
-  strokeClassName: string;
-  dotClassName: string;
-}
-
-// Группировка по статусу СВОЕГО ЦФО (не общему статусу пакета) — ЧТЗ «Кабинет
-// ЦФО», раздел 2.4: две колонки/оси намеренно разведены, «статус пакета» может
-// отличаться от «статуса нашего ЦФО» (другой ЦФО ещё не решил или уже вернул).
-const CFO_STATUS_GROUPS: CfoStatusGroup[] = [
-  { key: "PENDING", label: "На проверке у нас", strokeClassName: "stroke-sky-500", dotClassName: "bg-sky-500" },
-  { key: "RETURNED", label: "Мы вернули", strokeClassName: "stroke-red-500", dotClassName: "bg-red-500" },
-  { key: "APPROVED", label: "Мы согласовали", strokeClassName: "stroke-emerald-500", dotClassName: "bg-emerald-500" },
-];
 
 function correctionMatchesFilter(item: CorrectionListItem, statusFilter: string, filialFilter: string): boolean {
   if (statusFilter !== "all" && item.myCfoStatus !== statusFilter) return false;
