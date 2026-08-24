@@ -25,12 +25,19 @@ Delta specs не создаются.
   (`flex flex-col gap-3`) между пунктами списка вместо элементов, прижатых друг к
   другу.
 
+`apps/frontend/src/components/error-boundary/error-boundary.tsx`:
+- `ErrorFallback`: нативный `<button>` кнопки «Попробовать еще» заменён на
+  `Button` из `#/components/ui/button` с `variant="outline"`. Это была
+  единственная кнопка в проекте вне UI-кита, из-за чего она не получала общих
+  стилей, состояний фокуса и `disabled`.
+
 ## Влияние на качество
 
 - Уровень риска: P3
 - Затронутые маршруты: нет (переиспользуемый UI-примитив, ещё не подключён ни к
   одной странице)
-- Затронутые frontend-компоненты: `apps/frontend/src/components/ui/select/select.tsx`
+- Затронутые frontend-компоненты: `apps/frontend/src/components/ui/select/select.tsx`,
+  `apps/frontend/src/components/error-boundary/error-boundary.tsx`
 - Затронутые API: нет
 - TDD-порядок: не применим — чисто визуальная правка без наблюдаемого поведения
 - Обязательные уровни проверки: Static (`bun run lint`, `bun run typecheck`)

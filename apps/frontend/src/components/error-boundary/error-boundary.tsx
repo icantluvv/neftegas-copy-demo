@@ -2,6 +2,8 @@ import type { ComponentType, ErrorInfo, ReactNode } from 'react'
 
 import { Component } from 'react'
 
+import { Button } from '#/components/ui/button'
+
 interface ErrorBoundaryProps {
 	children: ReactNode
 	fallback?: ComponentType<ErrorFallbackProps>
@@ -34,7 +36,11 @@ export function ErrorFallback({
 			<p>{DEFAULT_ERROR_TEXT}</p>
 			<br />
 			{description}
-			{resetError && <button onClick={resetError}>Попробовать еще</button>}
+			{resetError && (
+				<Button onClick={resetError} variant="outline">
+					Попробовать еще
+				</Button>
+			)}
 		</div>
 	)
 }
