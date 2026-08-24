@@ -11,10 +11,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Cfo } from '../../org/entities/cfo.entity';
 import { CorrectionType } from '../../org/entities/correction-type.entity';
 import { Filial } from '../../org/entities/filial.entity';
 import { User } from '../../users/entities/user.entity';
 import { CorrectionCfoStatus } from './correction-cfo-status.entity';
+import { CorrectionFilialStatus } from './correction-filial-status.entity';
 import { CorrectionHistoryEntry } from './correction-history-entry.entity';
 import { DocumentSlot } from './document-slot.entity';
 import { Remark } from './remark.entity';
@@ -30,6 +32,24 @@ export enum CorrectionStatus {
   UNDER_DTOE_REVIEW = 'UNDER_DTOE_REVIEW',
   RETURNED_BY_DTOE = 'RETURNED_BY_DTOE',
   APPROVED_BY_DTOE = 'APPROVED_BY_DTOE',
+  // Зеркальный цикл для корректировок, инициированных ЦФО (initiatorKind = CFO).
+  UNDER_FILIAL_REVIEW = 'UNDER_FILIAL_REVIEW',
+  PARTIALLY_APPROVED_BY_FILIALS = 'PARTIALLY_APPROVED_BY_FILIALS',
+  RETURNED_FOR_REVISION_BY_FILIAL = 'RETURNED_FOR_REVISION_BY_FILIAL',
+  RESUBMITTED_TO_FILIALS = 'RESUBMITTED_TO_FILIALS',
+  ALL_FILIALS_APPROVED = 'ALL_FILIALS_APPROVED',
+}
+
+/** Кто создал корректировку — определяет, кто выступает проверяющим. */
+export enum InitiatorKind {
+  FILIAL = 'FILIAL',
+  CFO = 'CFO',
+}
+
+/** Куда ЦФО-инициатор фактически направил корректировку (заполняется при send-as-cfo). */
+export enum TargetKind {
+  FILIAL = 'FILIAL',
+  DTOE = 'DTOE',
 }
 
 /** Корректировка — основной документ, проходящий полный цикл согласования. */
@@ -42,14 +62,42 @@ export class Correction {
   @Column()
   humanId: string;
 
+  /**
+   * Единственный филиал-владелец при initiatorKind = FILIAL (исторический
+   * смысл поля). При initiatorKind = CFO — null; целевые филиалы (может быть
+   * несколько) живут в filialStatuses.
+   */
   @ManyToOne(() => Filial, (filial) => filial.corrections, {
+    nullable: true,
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'filialId' })
-  filial: Relation<Filial>;
+  filial: Relation<Filial> | null;
 
-  @Column()
-  filialId: number;
+  @Column({ nullable: true })
+  filialId: number | null;
+
+  @Column({
+    type: 'enum',
+    enum: InitiatorKind,
+    default: InitiatorKind.FILIAL,
+  })
+  initiatorKind: InitiatorKind;
+
+  /** Заполнен только при initiatorKind = FILIAL (дублирует filialId по смыслу). */
+  @Column({ nullable: true })
+  initiatorFilialId: number | null;
+
+  @ManyToOne(() => Cfo, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'initiatorCfoId' })
+  initiatorCfo: Relation<Cfo> | null;
+
+  @Column({ nullable: true })
+  initiatorCfoId: number | null;
+
+  /** Куда ЦФО-инициатор направил корректировку — FILIAL или DTOE. Null, пока не направлено. */
+  @Column({ type: 'enum', enum: TargetKind, nullable: true })
+  targetKind: TargetKind | null;
 
   @ManyToOne(() => CorrectionType, (type) => type.corrections, {
     onDelete: 'RESTRICT',
@@ -94,6 +142,9 @@ export class Correction {
 
   @OneToMany(() => CorrectionCfoStatus, (status) => status.correction)
   cfoStatuses: CorrectionCfoStatus[];
+
+  @OneToMany(() => CorrectionFilialStatus, (status) => status.correction)
+  filialStatuses: CorrectionFilialStatus[];
 
   @OneToMany(() => Remark, (remark) => remark.correction)
   remarks: Remark[];

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 
 import { Cfo } from '../../org/entities/cfo.entity';
+import { Filial } from '../../org/entities/filial.entity';
 import { User } from '../../users/entities/user.entity';
 import { Correction } from './correction.entity';
 import { DocumentSlot } from './document-slot.entity';
@@ -23,8 +24,9 @@ export enum RemarkStatus {
 }
 
 /**
- * Замечание — создаётся ЦФО или ДТОиР при возврате на доработку.
- * cfo = null означает, что замечание от ДТОиР.
+ * Замечание — создаётся проверяющим при возврате на доработку. Ровно один из
+ * cfoId/filialId заполнен (ЦФО или Филиал-проверяющий соответственно); оба
+ * пустые — замечание от ДТОиР.
  */
 @Entity('remarks')
 export class Remark {
@@ -50,6 +52,13 @@ export class Remark {
 
   @Column({ nullable: true })
   cfoId: number | null;
+
+  @ManyToOne(() => Filial, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'filialId' })
+  filial: Relation<Filial> | null;
+
+  @Column({ nullable: true })
+  filialId: number | null;
 
   @ManyToOne(() => User, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'authorId' })
@@ -104,6 +113,8 @@ export class Remark {
   closedAt: Date | null;
 
   get issuerLabel(): string {
-    return this.cfo ? this.cfo.code : 'ДТОиР';
+    if (this.cfo) return this.cfo.code;
+    if (this.filial) return this.filial.code;
+    return 'ДТОиР';
   }
 }
