@@ -4,6 +4,7 @@
 */
 
 import type { CorrectionDetail } from "../CorrectionDetail";
+import type { ErrorResponse2 } from "../ErrorResponse2";
 
 export interface CancelCfoDecisionPathParams {
     /**
@@ -17,10 +18,15 @@ export interface CancelCfoDecisionPathParams {
 */
 export type CancelCfoDecision200 = CorrectionDetail;
 
+/**
+ * @description Нечего отменять или корректировка уже вне зоны ответственности ЦФО
+*/
+export type CancelCfoDecision400 = ErrorResponse2;
+
 export type CancelCfoDecisionMutationResponse = CancelCfoDecision200;
 
 export type CancelCfoDecisionMutation = {
     Response: CancelCfoDecision200;
     PathParams: CancelCfoDecisionPathParams;
-    Errors: any;
+    Errors: CancelCfoDecision400;
 };

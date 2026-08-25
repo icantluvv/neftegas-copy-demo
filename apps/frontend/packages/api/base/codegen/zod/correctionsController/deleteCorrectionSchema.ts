@@ -4,6 +4,7 @@
 */
 
 import * as z from "zod/mini";
+import { errorResponse2Schema } from "../errorResponse2Schema";
 
 export const deleteCorrectionPathParamsSchema = z.object({
     "humanId": z.string()
@@ -13,5 +14,20 @@ export const deleteCorrectionPathParamsSchema = z.object({
  * @description Корректировка удалена
  */
 export const deleteCorrection204Schema = z.unknown()
+
+/**
+ * @description Корректировка не в статусе «Черновик»
+ */
+export const deleteCorrection400Schema = z.lazy(() => errorResponse2Schema)
+
+/**
+ * @description Нет доступа (не автор/не владелец филиала)
+ */
+export const deleteCorrection403Schema = z.lazy(() => errorResponse2Schema)
+
+/**
+ * @description Не найдено
+ */
+export const deleteCorrection404Schema = z.lazy(() => errorResponse2Schema)
 
 export const deleteCorrectionMutationResponseSchema = z.lazy(() => deleteCorrection204Schema)

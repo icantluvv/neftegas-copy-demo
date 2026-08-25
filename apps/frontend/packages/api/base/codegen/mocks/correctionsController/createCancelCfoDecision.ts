@@ -3,8 +3,9 @@
 * Do not edit manually.
 */
 
-import type { CancelCfoDecision200, CancelCfoDecisionMutationResponse, CancelCfoDecisionPathParams } from "../../types/correctionsController/CancelCfoDecision";
+import type { CancelCfoDecision200, CancelCfoDecision400, CancelCfoDecisionMutationResponse, CancelCfoDecisionPathParams } from "../../types/correctionsController/CancelCfoDecision";
 import { createCorrectionDetail } from "../createCorrectionDetail";
+import { createErrorResponse2 } from "../createErrorResponse2";
 import { faker } from "@faker-js/faker";
 
 export function createCancelCfoDecisionPathParams(data?: Partial<CancelCfoDecisionPathParams>): CancelCfoDecisionPathParams {
@@ -21,6 +22,14 @@ export function createCancelCfoDecisionPathParams(data?: Partial<CancelCfoDecisi
 export function createCancelCfoDecision200(data?: Partial<CancelCfoDecision200>): CancelCfoDecision200 {
 
   return createCorrectionDetail(data)
+}
+
+/**
+ * @description Нечего отменять или корректировка уже вне зоны ответственности ЦФО
+ */
+export function createCancelCfoDecision400(data?: Partial<CancelCfoDecision400>): CancelCfoDecision400 {
+
+  return createErrorResponse2(data)
 }
 
 export function createCancelCfoDecisionMutationResponse(data?: Partial<CancelCfoDecisionMutationResponse>): CancelCfoDecisionMutationResponse {

@@ -38,4 +38,14 @@ export interface DocumentSlot {
     */
     responsibleCfo: (Cfo | null);
     currentVersion?: (FileVersion2 | null);
+    /**
+     * @description Общий ключ для слотов-альтернатив («выбери один из группы»); null — слот не входит в группу
+     * @type string,null
+    */
+    choiceGroupKey?: string | null;
+    /**
+     * @description Заголовок группы для UI; null — слот не входит в группу
+     * @type string,null
+    */
+    groupLabel?: string | null;
 }

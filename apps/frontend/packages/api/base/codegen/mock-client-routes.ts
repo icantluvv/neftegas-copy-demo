@@ -23,14 +23,18 @@ import { createCreateCfoMutationResponse } from './mocks/orgController/createCre
 import { createGetMeQueryResponse } from './mocks/authController/createGetMe'
 import { createGetUsersQueryResponse } from './mocks/usersController/createGetUsers'
 import { createCreateUserMutationResponse } from './mocks/usersController/createCreateUser'
+import { createMarkNotificationsReadByCorrectionMutationResponse } from './mocks/notificationsController/createMarkNotificationsReadByCorrection'
 import { createCreatePackageRequirementMutationResponse } from './mocks/orgController/createCreatePackageRequirement'
 import { createResubmitCorrectionToDtoeMutationResponse } from './mocks/correctionsController/createResubmitCorrectionToDtoe'
 import { createSendCorrectionToDtoeMutationResponse } from './mocks/correctionsController/createSendCorrectionToDtoe'
 import { createApproveCorrectionByDtoeMutationResponse } from './mocks/correctionsController/createApproveCorrectionByDtoe'
+import { createChangeCorrectionTypeMutationResponse } from './mocks/correctionsController/createChangeCorrectionType'
 import { createApproveCorrectionByCfoMutationResponse } from './mocks/correctionsController/createApproveCorrectionByCfo'
 import { createReturnCorrectionByDtoeMutationResponse } from './mocks/correctionsController/createReturnCorrectionByDtoe'
 import { createReturnCorrectionByCfoMutationResponse } from './mocks/correctionsController/createReturnCorrectionByCfo'
+import { createCancelCfoDecisionMutationResponse } from './mocks/correctionsController/createCancelCfoDecision'
 import { createResubmitCorrectionMutationResponse } from './mocks/correctionsController/createResubmitCorrection'
+import { createLeaveRemarkMutationResponse } from './mocks/correctionsController/createLeaveRemark'
 import { createSendCorrectionMutationResponse } from './mocks/correctionsController/createSendCorrection'
 import { createUpdateFilialCfoLinkMutationResponse } from './mocks/orgController/createUpdateFilialCfoLink'
 import { createDeleteFilialCfoLinkMutationResponse } from './mocks/orgController/createDeleteFilialCfoLink'
@@ -41,6 +45,7 @@ import { createOpenNotificationMutationResponse } from './mocks/notificationsCon
 import { createUpdatePackageRequirementMutationResponse } from './mocks/orgController/createUpdatePackageRequirement'
 import { createDeletePackageRequirementMutationResponse } from './mocks/orgController/createDeletePackageRequirement'
 import { createGetCorrectionQueryResponse } from './mocks/correctionsController/createGetCorrection'
+import { createDeleteCorrectionMutationResponse } from './mocks/correctionsController/createDeleteCorrection'
 import { createDownloadFileVersionQueryResponse } from './mocks/correctionsController/createDownloadFileVersion'
 import { createUpdateFilialMutationResponse } from './mocks/orgController/createUpdateFilial'
 import { createDeleteFilialMutationResponse } from './mocks/orgController/createDeleteFilial'
@@ -76,14 +81,18 @@ export const mockRoutes = [
 	{ method: 'GET', pattern: /^\/auth\/me$/, create: createGetMeQueryResponse },
 	{ method: 'GET', pattern: /^\/users$/, create: createGetUsersQueryResponse },
 	{ method: 'POST', pattern: /^\/users$/, status: 201, create: createCreateUserMutationResponse },
+	{ method: 'POST', pattern: /^\/notifications\/by-correction\/[^/]+\/read$/, create: createMarkNotificationsReadByCorrectionMutationResponse },
 	{ method: 'POST', pattern: /^\/org\/correction-types\/[^/]+\/requirements$/, status: 201, create: createCreatePackageRequirementMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/resubmit-to-dtoe$/, create: createResubmitCorrectionToDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/send-to-dtoe$/, create: createSendCorrectionToDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/dtoe-approve$/, create: createApproveCorrectionByDtoeMutationResponse },
+	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/change-type$/, create: createChangeCorrectionTypeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/cfo-approve$/, create: createApproveCorrectionByCfoMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/dtoe-return$/, create: createReturnCorrectionByDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/cfo-return$/, create: createReturnCorrectionByCfoMutationResponse },
+	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/cfo-cancel$/, create: createCancelCfoDecisionMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/resubmit$/, create: createResubmitCorrectionMutationResponse },
+	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/remarks$/, create: createLeaveRemarkMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/send$/, create: createSendCorrectionMutationResponse },
 	{ method: 'PATCH', pattern: /^\/org\/filial-cfo-links\/[^/]+$/, create: createUpdateFilialCfoLinkMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/filial-cfo-links\/[^/]+$/, status: 204, create: createDeleteFilialCfoLinkMutationResponse },
@@ -94,6 +103,7 @@ export const mockRoutes = [
 	{ method: 'PATCH', pattern: /^\/org\/requirements\/[^/]+$/, create: createUpdatePackageRequirementMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/requirements\/[^/]+$/, status: 204, create: createDeletePackageRequirementMutationResponse },
 	{ method: 'GET', pattern: /^\/corrections\/[^/]+$/, create: createGetCorrectionQueryResponse },
+	{ method: 'DELETE', pattern: /^\/corrections\/[^/]+$/, status: 204, create: createDeleteCorrectionMutationResponse },
 	{ method: 'GET', pattern: /^\/files\/[^/]+\/download$/, create: createDownloadFileVersionQueryResponse },
 	{ method: 'PATCH', pattern: /^\/org\/filials\/[^/]+$/, create: createUpdateFilialMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/filials\/[^/]+$/, status: 204, create: createDeleteFilialMutationResponse },

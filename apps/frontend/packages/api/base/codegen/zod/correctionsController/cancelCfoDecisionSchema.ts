@@ -5,6 +5,7 @@
 
 import * as z from "zod/mini";
 import { correctionDetailSchema } from "../correctionDetailSchema";
+import { errorResponse2Schema } from "../errorResponse2Schema";
 
 export const cancelCfoDecisionPathParamsSchema = z.object({
     "humanId": z.string()
@@ -14,5 +15,10 @@ export const cancelCfoDecisionPathParamsSchema = z.object({
  * @description Решение ЦФО отменено, статус возвращён в PENDING
  */
 export const cancelCfoDecision200Schema = z.lazy(() => correctionDetailSchema)
+
+/**
+ * @description Нечего отменять или корректировка уже вне зоны ответственности ЦФО
+ */
+export const cancelCfoDecision400Schema = z.lazy(() => errorResponse2Schema)
 
 export const cancelCfoDecisionMutationResponseSchema = z.lazy(() => cancelCfoDecision200Schema)

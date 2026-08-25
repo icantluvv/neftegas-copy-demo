@@ -1,8 +1,9 @@
 ## 1. API
 
-- [ ] 1.1 [api] Добавить `choiceGroupKey`/`groupLabel` (nullable) в схему
-      `DocumentSlot` (`api/src/components/schemas/**`, см. `design.md` → API
-      Shape). Выполнить `npm run lint` из `api/`.
+- [x] 1.1 [api] Добавить `choiceGroupKey`/`groupLabel` (nullable) в схему
+      `DocumentSlot` (`api/src/components/schemas/document-slot.yaml`, см.
+      `design.md` → API Shape). `redocly lint` — валиден (44 pre-existing
+      warnings, без новых ошибок).
 
 ## 2. Backend
 
@@ -60,21 +61,29 @@
 
 ## 3. Frontend
 
-- [ ] 3.1.1 [frontend] Перегенерировать `apps/frontend/packages/api/base/codegen/**`
-      из обновлённого `openapi.yaml`.
-- [ ] 3.1.2 [frontend] Failing component-тест
-      `package-completeness.component.test.tsx`: строки с одинаковым
-      `choiceGroupKey` рендерятся с заголовком `groupLabel` и пометкой
-      «выберите один вариант»; колонка «Обязателен» для строк группы — «Да
-      (один из группы)» → реализовать в `package-completeness.tsx` (см.
-      `design.md` → «Дизайн (UI)», решение по умолчанию) → green.
+- [x] 3.1.1 [frontend] Перегенерировать `apps/frontend/packages/api/base/codegen/**`
+      из обновлённого `openapi.yaml` (502 файла, `bun run generate` в
+      dev-контейнере фронтенда).
+- [x] 3.1.2 [frontend] `package-completeness.tsx`: строки с одинаковым
+      `choiceGroupKey` рендерятся с заголовком `groupLabel — выберите один
+      вариант` над первой строкой группы (в ячейке колонки «Элемент»);
+      колонка «Обязателен» для строк группы — «Да (один из группы)» →
+      реализовано, см. `design.md` → «Дизайн (UI)» → «Реализовано».
+      Component-тест не написан — Chromium недоступен в dev-контейнере
+      фронтенда (тот же waiver, что и в остальных changes этой сессии), см.
+      `test-plan.md`.
 
 ## 4. Финализация
 
-- [ ] 4.1 [openspec] Обновить `test-plan.md` (статусы строк покрытия).
-- [ ] 4.2 [root] Ручная проверка на `infra-db-1` после 2.3.3 (см.
-      `test-plan.md` → Manual checks).
+- [x] 4.1 [openspec] Обновить `test-plan.md` (статусы строк покрытия,
+      журнал уточнений от 2026-08-25).
+- [x] 4.2 [root] Ручная проверка на `infra-db-1` после 2.3.3 (см.
+      `test-plan.md` → Manual checks) + повторная проверка после реализации
+      3.1.1–3.1.2 через новую тестовую корректировку `COR-000015` (удалена).
 - [ ] 4.3 [openspec] `openspec validate revise-package-requirements --strict
-      --no-interactive`, если CLI доступен.
+      --no-interactive` — CLI недоступен в этой сессии (нет `npx`/сети для
+      установки в среде агента), не выполнено.
 - [ ] 4.4 [openspec] Архивировать change после завершения секций 1–3 и
-      обязательных проверок.
+      обязательных проверок — component/E2E-тесты (3.1.2) остаются
+      waiver'ом до появления Chromium в dev-контейнере; архивировать можно
+      с этим известным условием, если пользователь подтвердит.

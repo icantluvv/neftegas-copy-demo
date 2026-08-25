@@ -15,9 +15,8 @@ function getReturnCorrectionByDtoeUrl({ humanId }: { humanId: ReturnCorrectionBy
 
 /**
  * @description Роль DTOE. Переводит корректировку в «Возвращено ДТОиР». Требует, чтобы
-ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
-(`POST /corrections/{humanId}/remarks`) — иначе `400`.
-
+ * ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
+ * (`POST /corrections/{humanId}/remarks`) — иначе `400`.
  * @summary Финализировать возврат на доработку от лица ДТОиР
  * {@link /corrections/:humanId/dtoe-return}
  */
