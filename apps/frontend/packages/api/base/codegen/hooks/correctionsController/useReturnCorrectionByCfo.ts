@@ -27,14 +27,13 @@ export function returnCorrectionByCfoMutationOptions<TContext = unknown>(config:
 
 /**
  * @description Роль CFO. Переводит корректировку в «Возвращено на доработку», а статус
-этого ЦФО — в «Возвращено». Требует, чтобы у этого ЦФО уже было оставлено
-хотя бы одно открытое замечание по этой корректировке
-(`POST /corrections/{humanId}/remarks`) — иначе `400`.
-
+ * этого ЦФО — в «Возвращено». Требует, чтобы у этого ЦФО уже было оставлено
+ * хотя бы одно открытое замечание по этой корректировке
+ * (`POST /corrections/{humanId}/remarks`) — иначе `400`.
  * @summary Финализировать возврат на доработку от лица ЦФО
  * {@link /corrections/:humanId/cfo-return}
  */
-export function useReturnCorrectionByCfo<TContext>(options:
+export function useReturnCorrectionByCfo<TContext>(options: 
 {
   mutation?: UseMutationOptions<ReturnCorrectionByCfoMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByCfoPathParams["humanId"]}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
@@ -46,12 +45,12 @@ export function useReturnCorrectionByCfo<TContext>(options:
           const mutationKey = mutationOptions.mutationKey ?? returnCorrectionByCfoMutationKey()
 
           const baseOptions = returnCorrectionByCfoMutationOptions(config) as UseMutationOptions<ReturnCorrectionByCfoMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByCfoPathParams["humanId"]}, TContext>
-
+          
 
           return useMutation<ReturnCorrectionByCfoMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByCfoPathParams["humanId"]}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
           }, queryClient) as UseMutationResult<ReturnCorrectionByCfoMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByCfoPathParams["humanId"]}, TContext>
-
+      
 }

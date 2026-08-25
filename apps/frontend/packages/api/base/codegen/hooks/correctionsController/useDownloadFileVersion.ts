@@ -27,6 +27,9 @@ export function downloadFileVersionQueryOptions({ id }: { id: DownloadFileVersio
 }
 
 /**
+ * @description Открыть/скачать содержимое версии файла. Доступно только ролям CFO и DTOE
+ * (проверяющим), имеющим доступ к соответствующей корректировке — филиал,
+ * загрузивший файл, эндпоинт не использует.
  * @summary Скачать файл версии
  * {@link /files/:id/download}
  */

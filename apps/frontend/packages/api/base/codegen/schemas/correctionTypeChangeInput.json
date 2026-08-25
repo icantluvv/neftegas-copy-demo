@@ -1,0 +1,1 @@
+{"type":"object","required":["correctionTypeId"],"properties":{"correctionTypeId":{"type":"integer"}},"x-readme-ref-name":"CorrectionTypeChangeInput"}

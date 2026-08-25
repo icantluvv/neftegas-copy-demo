@@ -24,6 +24,7 @@ import { CreateCorrectionDto } from './dto/create-correction.dto';
 import { FindCorrectionsQueryDto } from './dto/find-corrections-query.dto';
 import { RemarkCreateDto } from './dto/remark-create.dto';
 import { RemarkReopenDto } from './dto/remark-reopen.dto';
+import { UpdateCorrectionTypeDto } from './dto/update-correction-type.dto';
 import { UploadFileDto } from './dto/upload-file.dto';
 
 @ApiTags('Corrections')
@@ -73,8 +74,21 @@ export class CorrectionsController {
   @Roles(Role.FILIAL)
   @Delete(':humanId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteCorrection(@CurrentUser() user: User, @Param('humanId') humanId: string) {
+  deleteCorrection(
+    @CurrentUser() user: User,
+    @Param('humanId') humanId: string,
+  ) {
     return this.service.deleteCorrection(user, humanId);
+  }
+
+  @Roles(Role.FILIAL)
+  @Post(':humanId/change-type')
+  changeType(
+    @CurrentUser() user: User,
+    @Param('humanId') humanId: string,
+    @Body() dto: UpdateCorrectionTypeDto,
+  ) {
+    return this.service.updateCorrectionType(user, humanId, dto);
   }
 
   @Roles(Role.FILIAL)

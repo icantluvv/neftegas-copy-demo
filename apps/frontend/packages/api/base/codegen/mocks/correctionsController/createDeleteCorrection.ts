@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { DeleteCorrectionMutationResponse, DeleteCorrectionPathParams } from "../../types/correctionsController/DeleteCorrection";
+import type { DeleteCorrection400, DeleteCorrection403, DeleteCorrection404, DeleteCorrectionMutationResponse, DeleteCorrectionPathParams } from "../../types/correctionsController/DeleteCorrection";
+import { createErrorResponse2 } from "../createErrorResponse2";
 import { faker } from "@faker-js/faker";
 
 export function createDeleteCorrectionPathParams(data?: Partial<DeleteCorrectionPathParams>): DeleteCorrectionPathParams {
@@ -20,6 +21,30 @@ export function createDeleteCorrectionPathParams(data?: Partial<DeleteCorrection
 export function createDeleteCorrection204() {
 
   return undefined
+}
+
+/**
+ * @description Корректировка не в статусе «Черновик»
+ */
+export function createDeleteCorrection400(data?: Partial<DeleteCorrection400>): DeleteCorrection400 {
+
+  return createErrorResponse2(data)
+}
+
+/**
+ * @description Нет доступа (не автор/не владелец филиала)
+ */
+export function createDeleteCorrection403(data?: Partial<DeleteCorrection403>): DeleteCorrection403 {
+
+  return createErrorResponse2(data)
+}
+
+/**
+ * @description Не найдено
+ */
+export function createDeleteCorrection404(data?: Partial<DeleteCorrection404>): DeleteCorrection404 {
+
+  return createErrorResponse2(data)
 }
 
 export function createDeleteCorrectionMutationResponse(data?: Partial<DeleteCorrectionMutationResponse>): DeleteCorrectionMutationResponse {

@@ -20,3 +20,11 @@ properties:
     oneOf:
       - $ref: './file-version.yaml'
       - type: 'null'
+  choiceGroupKey:
+    type: [string, 'null']
+    description: >-
+      Общий ключ для слотов-альтернатив («выбери один из группы»); null —
+      слот не входит в группу
+  groupLabel:
+    type: [string, 'null']
+    description: Заголовок группы для UI; null — слот не входит в группу

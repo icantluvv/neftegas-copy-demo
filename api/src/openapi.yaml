@@ -77,6 +77,8 @@ paths:
     $ref: './paths/corrections-stats-dtoe.yaml'
   /corrections/{humanId}:
     $ref: './paths/corrections-human-id.yaml'
+  /corrections/{humanId}/change-type:
+    $ref: './paths/corrections-human-id-change-type.yaml'
   /corrections/{humanId}/slots/{slotId}/files:
     $ref: './paths/corrections-human-id-slots-slot-id-files.yaml'
   /corrections/{humanId}/send:
@@ -115,6 +117,8 @@ paths:
     $ref: './paths/notifications-id-open.yaml'
   /notifications/read-all:
     $ref: './paths/notifications-read-all.yaml'
+  /notifications/by-correction/{correctionId}/read:
+    $ref: './paths/notifications-by-correction-correction-id-read.yaml'
 
 components:
   securitySchemes:

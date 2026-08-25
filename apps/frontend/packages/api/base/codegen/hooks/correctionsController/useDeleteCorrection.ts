@@ -4,7 +4,7 @@
 */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { DeleteCorrectionMutationResponse, DeleteCorrectionPathParams } from "../../types/correctionsController/DeleteCorrection";
+import type { DeleteCorrectionMutationResponse, DeleteCorrectionPathParams, DeleteCorrection400, DeleteCorrection403, DeleteCorrection404 } from "../../types/correctionsController/DeleteCorrection";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { deleteCorrection } from "../../clients/correctionsController/deleteCorrection";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ export type DeleteCorrectionMutationKey = ReturnType<typeof deleteCorrectionMuta
 export function deleteCorrectionMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const mutationKey = deleteCorrectionMutationKey()
-        return mutationOptions<DeleteCorrectionMutationResponse, ResponseErrorConfig<Error>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>({
+        return mutationOptions<DeleteCorrectionMutationResponse, ResponseErrorConfig<DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>({
           mutationKey,
           mutationFn: async({ humanId }) => {
             return deleteCorrection({ humanId }, config)
@@ -27,19 +27,18 @@ export function deleteCorrectionMutationOptions<TContext = unknown>(config: Part
 
 /**
  * @description Роль FILIAL, только автор/владелец. Доступно только для корректировки в
-статусе `DRAFT` — направленную (любой другой статус) удалить нельзя,
-`400`. Удаляет корректировку целиком: слоты, версии файлов, замечания,
-статусы ЦФО, историю и уведомления по каскаду. `DRAFT`-корректировка не
-может иметь ни одного статуса ЦФО (они создаются только `POST
-.../send`), поэтому удаление черновика не затрагивает решений
-проверяющих и не требует их уведомления.
-
+ * статусе `DRAFT` — направленную (любой другой статус) удалить нельзя,
+ * `400`. Удаляет корректировку целиком: слоты, версии файлов, замечания,
+ * статусы ЦФО, историю и уведомления по каскаду. `DRAFT`-корректировка не
+ * может иметь ни одного статуса ЦФО (они создаются только `POST
+ * .../send`), поэтому удаление черновика не затрагивает решений
+ * проверяющих и не требует их уведомления.
  * @summary Удалить корректировку
  * {@link /corrections/:humanId}
  */
-export function useDeleteCorrection<TContext>(options:
+export function useDeleteCorrection<TContext>(options: 
 {
-  mutation?: UseMutationOptions<DeleteCorrectionMutationResponse, ResponseErrorConfig<Error>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<DeleteCorrectionMutationResponse, ResponseErrorConfig<DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
 }
  = {}) {
@@ -48,13 +47,13 @@ export function useDeleteCorrection<TContext>(options:
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? deleteCorrectionMutationKey()
 
-          const baseOptions = deleteCorrectionMutationOptions(config) as UseMutationOptions<DeleteCorrectionMutationResponse, ResponseErrorConfig<Error>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>
+          const baseOptions = deleteCorrectionMutationOptions(config) as UseMutationOptions<DeleteCorrectionMutationResponse, ResponseErrorConfig<DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>
+          
 
-
-          return useMutation<DeleteCorrectionMutationResponse, ResponseErrorConfig<Error>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>({
+          return useMutation<DeleteCorrectionMutationResponse, ResponseErrorConfig<DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<DeleteCorrectionMutationResponse, ResponseErrorConfig<Error>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>
-
+          }, queryClient) as UseMutationResult<DeleteCorrectionMutationResponse, ResponseErrorConfig<DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404>, {humanId: DeleteCorrectionPathParams["humanId"]}, TContext>
+      
 }

@@ -3,6 +3,7 @@
 * Do not edit manually.
 */
 
+import type { ErrorResponse2 } from "../ErrorResponse2";
 
 export interface DeleteCorrectionPathParams {
     /**
@@ -16,10 +17,25 @@ export interface DeleteCorrectionPathParams {
 */
 export type DeleteCorrection204 = unknown;
 
+/**
+ * @description Корректировка не в статусе «Черновик»
+*/
+export type DeleteCorrection400 = ErrorResponse2;
+
+/**
+ * @description Нет доступа (не автор/не владелец филиала)
+*/
+export type DeleteCorrection403 = ErrorResponse2;
+
+/**
+ * @description Не найдено
+*/
+export type DeleteCorrection404 = ErrorResponse2;
+
 export type DeleteCorrectionMutationResponse = DeleteCorrection204;
 
 export type DeleteCorrectionMutation = {
     Response: DeleteCorrection204;
     PathParams: DeleteCorrectionPathParams;
-    Errors: any;
+    Errors: DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404;
 };

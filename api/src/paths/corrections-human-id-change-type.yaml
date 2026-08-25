@@ -1,0 +1,39 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Изменить тип корректировки
+  operationId: changeCorrectionType
+  tags: [Corrections]
+  description: |
+    Роль FILIAL, только автор/владелец, только пока статус `DRAFT` — после
+    направления маршрут недоступен даже при прямом вызове, `400`. Слоты
+    пакета, привязанные к прежнему типу, удаляются вместе с уже
+    загруженными в них версиями файлов; для нового типа слоты создаются
+    заново тем же алгоритмом, что при создании корректировки. Общий слот
+    «Excel корректировка» от типа не зависит и не затрагивается.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/correction.yaml#/CorrectionTypeChangeInput' }
+  responses:
+    '200':
+      description: Тип изменён
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }
+    '400':
+      description: Корректировка не в статусе «Черновик»
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа (не автор/не владелец филиала)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: Корректировка или тип корректировки не найдены
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

@@ -19,5 +19,7 @@ get "responsibleCfo"(){
               },
 get "currentVersion"(){
                 return z.optional(z.union([fileVersion2Schema, z.null()]))
-              }
+              },
+"choiceGroupKey": z.nullish(z.string()),
+"groupLabel": z.nullish(z.string())
     })

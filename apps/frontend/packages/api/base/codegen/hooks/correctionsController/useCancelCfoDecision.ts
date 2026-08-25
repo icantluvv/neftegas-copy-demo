@@ -4,7 +4,7 @@
 */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { CancelCfoDecisionMutationResponse, CancelCfoDecisionPathParams } from "../../types/correctionsController/CancelCfoDecision";
+import type { CancelCfoDecisionMutationResponse, CancelCfoDecisionPathParams, CancelCfoDecision400 } from "../../types/correctionsController/CancelCfoDecision";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { cancelCfoDecision } from "../../clients/correctionsController/cancelCfoDecision";
 import { mutationOptions, useMutation } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ export type CancelCfoDecisionMutationKey = ReturnType<typeof cancelCfoDecisionMu
 export function cancelCfoDecisionMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const mutationKey = cancelCfoDecisionMutationKey()
-        return mutationOptions<CancelCfoDecisionMutationResponse, ResponseErrorConfig<Error>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>({
+        return mutationOptions<CancelCfoDecisionMutationResponse, ResponseErrorConfig<CancelCfoDecision400>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>({
           mutationKey,
           mutationFn: async({ humanId }) => {
             return cancelCfoDecision({ humanId }, config)
@@ -27,18 +27,17 @@ export function cancelCfoDecisionMutationOptions<TContext = unknown>(config: Par
 
 /**
  * @description Роль CFO. Возвращает статус этого ЦФО (APPROVED или RETURNED) обратно в
-PENDING — страховка от случайного клика по «Согласовать»/«Вернуть на
-доработку». Оставленные замечания не удаляются и не меняются, это часть
-истории — откатывается только статус ЦФО. Недоступно, если корректировка
-уже передана в ДТОиР (`UNDER_DTOE_REVIEW`/`RETURNED_BY_DTOE`/`APPROVED_BY_DTOE`)
-— тогда `400`.
-
+ * PENDING — страховка от случайного клика по «Согласовать»/«Вернуть на
+ * доработку». Оставленные замечания не удаляются и не меняются, это часть
+ * истории — откатывается только статус ЦФО. Недоступно, если корректировка
+ * уже передана в ДТОиР (`UNDER_DTOE_REVIEW`/`RETURNED_BY_DTOE`/`APPROVED_BY_DTOE`)
+ * — тогда `400`.
  * @summary Отменить собственное решение ЦФО
  * {@link /corrections/:humanId/cfo-cancel}
  */
-export function useCancelCfoDecision<TContext>(options:
+export function useCancelCfoDecision<TContext>(options: 
 {
-  mutation?: UseMutationOptions<CancelCfoDecisionMutationResponse, ResponseErrorConfig<Error>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<CancelCfoDecisionMutationResponse, ResponseErrorConfig<CancelCfoDecision400>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
 }
  = {}) {
@@ -47,13 +46,13 @@ export function useCancelCfoDecision<TContext>(options:
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? cancelCfoDecisionMutationKey()
 
-          const baseOptions = cancelCfoDecisionMutationOptions(config) as UseMutationOptions<CancelCfoDecisionMutationResponse, ResponseErrorConfig<Error>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>
+          const baseOptions = cancelCfoDecisionMutationOptions(config) as UseMutationOptions<CancelCfoDecisionMutationResponse, ResponseErrorConfig<CancelCfoDecision400>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>
+          
 
-
-          return useMutation<CancelCfoDecisionMutationResponse, ResponseErrorConfig<Error>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>({
+          return useMutation<CancelCfoDecisionMutationResponse, ResponseErrorConfig<CancelCfoDecision400>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<CancelCfoDecisionMutationResponse, ResponseErrorConfig<Error>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>
-
+          }, queryClient) as UseMutationResult<CancelCfoDecisionMutationResponse, ResponseErrorConfig<CancelCfoDecision400>, {humanId: CancelCfoDecisionPathParams["humanId"]}, TContext>
+      
 }

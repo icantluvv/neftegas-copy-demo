@@ -25,6 +25,7 @@ import { CreateCorrectionDto } from './dto/create-correction.dto';
 import { FindCorrectionsQueryDto } from './dto/find-corrections-query.dto';
 import { RemarkCreateDto } from './dto/remark-create.dto';
 import { RemarkReopenDto } from './dto/remark-reopen.dto';
+import { UpdateCorrectionTypeDto } from './dto/update-correction-type.dto';
 import {
   CfoStatusValue,
   CorrectionCfoStatus,
@@ -282,6 +283,86 @@ export class CorrectionsService {
   }
 
   /**
+   * Меняет тип корректировки, пока она в статусе `DRAFT` (docs/tz/filial-cabinet.md,
+   * раздел 0.3). Слоты пакета жёстко привязаны к `PackageRequirement`
+   * конкретного типа (каждый `PackageRequirement` принадлежит ровно одному
+   * `CorrectionType`), поэтому смена типа не может «переиспользовать» старые
+   * слоты — все типозависимые слоты (`requirementId != null`) вместе с уже
+   * загруженными в них версиями файлов удаляются (физические файлы — с
+   * диска, как в `deleteCorrection`), и для нового типа создаются слоты
+   * заново, тем же алгоритмом, что и в `create()`. Общий слот «Excel
+   * корректировка» (`requirementId == null`) от типа не зависит и не
+   * трогается — его версии сохраняются.
+   */
+  async updateCorrectionType(
+    user: User,
+    humanId: string,
+    dto: UpdateCorrectionTypeDto,
+  ) {
+    const correction = await this.findByHumanIdOrThrow(humanId);
+    if (!(user.role === Role.FILIAL && user.filialId === correction.filialId)) {
+      throw new ForbiddenException();
+    }
+    if (correction.status !== CorrectionStatus.DRAFT) {
+      throw new BadRequestException(
+        'Менять тип можно только у корректировки в статусе «Черновик».',
+      );
+    }
+    const newType = await this.correctionTypes.findOne({
+      where: { id: dto.correctionTypeId },
+      relations: ['requirements'],
+    });
+    if (!newType) throw new NotFoundException('Тип корректировки не найден');
+
+    if (newType.id === correction.correctionTypeId) {
+      return this.toDetailDto(correction, user);
+    }
+
+    const staleSlots = correction.slots.filter((s) => s.requirementId != null);
+    const staleStoragePaths = staleSlots.flatMap(
+      (slot) => slot.versions?.map((version) => version.storagePath) ?? [],
+    );
+
+    await this.dataSource.transaction(async (manager) => {
+      if (staleSlots.length) {
+        await manager
+          .getRepository(DocumentSlot)
+          .delete(staleSlots.map((s) => s.id));
+      }
+      const packageSlots = newType.requirements.filter((r) =>
+        [
+          PackageRequirementKind.EXCEL_SHEET,
+          PackageRequirementKind.DOCUMENT,
+        ].includes(r.kind),
+      );
+      for (const req of packageSlots) {
+        await manager.getRepository(DocumentSlot).save({
+          correctionId: correction.id,
+          requirementId: req.id,
+          label: req.name,
+        });
+      }
+      await manager
+        .getRepository(Correction)
+        .update(correction.id, { correctionTypeId: newType.id });
+      await this.log(
+        manager,
+        correction.id,
+        user,
+        `Филиал изменил тип корректировки на «${newType.name}».`,
+      );
+    });
+
+    await Promise.all(
+      staleStoragePaths.map((storagePath) =>
+        fs.unlink(storagePath).catch(() => undefined),
+      ),
+    );
+
+    return this.toDetailDto(await this.loadDetail(correction.id), user);
+  }
+
+  /**
    * Удаляет корректировку целиком — доступно только для `DRAFT`. Ни у одного
    * ЦФО не может быть строки статуса по `DRAFT`-корректировке (они создаются
    * только в `send()`), поэтому удаление черновика не требует уведомления
@@ -308,7 +389,9 @@ export class CorrectionsService {
       (slot) => slot.versions?.map((version) => version.storagePath) ?? [],
     );
     await Promise.all(
-      storagePaths.map((storagePath) => fs.unlink(storagePath).catch(() => undefined)),
+      storagePaths.map((storagePath) =>
+        fs.unlink(storagePath).catch(() => undefined),
+      ),
     );
   }
 

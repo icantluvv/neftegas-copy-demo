@@ -56,4 +56,18 @@ export class NotificationsService {
     );
     return { updatedCount: result.affected ?? 0 };
   }
+
+  /**
+   * Открытие карточки корректировки помечает прочитанными все связанные с
+   * ней уведомления текущего пользователя, независимо от того, попал ли он
+   * на карточку через клик по уведомлению или напрямую (docs/tz/filial-cabinet.md,
+   * раздел 6.6).
+   */
+  async markReadByCorrection(user: User, correctionId: number) {
+    const result = await this.notifications.update(
+      { userId: user.id, correctionId, isRead: false },
+      { isRead: true },
+    );
+    return { updatedCount: result.affected ?? 0 };
+  }
 }

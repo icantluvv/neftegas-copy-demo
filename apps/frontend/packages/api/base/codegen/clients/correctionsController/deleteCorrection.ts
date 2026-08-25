@@ -5,7 +5,7 @@
 
 import fetch from "../../../client";
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { DeleteCorrectionMutationResponse, DeleteCorrectionPathParams } from "../../types/correctionsController/DeleteCorrection";
+import type { DeleteCorrectionMutationResponse, DeleteCorrectionPathParams, DeleteCorrection400, DeleteCorrection403, DeleteCorrection404 } from "../../types/correctionsController/DeleteCorrection";
 import { deleteCorrectionMutationResponseSchema } from "../../zod/correctionsController/deleteCorrectionSchema";
 
 function getDeleteCorrectionUrl({ humanId }: { humanId: DeleteCorrectionPathParams["humanId"] }) {
@@ -15,13 +15,12 @@ function getDeleteCorrectionUrl({ humanId }: { humanId: DeleteCorrectionPathPara
 
 /**
  * @description Роль FILIAL, только автор/владелец. Доступно только для корректировки в
-статусе `DRAFT` — направленную (любой другой статус) удалить нельзя,
-`400`. Удаляет корректировку целиком: слоты, версии файлов, замечания,
-статусы ЦФО, историю и уведомления по каскаду. `DRAFT`-корректировка не
-может иметь ни одного статуса ЦФО (они создаются только `POST
-.../send`), поэтому удаление черновика не затрагивает решений
-проверяющих и не требует их уведомления.
-
+ * статусе `DRAFT` — направленную (любой другой статус) удалить нельзя,
+ * `400`. Удаляет корректировку целиком: слоты, версии файлов, замечания,
+ * статусы ЦФО, историю и уведомления по каскаду. `DRAFT`-корректировка не
+ * может иметь ни одного статуса ЦФО (они создаются только `POST
+ * .../send`), поэтому удаление черновика не затрагивает решений
+ * проверяющих и не требует их уведомления.
  * @summary Удалить корректировку
  * {@link /corrections/:humanId}
  */
@@ -30,6 +29,6 @@ export async function deleteCorrection({ humanId }: { humanId: DeleteCorrectionP
 
 
 
-  const res = await request<DeleteCorrectionMutationResponse, ResponseErrorConfig<Error>, unknown>({ method : "DELETE", url : getDeleteCorrectionUrl({ humanId }).url.toString(), ... requestConfig })
+  const res = await request<DeleteCorrectionMutationResponse, ResponseErrorConfig<DeleteCorrection400 | DeleteCorrection403 | DeleteCorrection404>, unknown>({ method : "DELETE", url : getDeleteCorrectionUrl({ humanId }).url.toString(), ... requestConfig })
   return deleteCorrectionMutationResponseSchema.parse(res.data)
 }

@@ -27,13 +27,12 @@ export function returnCorrectionByDtoeMutationOptions<TContext = unknown>(config
 
 /**
  * @description Роль DTOE. Переводит корректировку в «Возвращено ДТОиР». Требует, чтобы
-ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
-(`POST /corrections/{humanId}/remarks`) — иначе `400`.
-
+ * ДТОиР уже оставил хотя бы одно открытое замечание по этой корректировке
+ * (`POST /corrections/{humanId}/remarks`) — иначе `400`.
  * @summary Финализировать возврат на доработку от лица ДТОиР
  * {@link /corrections/:humanId/dtoe-return}
  */
-export function useReturnCorrectionByDtoe<TContext>(options:
+export function useReturnCorrectionByDtoe<TContext>(options: 
 {
   mutation?: UseMutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
@@ -45,12 +44,12 @@ export function useReturnCorrectionByDtoe<TContext>(options:
           const mutationKey = mutationOptions.mutationKey ?? returnCorrectionByDtoeMutationKey()
 
           const baseOptions = returnCorrectionByDtoeMutationOptions(config) as UseMutationOptions<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>
-
+          
 
           return useMutation<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
           }, queryClient) as UseMutationResult<ReturnCorrectionByDtoeMutationResponse, ResponseErrorConfig<Error>, {humanId: ReturnCorrectionByDtoePathParams["humanId"]}, TContext>
-
+      
 }

@@ -1,22 +1,17 @@
 "use client";
 
 import {Popover} from "@base-ui/react/popover";
-import {useQueryClient} from "@tanstack/react-query";
 import {Bell} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {useCallback, useState} from "react";
 
 import {cn} from "@/lib/utils";
-import {
-  getNotificationsQueryKey,
-  type Notification,
-  useGetNotifications,
-  useOpenNotification,
-} from "@/packages/api/base/codegen";
+import {type Notification, useGetNotifications} from "@/packages/api/base/codegen";
 
 import {buttonVariants} from "#/components/ui/button";
 import {useDesktopNotifications} from "#/hooks/use-desktop-notifications";
+import {useMarkCorrectionNotificationsRead} from "#/hooks/use-mark-correction-notifications-read";
 
 import {NotificationPanelList} from "./notification-panel-list";
 
@@ -26,29 +21,24 @@ const POLL_INTERVAL_MS = 60_000;
 export function NotificationBell() {
     const [open, setOpen] = useState(false);
     const router = useRouter();
-    const queryClient = useQueryClient();
 
     const notificationsQuery = useGetNotifications({
         query: {refetchInterval: POLL_INTERVAL_MS},
     });
-    const openNotification = useOpenNotification();
+    const markCorrectionRead = useMarkCorrectionNotificationsRead();
 
     const notifications = notificationsQuery.data ?? [];
     const unreadCount = notifications.filter((n) => !n.isRead).length;
     const panelItems = notifications.slice(0, PANEL_LIMIT);
     const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
 
-    const invalidateNotifications = useCallback(() => {
-        void queryClient.invalidateQueries({queryKey: getNotificationsQueryKey()});
-    }, [queryClient]);
-
     const handleSelectNotification = useCallback(
         (notification: Notification) => {
-            openNotification.mutate({id: notification.id}, {onSuccess: invalidateNotifications});
+            markCorrectionRead(notification.correctionId);
             setOpen(false);
             router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
         },
-        [openNotification, invalidateNotifications, router],
+        [markCorrectionRead, router],
     );
 
     useDesktopNotifications(notifications, handleSelectNotification);

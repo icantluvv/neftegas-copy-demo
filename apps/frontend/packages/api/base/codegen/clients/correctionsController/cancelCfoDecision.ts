@@ -5,7 +5,7 @@
 
 import fetch from "../../../client";
 import type { Client, RequestConfig, ResponseErrorConfig } from "../../../client";
-import type { CancelCfoDecisionMutationResponse, CancelCfoDecisionPathParams } from "../../types/correctionsController/CancelCfoDecision";
+import type { CancelCfoDecisionMutationResponse, CancelCfoDecisionPathParams, CancelCfoDecision400 } from "../../types/correctionsController/CancelCfoDecision";
 import { cancelCfoDecisionMutationResponseSchema } from "../../zod/correctionsController/cancelCfoDecisionSchema";
 
 function getCancelCfoDecisionUrl({ humanId }: { humanId: CancelCfoDecisionPathParams["humanId"] }) {
@@ -15,12 +15,11 @@ function getCancelCfoDecisionUrl({ humanId }: { humanId: CancelCfoDecisionPathPa
 
 /**
  * @description Роль CFO. Возвращает статус этого ЦФО (APPROVED или RETURNED) обратно в
-PENDING — страховка от случайного клика по «Согласовать»/«Вернуть на
-доработку». Оставленные замечания не удаляются и не меняются, это часть
-истории — откатывается только статус ЦФО. Недоступно, если корректировка
-уже передана в ДТОиР (`UNDER_DTOE_REVIEW`/`RETURNED_BY_DTOE`/`APPROVED_BY_DTOE`)
-— тогда `400`.
-
+ * PENDING — страховка от случайного клика по «Согласовать»/«Вернуть на
+ * доработку». Оставленные замечания не удаляются и не меняются, это часть
+ * истории — откатывается только статус ЦФО. Недоступно, если корректировка
+ * уже передана в ДТОиР (`UNDER_DTOE_REVIEW`/`RETURNED_BY_DTOE`/`APPROVED_BY_DTOE`)
+ * — тогда `400`.
  * @summary Отменить собственное решение ЦФО
  * {@link /corrections/:humanId/cfo-cancel}
  */
@@ -29,6 +28,6 @@ export async function cancelCfoDecision({ humanId }: { humanId: CancelCfoDecisio
 
 
 
-  const res = await request<CancelCfoDecisionMutationResponse, ResponseErrorConfig<Error>, unknown>({ method : "POST", url : getCancelCfoDecisionUrl({ humanId }).url.toString(), ... requestConfig })
+  const res = await request<CancelCfoDecisionMutationResponse, ResponseErrorConfig<CancelCfoDecision400>, unknown>({ method : "POST", url : getCancelCfoDecisionUrl({ humanId }).url.toString(), ... requestConfig })
   return cancelCfoDecisionMutationResponseSchema.parse(res.data)
 }

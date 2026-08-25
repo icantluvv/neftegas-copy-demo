@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { CorrectionDetail } from "@/packages/api/base/codegen";
 
 import { Badge } from "#/components/ui/badge";
@@ -7,6 +9,7 @@ import { getCorrectionStatusLabel } from "../../../lib/status-labels";
 
 export function CorrectionHeader({ detail }: { detail: CorrectionDetail }) {
   const statusLabel = getCorrectionStatusLabel(detail.status);
+  const canChangeType = detail.isFilialOwner && detail.status === "DRAFT";
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
@@ -15,7 +18,14 @@ export function CorrectionHeader({ detail }: { detail: CorrectionDetail }) {
           <h1 className="text-lg font-semibold">{detail.humanId}</h1>
           <Badge tone={statusLabel.tone}>{statusLabel.text}</Badge>
         </div>
-        <span className="text-sm text-muted-foreground">{detail.correctionType.name}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{detail.correctionType.name}</span>
+          {canChangeType && (
+            <Link href={`/corrections/${detail.humanId}/edit`} className="text-sm text-primary hover:underline">
+              Изменить тип
+            </Link>
+          )}
+        </div>
       </div>
       <p className="text-sm text-muted-foreground">{detail.stageNote}</p>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm md:grid-cols-4">

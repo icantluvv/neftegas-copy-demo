@@ -15,10 +15,9 @@ function getReturnCorrectionByCfoUrl({ humanId }: { humanId: ReturnCorrectionByC
 
 /**
  * @description Роль CFO. Переводит корректировку в «Возвращено на доработку», а статус
-этого ЦФО — в «Возвращено». Требует, чтобы у этого ЦФО уже было оставлено
-хотя бы одно открытое замечание по этой корректировке
-(`POST /corrections/{humanId}/remarks`) — иначе `400`.
-
+ * этого ЦФО — в «Возвращено». Требует, чтобы у этого ЦФО уже было оставлено
+ * хотя бы одно открытое замечание по этой корректировке
+ * (`POST /corrections/{humanId}/remarks`) — иначе `400`.
  * @summary Финализировать возврат на доработку от лица ЦФО
  * {@link /corrections/:humanId/cfo-return}
  */
