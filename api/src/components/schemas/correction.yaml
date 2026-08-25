@@ -60,3 +60,9 @@ CorrectionCreateInput:
   required: [correctionTypeId]
   properties:
     correctionTypeId: { type: integer }
+
+CorrectionTypeChangeInput:
+  type: object
+  required: [correctionTypeId]
+  properties:
+    correctionTypeId: { type: integer }
