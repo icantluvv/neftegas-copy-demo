@@ -7,9 +7,10 @@ P1
 
 | Requirement | Scenario | Risk | Test level | Test file | Status |
 |---|---|---:|---|---|---|
-| Пометка прочитанным при открытии панели и карточки корректировки | Открытие панели не меняет статус прочитанности | P2 | (не изменялось этим change — покрыто существующим сценарием `notifications` spec) | — | Unchanged |
-| Пометка прочитанным при открытии панели и карточки корректировки | Открытие карточки корректировки напрямую помечает связанные уведомления прочитанными | P0 | Manual | curl (5.1) | Done |
-| Пометка прочитанным при открытии панели и карточки корректировки | Открытие карточки через клик по уведомлению помечает его прочитанным тем же способом | P1 | Manual | не выполнено визуально в браузере — waiver | Waiver |
+| Пометка прочитанным при переходе на карточку корректировки из интерфейса | Открытие панели не меняет статус прочитанности | P2 | (не изменялось этим change — покрыто существующим сценарием `notifications` spec) | — | Unchanged |
+| Пометка прочитанным при переходе на карточку корректировки из интерфейса | Клик по кнопке «Открыть» в дашборде помечает связанные уведомления прочитанными | P0 | Manual | curl (5.1) | Done |
+| Пометка прочитанным при переходе на карточку корректировки из интерфейса | Открытие карточки через клик по уведомлению помечает все связанные уведомления прочитанными | P1 | Manual | не выполнено визуально в браузере — waiver | Waiver |
+| Пометка прочитанным при переходе на карточку корректировки из интерфейса | Обновление уже открытой карточки не отправляет повторный запрос на пометку | P1 | Manual | ручная проверка через DevTools Network не выполнена — waiver | Waiver |
 
 ## Required automated tests
 
@@ -17,13 +18,14 @@ P1
 - [ ] `apps/backend/src/notifications/notifications.service.spec.ts` — `markReadByCorrection`: идемпотентность, изоляция по пользователю, изоляция по корректировке
 
 ### Component
-- [ ] `apps/frontend/app/(private)/corrections/[humanId]/components/correction-detail-view.component.test.tsx` (расширение) — эффект вызывается один раз при монтировании с данной `detail.id`, не повторяется при ре-рендерах
+- [ ] `apps/frontend/src/hooks/use-mark-correction-notifications-read.test.ts` (новый) — инвалидация `getNotificationsQueryKey()` только при `updatedCount > 0`, мутация вызывается на каждый вызов возвращённой функции
+- [ ] `apps/frontend/src/components/notification-bell/notification-bell.component.test.tsx` (расширение) — клик по записи вызывает `useMarkCorrectionNotificationsRead(notification.correctionId)`, не `useOpenNotification`
 
 ### Integration
 _(не вводится)_
 
 ### E2E
-- [ ] `apps/frontend/e2e/correction-detail.e2e.spec.ts` (расширение) — непрочитанное уведомление → прямой переход на карточку → бейдж уменьшился
+- [ ] `apps/frontend/e2e/correction-detail.e2e.spec.ts` (расширение) — непрочитанное уведомление → клик по нему → бейдж уменьшился; обновление уже открытой карточки (F5) не создаёт запрос `POST /notifications/by-correction/*/read`
 
 ## Manual checks
 - [x] `curl` под `filial.donbassgaz@demo.local`: `POST /notifications/by-correction/1/read` → `{"updatedCount":5}`

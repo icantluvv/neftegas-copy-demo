@@ -17,6 +17,7 @@ import { formatNotificationDateTime } from "#/utils/format-notification-date-tim
 import { getCorrectionStatusLabel } from "../../lib/status-labels";
 import { STAGE_GROUPS } from "../constants";
 import { DonutChart, type DonutSegment } from "./donut-chart";
+import { OpenCorrectionLink } from "./open-correction-link";
 
 function groupKeyOfStatus(status: CorrectionStatus2): string {
   return STAGE_GROUPS.find((group) => group.statuses.includes(status))?.key ?? "draft";
@@ -82,9 +83,7 @@ const columns: ColumnDef<CorrectionListItem, unknown>[] = [
     header: "",
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <Link href={`/corrections/${row.original.humanId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
-          Открыть
-        </Link>
+        <OpenCorrectionLink id={row.original.id} humanId={row.original.humanId} />
         {row.original.status === "DRAFT" && <DeleteDraftCorrectionCell humanId={row.original.humanId} />}
       </div>
     ),

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -8,7 +7,6 @@ import type { CorrectionListItem } from "@/packages/api/base/codegen";
 import { useGetCorrections } from "@/packages/api/base/codegen";
 
 import { Badge } from "#/components/ui/badge";
-import { buttonVariants } from "#/components/ui/button";
 import { DataTable } from "#/components/ui/data-table";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "#/components/ui/select";
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
@@ -16,6 +14,7 @@ import { formatNotificationDateTime } from "#/utils/format-notification-date-tim
 import { getCfoStatusLabel, getCorrectionStatusLabel } from "../../lib/status-labels";
 import { CFO_STATUS_GROUPS } from "../constants";
 import { DonutChart, type DonutSegment } from "./donut-chart";
+import { OpenCorrectionLink } from "./open-correction-link";
 
 function correctionMatchesFilter(item: CorrectionListItem, statusFilter: string, filialFilter: string): boolean {
   if (statusFilter !== "all" && item.myCfoStatus !== statusFilter) return false;
@@ -52,11 +51,7 @@ const columns: ColumnDef<CorrectionListItem, unknown>[] = [
   {
     id: "actions",
     header: "",
-    cell: ({ row }) => (
-      <Link href={`/corrections/${row.original.humanId}`} className={buttonVariants({ variant: "outline", size: "sm" })}>
-        Открыть
-      </Link>
-    ),
+    cell: ({ row }) => <OpenCorrectionLink id={row.original.id} humanId={row.original.humanId} />,
   },
 ];
 

@@ -22,15 +22,23 @@
 ## Goals / Non-Goals
 
 **Goals:**
-- Реализовать автопометку прочитанным при открытии карточки корректировки,
-  единообразно для обоих способов попадания на неё.
+- Реализовать автопометку прочитанным при переходе на карточку корректировки
+  из интерфейса приложения (клик по уведомлению, по строке в списке
+  уведомлений, по кнопке «Открыть» в дашборде филиала/ЦФО).
 - Обновить бейдж колокольчика без ожидания фонового 60-секундного опроса.
+- Не отправлять запрос на пометку прочитанным при каждом заходе на уже
+  открытую карточку (обновление страницы, переход назад/вперёд) — запрос
+  должен быть привязан к самому действию перехода, а не к монтированию
+  карточки.
 
 **Non-Goals:**
 - Изменение поведения выпадающей панели (открытие без клика по-прежнему не
   меняет прочитанность) — ЧТЗ закрывает только вопрос про карточку.
 - Отдельный UI-индикатор «уведомления по этой корректировке помечены
-  прочitanными» на самой карточке — не запрошено.
+  прочитанными» на самой карточке — не запрошено.
+- Пометка прочитанным при заходе на карточку в обход интерфейса приложения
+  (прямой ввод URL, переход по внешней ссылке, браузерные назад/вперёд) — см.
+  «Decisions» и `spec.md`, сценарий сужен сознательно после ревью.
 
 ## Decisions
 
@@ -45,13 +53,47 @@
 isRead=false)` — как `markAllRead`, но с дополнительным условием по
 корректировке — проще и надёжнее.
 
-### Эффект на клиенте — `useEffect` с ref-guard по `detail.id`, не серверный вызов в RSC
-`CorrectionDetailView` уже клиентский компонент с `useGetCorrectionSuspense`;
-добавление серверного вызова в `page.tsx` потребовало бы либо дублировать
-`correctionId` через дополнительный проп, либо ещё один запрос за деталями
-корректировки в RSC. Клиентский `useEffect`, срабатывающий при смене
-`detail.id` (не при каждом ре-рендере — `useRef` предотвращает повторный
-вызов для той же корректировки), проще и не требует RSC-изменений.
+### Триггер на клиенте — обработчик клика в местах перехода, не `useEffect` на карточке
+Первая версия вызывала мутацию из `useEffect` в `CorrectionDetailView` при
+монтировании/смене `detail.id`, с `useRef`-guard против повторного вызова
+при ре-рендере той же карточки. Ревью выявило проблему: guard защищает
+только от повторного вызова внутри одного и того же React-дерева, но не от
+повторного захода на ту же карточку — каждое обновление страницы (F5),
+переход по истории браузера или повторный прямой заход заново монтирует
+компонент и снова шлёт запрос, даже когда по корректировке давно нет
+непрочитанных уведомлений. Идемпотентность эндпоинта делает это дешёвым на
+бэкенде, но `onSuccess` безусловно инвалидировал кэш списка уведомлений —
+лишний `GET /notifications` на каждый такой заход.
+
+Решение — перенести вызов мутации из точки монтирования карточки в точку
+перехода на неё: обработчик клика на элементе, ведущем на
+`/corrections/{humanId}`. Мутация вызывается один раз на конкретное
+пользовательское действие «перейти», а не на каждое появление компонента на
+экране; `invalidateQueries` в `onSuccess` вызывается только при
+`updatedCount > 0`, устраняя и лишний рефетч.
+
+Реализовано хуком `useMarkCorrectionNotificationsRead`
+(`apps/frontend/src/hooks/use-mark-correction-notifications-read.ts`),
+подключённым в четырёх точках перехода на карточку:
+- `NotificationBell.handleSelectNotification` (клик по записи в панели
+  колокольчика) — заменил точечный `useOpenNotification(id)`, поскольку
+  массовая пометка по корректировке уже покрывает конкретно кликнутое
+  уведомление и все остальные, связанные с той же корректировкой.
+- `NotificationsContent.handleOpen` (клик по строке в `/notifications`) —
+  аналогичная замена `useOpenNotification`.
+- `OpenCorrectionLink` (`apps/frontend/app/(private)/dashboard/components/`)
+  — общий компонент кнопки «Открыть» в обзорных таблицах дашборда
+  (`FilialCorrectionsOverview`, `CfoCorrectionsOverview`); `onClick`
+  вызывает мутацию, `Link` выполняет обычную клиентскую навигацию.
+
+**Осознанное сужение покрытия.** Переход по прямой ссылке в обход
+перечисленных элементов интерфейса (ручной ввод URL, переход по внешней
+ссылке, браузерные назад/вперёд) больше не помечает уведомления
+прочитанными — соответствующий сценарий убран из `spec.md`. Возвращение
+`useEffect`-варианта с условной инвалидацией рассматривалось как
+альтернатива, сохраняющая это покрытие, но отклонено: было явно решено
+после ревью не отправлять запрос при каждом заходе на страницу вообще,
+независимо от способа захода.
 
 ## API Shape
 
@@ -73,9 +115,19 @@ Response `200`: `{ updatedCount: integer }` — та же форма, что у
 
 ## Frontend
 
-`apps/frontend/app/(private)/corrections/[humanId]/components/correction-detail-view.tsx`
-— `useMarkNotificationsReadByCorrection` + `useEffect` с `useRef`-guard по
-`detail.id`, инвалидация `getNotificationsQueryKey()` в `onSuccess`.
+- `apps/frontend/src/hooks/use-mark-correction-notifications-read.ts` —
+  `useMarkCorrectionNotificationsRead()`: обёртка над
+  `useMarkNotificationsReadByCorrection`, инвалидирует
+  `getNotificationsQueryKey()` только при `updatedCount > 0`.
+- `apps/frontend/src/components/notification-bell/notification-bell.tsx` —
+  `handleSelectNotification` вызывает хук вместо `useOpenNotification`.
+- `apps/frontend/app/(private)/notifications/components/notifications-content.tsx`
+  — `handleOpen` вызывает хук вместо `useOpenNotification`.
+- `apps/frontend/app/(private)/dashboard/components/open-correction-link.tsx`
+  — новый общий компонент кнопки-ссылки «Открыть», используется в
+  `filial-corrections-overview.tsx` и `cfo-corrections-overview.tsx`.
+- `apps/frontend/app/(private)/corrections/[humanId]/components/correction-detail-view.tsx`
+  — без изменений относительно кода до этого change (без эффекта пометки).
 
 ## Files / Owners
 
@@ -83,7 +135,7 @@ Response `200`: `{ updatedCount: integer }` — та же форма, что у
 |---|---|---|
 | API | `api/src/paths/notifications-by-correction-correction-id-read.yaml`, `api/src/openapi.yaml` | автор change |
 | Backend | `apps/backend/src/notifications/{notifications.service.ts,notifications.controller.ts}` | автор change |
-| Frontend | `apps/frontend/app/(private)/corrections/[humanId]/components/correction-detail-view.tsx` | автор change |
+| Frontend | `apps/frontend/src/hooks/use-mark-correction-notifications-read.ts`, `apps/frontend/src/components/notification-bell/notification-bell.tsx`, `apps/frontend/app/(private)/notifications/components/notifications-content.tsx`, `apps/frontend/app/(private)/dashboard/components/open-correction-link.tsx`, `apps/frontend/app/(private)/dashboard/components/{filial-corrections-overview.tsx,cfo-corrections-overview.tsx}` | автор change |
 
 ## Readiness Decision
 
@@ -100,11 +152,15 @@ Response `200`: `{ updatedCount: integer }` — та же форма, что у
   `updatedCount: 0`), изоляция по пользователю (не трогает чужие
   уведомления той же корректировки) и по корректировке (не трогает
   уведомления того же пользователя по другой корректировке).
-- Frontend Component: эффект в `correction-detail-view` вызывается ровно
-  один раз при монтировании с данной `detail.id` и не повторяется при
-  ре-рендерах без смены корректировки.
-- Frontend E2E: непрочитанное уведомление → переход на карточку по прямой
-  ссылке (не через клик по уведомлению) → бейдж колокольчика уменьшился.
+- Frontend Component: `useMarkCorrectionNotificationsRead` вызывает мутацию
+  на каждый вызов возвращённой функции и инвалидирует кэш уведомлений только
+  при `updatedCount > 0`, не инвалидирует при `updatedCount === 0`.
+- Frontend E2E: непрочитанное уведомление → клик по записи в панели
+  колокольчика → бейдж уменьшился, карточка открыта. Тот же сценарий для
+  клика по строке в `/notifications` и по кнопке «Открыть» в дашборде.
+  Отдельно: повторный заход на уже открытую (без непрочитанных) карточку
+  через обновление страницы не создаёт сетевого запроса на пометку
+  прочитанным (сценарий, ради которого изменён дизайн).
 - Verification gates: `npx tsc --noEmit`, `bun run lint` (backend и
   frontend) — выполнены, чисто; `redocly lint` (`api/`) — валиден.
 
@@ -119,6 +175,16 @@ Response `200`: `{ updatedCount: integer }` — та же форма, что у
   сетевом сбое бейдж останется устаревшим до следующего фонового опроса (до
   60 секунд) → Митигация: это деградация до уже существующего поведения
   (опрос раз в 60 секунд), не хуже, чем до этого change.
+- [Риск] Прямой заход на карточку в обход интерфейса приложения (ручной ввод
+  URL, внешняя ссылка, браузерные назад/вперёд) не помечает связанные
+  уведомления прочитанными — уведомление останется непрочитанным до захода
+  через список/панель уведомлений или до следующего клика по кнопке
+  «Открыть» в дашборде → Митигация: это сознательный компромисс, принятый
+  после ревью, чтобы не слать запрос на каждый заход на карточку; см.
+  «Decisions». Для ДТОиР (аудит, потенциально внешние ссылки на карточки)
+  это означает, что бейдж может не отражать факт просмотра — не является
+  блокером, так как не влияет на данные корректировки, только на счётчик
+  уведомлений.
 
 ## Open Questions
 

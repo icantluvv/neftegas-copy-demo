@@ -10,11 +10,11 @@ import {
     type Notification,
     useGetNotificationsSuspense,
     useMarkAllNotificationsRead,
-    useOpenNotification,
 } from "@/packages/api/base/codegen";
 
 import {Button} from "#/components/ui/button";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "#/components/ui/select";
+import {useMarkCorrectionNotificationsRead} from "#/hooks/use-mark-correction-notifications-read";
 
 import {notificationsColumns} from "./notifications-columns";
 import {NotificationsTable} from "./notifications-table";
@@ -27,7 +27,7 @@ export function NotificationsContent() {
     const queryClient = useQueryClient();
 
     const notificationsQuery = useGetNotificationsSuspense();
-    const openNotification = useOpenNotification();
+    const markCorrectionRead = useMarkCorrectionNotificationsRead();
     const markAllRead = useMarkAllNotificationsRead();
 
     const notifications = notificationsQuery.data;
@@ -50,10 +50,10 @@ export function NotificationsContent() {
 
     const handleOpen = useCallback(
         (notification: Notification) => {
-            openNotification.mutate({id: notification.id}, {onSuccess: invalidateNotifications});
+            markCorrectionRead(notification.correctionId);
             router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
         },
-        [openNotification, invalidateNotifications, router],
+        [markCorrectionRead, router],
     );
 
     const handleMarkAllRead = useCallback(() => {

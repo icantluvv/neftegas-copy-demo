@@ -11,7 +11,7 @@ function renderWithQueryClient(ui: React.ReactElement) {
 }
 
 const useGetNotificationsSuspenseMock = vi.hoisted(() => vi.fn())
-const useOpenNotificationMock = vi.hoisted(() => vi.fn())
+const useMarkNotificationsReadByCorrectionMock = vi.hoisted(() => vi.fn())
 const useMarkAllNotificationsReadMock = vi.hoisted(() => vi.fn())
 
 vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
@@ -20,7 +20,7 @@ vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	return {
 		...actual,
 		useGetNotificationsSuspense: useGetNotificationsSuspenseMock,
-		useOpenNotification: useOpenNotificationMock,
+		useMarkNotificationsReadByCorrection: useMarkNotificationsReadByCorrectionMock,
 		useMarkAllNotificationsRead: useMarkAllNotificationsReadMock,
 	}
 })
@@ -42,21 +42,21 @@ function notification(overrides: Partial<Notification>): Notification {
 
 const state = {
 	notifications: [] as Notification[],
-	openMutateMock: vi.fn(),
+	markReadMutateMock: vi.fn(),
 	markAllReadMutateMock: vi.fn(),
 }
 
 beforeEach(() => {
 	state.notifications = []
-	state.openMutateMock.mockClear()
+	state.markReadMutateMock.mockClear()
 	state.markAllReadMutateMock.mockClear()
 
 	useGetNotificationsSuspenseMock.mockImplementation(() => ({
 		data: state.notifications,
 		isPending: false,
 	}))
-	useOpenNotificationMock.mockImplementation(() => ({
-		mutate: state.openMutateMock,
+	useMarkNotificationsReadByCorrectionMock.mockImplementation(() => ({
+		mutate: state.markReadMutateMock,
 		isPending: false,
 	}))
 	useMarkAllNotificationsReadMock.mockImplementation(() => ({
@@ -67,12 +67,12 @@ beforeEach(() => {
 
 describe('<NotificationsContent />', () => {
 	it('кнопка «Открыть» помечает запись прочитанной и переходит на корректировку', async () => {
-		state.notifications = [notification({ id: 7, correctionHumanId: 'COR-000002', text: 'Событие' })]
+		state.notifications = [notification({ id: 7, correctionId: 2, correctionHumanId: 'COR-000002', text: 'Событие' })]
 		const view = await renderWithQueryClient(<NotificationsContent />)
 
 		await view.getByRole('button', { name: 'Открыть' }).click()
 
-		expect(state.openMutateMock).toHaveBeenCalledWith({ id: 7 }, expect.anything())
+		expect(state.markReadMutateMock).toHaveBeenCalledWith({ correctionId: 2 }, expect.anything())
 		expect(useRouter().push).toHaveBeenCalledWith('/corrections/COR-000002')
 	})
 

@@ -12,7 +12,7 @@ function renderWithQueryClient(ui: React.ReactElement) {
 }
 
 const useGetNotificationsMock = vi.hoisted(() => vi.fn())
-const useOpenNotificationMock = vi.hoisted(() => vi.fn())
+const useMarkNotificationsReadByCorrectionMock = vi.hoisted(() => vi.fn())
 
 vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@/packages/api/base/codegen')>()
@@ -20,7 +20,7 @@ vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	return {
 		...actual,
 		useGetNotifications: useGetNotificationsMock,
-		useOpenNotification: useOpenNotificationMock,
+		useMarkNotificationsReadByCorrection: useMarkNotificationsReadByCorrectionMock,
 	}
 })
 
@@ -41,13 +41,13 @@ function notification(overrides: Partial<Notification>): Notification {
 
 const state = {
 	notifications: [] as Notification[],
-	openMutateMock: vi.fn(),
+	markReadMutateMock: vi.fn(),
 	refetchIntervalSeen: undefined as number | undefined,
 }
 
 beforeEach(() => {
 	state.notifications = []
-	state.openMutateMock.mockClear()
+	state.markReadMutateMock.mockClear()
 	state.refetchIntervalSeen = undefined
 
 	useGetNotificationsMock.mockImplementation((options?: { query?: { refetchInterval?: number } }) => {
@@ -57,8 +57,8 @@ beforeEach(() => {
 			isPending: false,
 		}
 	})
-	useOpenNotificationMock.mockImplementation(() => ({
-		mutate: state.openMutateMock,
+	useMarkNotificationsReadByCorrectionMock.mockImplementation(() => ({
+		mutate: state.markReadMutateMock,
 		isPending: false,
 	}))
 })
@@ -165,7 +165,7 @@ describe('<NotificationBell />', () => {
 		await view.getByRole('button', { name: 'Уведомления' }).click()
 		await view.getByText('Важное событие').click()
 
-		expect(state.openMutateMock).toHaveBeenCalledWith({ id: 42 }, expect.anything())
+		expect(state.markReadMutateMock).toHaveBeenCalledWith({ correctionId: 1 }, expect.anything())
 		expect(useRouter().push).toHaveBeenCalledWith('/corrections/COR-000002')
 		await expect.element(view.getByText('Важное событие')).not.toBeInTheDocument()
 	})
@@ -187,6 +187,6 @@ describe('<NotificationBell />', () => {
 
 		await view.getByRole('button', { name: 'Уведомления' }).click()
 
-		expect(state.openMutateMock).not.toHaveBeenCalled()
+		expect(state.markReadMutateMock).not.toHaveBeenCalled()
 	})
 })
