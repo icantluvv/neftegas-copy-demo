@@ -1,0 +1,22 @@
+parameters:
+  - { name: correctionId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Отметить прочитанными все уведомления пользователя по одной корректировке
+  operationId: markNotificationsReadByCorrection
+  tags: [Notifications]
+  description: |
+    Вызывается при открытии карточки корректировки — помечает прочитанными
+    все уведомления текущего пользователя, связанные с этой корректировкой,
+    независимо от того, попал ли пользователь на карточку через клик по
+    уведомлению или напрямую (docs/tz/filial-cabinet.md, раздел 6.6).
+    Идемпотентно — уже прочитанные записи повторно не пересчитываются.
+  responses:
+    '200':
+      description: Уведомления помечены прочитанными
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [updatedCount]
+            properties:
+              updatedCount: { type: integer, description: 'Число записей, реально переведённых из непрочитанных в прочитанные' }

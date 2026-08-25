@@ -117,6 +117,8 @@ paths:
     $ref: './paths/notifications-id-open.yaml'
   /notifications/read-all:
     $ref: './paths/notifications-read-all.yaml'
+  /notifications/by-correction/{correctionId}/read:
+    $ref: './paths/notifications-by-correction-correction-id-read.yaml'
 
 components:
   securitySchemes:

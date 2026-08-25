@@ -33,4 +33,13 @@ export class NotificationsController {
   readAll(@CurrentUser() user: User) {
     return this.service.markAllRead(user);
   }
+
+  @Post('by-correction/:correctionId/read')
+  @HttpCode(HttpStatus.OK)
+  readByCorrection(
+    @CurrentUser() user: User,
+    @Param('correctionId', ParseIntPipe) correctionId: number,
+  ) {
+    return this.service.markReadByCorrection(user, correctionId);
+  }
 }
