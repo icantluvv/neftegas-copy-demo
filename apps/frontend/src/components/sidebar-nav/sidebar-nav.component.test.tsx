@@ -91,11 +91,11 @@ describe('<SidebarNav />', () => {
 		await expect.element(view.getByTestId('sidebar-logo')).toBeVisible()
 	})
 
-	it('содержит пункт меню «Рабочий стол» со ссылкой на /dashboard', async () => {
+	it('содержит пункт меню «Корректировка» со ссылкой на /dashboard', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect
-			.element(view.getByRole('link', { name: 'Рабочий стол' }))
+			.element(view.getByRole('link', { name: 'Корректировка' }))
 			.toHaveAttribute('href', '/dashboard')
 	})
 

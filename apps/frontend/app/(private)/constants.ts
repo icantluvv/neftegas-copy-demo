@@ -1,4 +1,4 @@
-import {Bell, FilePlus, LayoutDashboard, type LucideIcon} from "lucide-react";
+import {Bell, CalendarRange, ClipboardCheck, FilePlus, LayoutDashboard, PlayCircle, type LucideIcon} from "lucide-react";
 
 import type {AuthUser} from "@/packages/api/base/codegen";
 
@@ -20,7 +20,10 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-    {href: "/dashboard", label: "Рабочий стол", icon: LayoutDashboard},
+    {href: "/planning", label: "План на 2027", icon: CalendarRange},
+    {href: "/execution", label: "Выполнение", icon: PlayCircle},
+    {href: "/dashboard", label: "Корректировка", icon: LayoutDashboard},
+    {href: "/fact", label: "Факт", icon: ClipboardCheck},
     {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
     {href: "/notifications", label: "Уведомления", icon: Bell},
 ];
