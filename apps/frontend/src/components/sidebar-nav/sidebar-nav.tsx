@@ -70,7 +70,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
                             const Icon = item.icon;
                             return (
                                 <Link
-                                    key={item.href}
+                                    key={item.label}
                                     href={item.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
