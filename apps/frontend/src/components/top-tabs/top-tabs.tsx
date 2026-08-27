@@ -5,7 +5,8 @@ import {usePathname} from "next/navigation";
 
 import {cn} from "@/lib/utils";
 
-import {findActiveModule, topTabs} from "@/app/(private)/constants";
+import {topTabs} from "@/app/(private)/constants";
+import {findActiveModule} from "#/utils/find-active-module";
 
 export function TopTabs() {
     const pathname = usePathname();

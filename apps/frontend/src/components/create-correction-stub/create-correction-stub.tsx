@@ -9,13 +9,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "#/c
 const STUB_CORRECTION_TYPE = "Стандартная корректировка";
 
 export interface CreateCorrectionStubProps {
-    /** Домашняя страница модуля — куда ведёт «Отмена». */
     cancelHref: string;
-    /**
-     * Названия элементов пакета документов — те же, что в модуле
-     * «Корректировка» (см. глоссарий в AGENTS.md), но без связи с реальными
-     * данными: список статический, файлы не загружаются.
-     */
     documentNames: string[];
 }
 

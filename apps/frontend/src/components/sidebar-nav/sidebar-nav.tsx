@@ -10,8 +10,8 @@ import {Button} from "#/components/ui/button";
 import {cn} from "@/lib/utils";
 import {AuthUser, useLogout} from "@/packages/api/base/codegen";
 
-import {getSidebarItems} from "@/app/(private)/constants";
 import {getInitials} from "#/utils/get-initials";
+import {getSidebarItems} from "#/utils/get-sidebar-items";
 
 export function SidebarNav({user}: { user: AuthUser }) {
     const pathname = usePathname();
