@@ -35,8 +35,7 @@ export interface ModuleTab extends NavItem {
     sidebarItems?: NavItem[];
 }
 
-const HOME_NAV_ITEM: NavItem = {href: "/dashboard", label: "Рабочий стол", icon: Home};
-const NOTIFICATIONS_NAV_ITEM: NavItem = {href: "/notifications", label: "Уведомления", icon: Bell};
+const FALLBACK_HOME_HREF = "/dashboard";
 
 /** Верхние вкладки: переключают рабочую область между разделами ДТОиР. */
 export const topTabs: ModuleTab[] = [
@@ -46,8 +45,14 @@ export const topTabs: ModuleTab[] = [
         href: "/dashboard",
         label: "Корректировка",
         icon: LayoutDashboard,
-        matchPrefixes: ["/corrections"],
-        sidebarItems: [{href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]}],
+        // «Уведомления» — только здесь: сегодня уведомления система генерирует
+        // только по событиям корректировок (см. глоссарий), у остальных
+        // модулей своих уведомлений пока нет.
+        matchPrefixes: ["/corrections", "/notifications"],
+        sidebarItems: [
+            {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
+            {href: "/notifications", label: "Уведомления", icon: Bell},
+        ],
     },
     {href: "/fact", label: "Факт", icon: ClipboardCheck, sidebarItems: []},
 ];
@@ -60,13 +65,19 @@ export function findActiveModule(pathname: string): ModuleTab | undefined {
 }
 
 /**
- * Пункты бокового меню для текущего маршрута: общие для всех модулей
- * («Рабочий стол», «Уведомления») плюс собственные пункты активного модуля.
+ * Пункты бокового меню для текущего маршрута: «Рабочий стол» ведёт на
+ * домашнюю страницу активного модуля (не на чужой модуль), дальше —
+ * собственные пункты этого модуля (могут быть пустыми — «в разработке»).
  */
 export function getSidebarItems(pathname: string): NavItem[] {
     const activeModule = findActiveModule(pathname);
+    const homeItem: NavItem = {
+        href: activeModule?.href ?? FALLBACK_HOME_HREF,
+        label: "Рабочий стол",
+        icon: Home,
+    };
 
-    return [HOME_NAV_ITEM, ...(activeModule?.sidebarItems ?? []), NOTIFICATIONS_NAV_ITEM];
+    return [homeItem, ...(activeModule?.sidebarItems ?? [])];
 }
 
 

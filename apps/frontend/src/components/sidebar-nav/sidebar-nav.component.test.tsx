@@ -102,7 +102,7 @@ describe('<SidebarNav />', () => {
 		await expect.element(view.getByTestId('sidebar-logo')).toBeVisible()
 	})
 
-	it('содержит пункт меню «Рабочий стол» со ссылкой на /dashboard', async () => {
+	it('содержит пункт меню «Рабочий стол» со ссылкой на /dashboard в модуле «Корректировка»', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect
@@ -110,12 +110,30 @@ describe('<SidebarNav />', () => {
 			.toHaveAttribute('href', '/dashboard')
 	})
 
-	it('содержит пункт меню «Уведомления» со ссылкой на /notifications', async () => {
+	it('«Рабочий стол» ведёт на домашнюю страницу активного модуля, а не в другой модуль', async () => {
+		usePathnameMock.mockReturnValue('/planning')
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect
+			.element(view.getByRole('link', { name: 'Рабочий стол' }))
+			.toHaveAttribute('href', '/planning')
+	})
+
+	it('содержит пункт меню «Уведомления» со ссылкой на /notifications в модуле «Корректировка»', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect
 			.element(view.getByRole('link', { name: 'Уведомления' }))
 			.toHaveAttribute('href', '/notifications')
+	})
+
+	it('не показывает «Уведомления» вне модуля «Корректировка» — у других модулей своих уведомлений пока нет', async () => {
+		usePathnameMock.mockReturnValue('/planning')
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect.element(view.getByRole('link', { name: 'Уведомления' })).not.toBeInTheDocument()
 	})
 
 	it('показывает «Создать корректировку» внутри модуля «Корректировка» (/dashboard, /corrections/*)', async () => {
