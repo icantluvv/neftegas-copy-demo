@@ -43,36 +43,21 @@ function openRemarkForSlot(detail: CorrectionDetail, slotId: number) {
   return detail.remarks.find((remark) => remark.relatedSlotId === slotId && remark.status !== "CLOSED");
 }
 
-function SlotLabelCell({ slot, canDownload, groupHeader }: { slot: DocumentSlot2; canDownload: boolean; groupHeader?: string }) {
-  const label =
-    !canDownload || !slot.currentVersion ? (
-      <>{slot.label}</>
-    ) : (
-      <a
-        href={`${clientEnvironment.NEXT_PUBLIC_BACK_URL}/files/${slot.currentVersion.id}/download`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-primary underline-offset-4 hover:underline"
-      >
-        {slot.label}
-      </a>
-    );
-
-  if (!groupHeader) {
-    return label;
+function SlotLabelCell({ slot, canDownload }: { slot: DocumentSlot2; canDownload: boolean }) {
+  if (!canDownload || !slot.currentVersion) {
+    return <>{slot.label}</>;
   }
 
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-semibold text-muted-foreground">{groupHeader} — выберите один вариант</span>
-      {label}
-    </div>
+    <a
+      href={`${clientEnvironment.NEXT_PUBLIC_BACK_URL}/files/${slot.currentVersion.id}/download`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary underline-offset-4 hover:underline"
+    >
+      {slot.label}
+    </a>
   );
-}
-
-function isFirstInGroup(slots: DocumentSlot2[], slot: DocumentSlot2) {
-  if (!slot.choiceGroupKey) return false;
-  return slots.find((s) => s.choiceGroupKey === slot.choiceGroupKey) === slot;
 }
 
 function CurrentVersionCell({ slot, canDownload }: { slot: DocumentSlot2; canDownload: boolean }) {
@@ -207,15 +192,7 @@ export function PackageCompleteness({ detail }: { detail: CorrectionDetail }) {
     {
       accessorKey: "label",
       header: "Элемент",
-      cell: ({ row }) => (
-        <SlotLabelCell
-          slot={row.original}
-          canDownload={isReviewer}
-          groupHeader={
-            isFirstInGroup(detail.slots, row.original) ? (row.original.groupLabel ?? undefined) : undefined
-          }
-        />
-      ),
+      cell: ({ row }) => <SlotLabelCell slot={row.original} canDownload={isReviewer} />,
     },
     {
       id: "isRequired",

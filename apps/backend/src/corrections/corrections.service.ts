@@ -44,6 +44,7 @@ import {
   toFileVersionDto,
   toHistoryEntryDto,
   toRemarkDto,
+  sortSlotsByRequirementOrder,
 } from './corrections.mapper';
 
 const DETAIL_RELATIONS = [
@@ -1215,7 +1216,9 @@ export class CorrectionsService {
         username: correction.author.username,
         fullName: correction.author.fullName,
       },
-      slots: correction.slots.map(toDocumentSlotDto),
+      slots: sortSlotsByRequirementOrder(correction.slots).map(
+        toDocumentSlotDto,
+      ),
       cfoStatuses: correction.cfoStatuses.map(toCfoStatusDto),
       remarks: correction.remarks.map(toRemarkDto),
       history: [...correction.history]

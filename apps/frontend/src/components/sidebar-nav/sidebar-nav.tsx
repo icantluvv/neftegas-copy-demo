@@ -10,8 +10,8 @@ import {Button} from "#/components/ui/button";
 import {cn} from "@/lib/utils";
 import {AuthUser, useLogout} from "@/packages/api/base/codegen";
 
-import {navItems} from "@/app/(private)/constants";
 import {getInitials} from "#/utils/get-initials";
+import {getSidebarItems} from "#/utils/get-sidebar-items";
 
 export function SidebarNav({user}: { user: AuthUser }) {
     const pathname = usePathname();
@@ -63,14 +63,14 @@ export function SidebarNav({user}: { user: AuthUser }) {
                     </div>
 
                     <nav className="flex flex-col gap-1">
-                        {navItems
+                        {getSidebarItems(pathname)
                             .filter((item) => !item.roles || item.roles.includes(user.role))
                             .map((item) => {
                             const isActive = pathname === item.href;
                             const Icon = item.icon;
                             return (
                                 <Link
-                                    key={item.href}
+                                    key={item.label}
                                     href={item.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(

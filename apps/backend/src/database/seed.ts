@@ -180,9 +180,16 @@ async function main() {
     {
       correctionTypeId: correctionType.id,
       kind: PackageRequirementKind.DOCUMENT,
-      name: 'Локальный сметный расчёт (ПД)',
+      name: 'Перечень комплекта МТР (ХС)',
       isRequired: true,
       order: 3,
+    },
+    {
+      correctionTypeId: correctionType.id,
+      kind: PackageRequirementKind.DOCUMENT,
+      name: 'Локальный сметный расчёт (ПД)',
+      isRequired: true,
+      order: 4,
       choiceGroupKey: MTR_CHOICE_GROUP,
       groupLabel: MTR_GROUP_LABEL,
     },
@@ -191,12 +198,12 @@ async function main() {
       kind: PackageRequirementKind.DOCUMENT,
       name: 'ХЗ-х ТКП',
       isRequired: true,
-      order: 4,
+      order: 5,
       choiceGroupKey: MTR_CHOICE_GROUP,
       groupLabel: MTR_GROUP_LABEL,
     },
   ]);
-  const [reqNote, reqPackage, reqLsr, reqTkp] = requirements;
+  const [reqNote, reqPackage, reqMtrList, reqLsr, reqTkp] = requirements;
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
 
@@ -338,6 +345,11 @@ async function main() {
       requirementId: reqPackage.id,
       label: reqPackage.name,
     });
+    const mtrListSlot = await slotRepo.save({
+      correctionId: correction.id,
+      requirementId: reqMtrList.id,
+      label: reqMtrList.name,
+    });
     const lsrSlot = await slotRepo.save({
       correctionId: correction.id,
       requirementId: reqLsr.id,
@@ -383,6 +395,13 @@ async function main() {
         daysAgo(daysBase),
       );
       await addFileVersion(
+        mtrListSlot,
+        1,
+        'perechen-mtr.pdf',
+        filialUser,
+        daysAgo(daysBase),
+      );
+      await addFileVersion(
         lsrSlot,
         1,
         'lokalny-smetny-raschet.pdf',
@@ -411,6 +430,13 @@ async function main() {
       packageSlot,
       1,
       'obosnovanie.pdf',
+      filialUser,
+      daysAgo(daysBase, 1),
+    );
+    await addFileVersion(
+      mtrListSlot,
+      1,
+      'perechen-mtr.pdf',
       filialUser,
       daysAgo(daysBase, 1),
     );

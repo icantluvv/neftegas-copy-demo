@@ -1,4 +1,4 @@
-import {Bell, FilePlus, LayoutDashboard, type LucideIcon} from "lucide-react";
+import {Bell, CalendarRange, ClipboardCheck, FilePlus, LayoutDashboard, PlayCircle, type LucideIcon} from "lucide-react";
 
 import type {AuthUser} from "@/packages/api/base/codegen";
 
@@ -15,14 +15,36 @@ export interface NavItem {
     href: string;
     label: string;
     icon: LucideIcon;
-    /** Отсутствие поля — пункт виден всем ролям. */
     roles?: AuthUser["role"][];
 }
 
-export const navItems: NavItem[] = [
-    {href: "/dashboard", label: "Рабочий стол", icon: LayoutDashboard},
-    {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
-    {href: "/notifications", label: "Уведомления", icon: Bell},
+export interface ModuleTab extends NavItem {
+    matchPrefixes?: string[];
+    sidebarItems?: NavItem[];
+}
+
+export const FALLBACK_HOME_HREF = "/dashboard";
+
+export const topTabs: ModuleTab[] = [
+    {
+        href: "/planning",
+        label: "План на 2027",
+        icon: CalendarRange,
+        matchPrefixes: ["/planning"],
+        sidebarItems: [{href: "/planning/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]}],
+    },
+    {href: "/execution", label: "Выполнение", icon: PlayCircle, sidebarItems: []},
+    {
+        href: "/dashboard",
+        label: "Корректировка",
+        icon: LayoutDashboard,
+        matchPrefixes: ["/corrections", "/notifications"],
+        sidebarItems: [
+            {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
+            {href: "/notifications", label: "Уведомления", icon: Bell},
+        ],
+    },
+    {href: "/fact", label: "Факт", icon: ClipboardCheck, sidebarItems: []},
 ];
 
 

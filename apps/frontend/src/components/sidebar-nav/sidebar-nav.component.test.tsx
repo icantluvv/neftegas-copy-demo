@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 
+import { nextNavigationMock, resetNextNavigationMock } from '#/test/mocks/next-navigation'
 import type { AuthUser } from '@/packages/api/base/codegen'
 
 const DESKTOP_VIEWPORT = { width: 1280, height: 800 } as const
@@ -55,6 +56,8 @@ describe('<SidebarNav />', () => {
 		state.mutationState = { isPending: false, isError: false }
 		state.onSuccess = undefined
 		state.onError = undefined
+		resetNextNavigationMock()
+		nextNavigationMock.pathname = '/dashboard'
 		await page.viewport(DESKTOP_VIEWPORT.width, DESKTOP_VIEWPORT.height)
 	})
 
@@ -91,7 +94,7 @@ describe('<SidebarNav />', () => {
 		await expect.element(view.getByTestId('sidebar-logo')).toBeVisible()
 	})
 
-	it('содержит пункт меню «Рабочий стол» со ссылкой на /dashboard', async () => {
+	it('содержит пункт меню «Рабочий стол» со ссылкой на /dashboard в модуле «Корректировка»', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect
@@ -99,12 +102,58 @@ describe('<SidebarNav />', () => {
 			.toHaveAttribute('href', '/dashboard')
 	})
 
-	it('содержит пункт меню «Уведомления» со ссылкой на /notifications', async () => {
+	it('«Рабочий стол» ведёт на домашнюю страницу активного модуля, а не в другой модуль', async () => {
+		nextNavigationMock.pathname = '/planning'
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect
+			.element(view.getByRole('link', { name: 'Рабочий стол' }))
+			.toHaveAttribute('href', '/planning')
+	})
+
+	it('содержит пункт меню «Уведомления» со ссылкой на /notifications в модуле «Корректировка»', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect
 			.element(view.getByRole('link', { name: 'Уведомления' }))
 			.toHaveAttribute('href', '/notifications')
+	})
+
+	it('не показывает «Уведомления» вне модуля «Корректировка» — у других модулей своих уведомлений пока нет', async () => {
+		nextNavigationMock.pathname = '/planning'
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect.element(view.getByRole('link', { name: 'Уведомления' })).not.toBeInTheDocument()
+	})
+
+	it('показывает «Создать корректировку» внутри модуля «Корректировка» (/dashboard, /corrections/*)', async () => {
+		nextNavigationMock.pathname = '/corrections/create'
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect
+			.element(view.getByRole('link', { name: 'Создать корректировку' }))
+			.toHaveAttribute('href', '/corrections/create')
+	})
+
+	it('показывает «Создать корректировку» модуля «План на 2027» со ссылкой на /planning/create', async () => {
+		nextNavigationMock.pathname = '/planning'
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect
+			.element(view.getByRole('link', { name: 'Создать корректировку' }))
+			.toHaveAttribute('href', '/planning/create')
+	})
+
+	it('не показывает «Создать корректировку» в модуле «Выполнение» — своих пунктов у него пока нет', async () => {
+		nextNavigationMock.pathname = '/execution'
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect.element(view.getByRole('link', { name: 'Создать корректировку' })).not.toBeInTheDocument()
 	})
 
 	it('показывает блок профиля с инициалами и ФИО пользователя из пропа', async () => {
