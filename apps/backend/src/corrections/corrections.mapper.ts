@@ -57,6 +57,20 @@ export function toFileVersionDto(version: FileVersion) {
   };
 }
 
+/**
+ * Порядок отображения в карточке определяется `PackageRequirement.order`
+ * (см. apps/backend/AGENTS.md), а не порядком вставки строк в БД — Postgres
+ * не гарантирует его без явного `ORDER BY`. Слот без требования (главный
+ * файл «Excel корректировка», `requirementId = null`) всегда идёт первым.
+ */
+export function sortSlotsByRequirementOrder(
+  slots: DocumentSlot[],
+): DocumentSlot[] {
+  return [...slots].sort(
+    (a, b) => (a.requirement?.order ?? -1) - (b.requirement?.order ?? -1),
+  );
+}
+
 export function toDocumentSlotDto(slot: DocumentSlot) {
   const versions = slot.versions ?? [];
   const current = versions.length

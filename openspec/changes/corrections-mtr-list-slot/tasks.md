@@ -11,6 +11,12 @@ _(нет задач — контракт не меняется)_
       демо-корректировках со статусом `DRAFT`
 - [x] 2.3 [backend] Пересидить локальную БД (`bun run seed`), проверить, что
       сидинг проходит без ошибок
+- [x] 2.4 [backend] Извлечь `sortSlotsByRequirementOrder` в
+      `corrections.mapper.ts` и применить в `toDetailDto`
+      (`corrections.service.ts`) — явная сортировка `slots` по
+      `requirement.order` вместо порядка вставки в БД
+- [x] 2.5 [backend] Unit-тест `corrections.mapper.spec.ts`: сортировка при
+      перемешанном порядке вставки, отсутствие мутации исходного массива
 
 ## Frontend
 
@@ -22,6 +28,8 @@ _(нет задач — контракт не меняется)_
 ## Проверка
 
 - [x] `bun run seed` (apps/backend) — без ошибок
+- [x] `bunx tsc --noEmit`, `bun run test` (42/42), `bun run lint`
+      (apps/backend)
 - [x] `bunx tsc --noEmit`, `bun run lint` по изменённому
       `package-completeness.tsx` (apps/frontend)
 - [x] Ручная проверка: карточка демо-корректировки в статусе «Черновик» —
