@@ -19,14 +19,19 @@ export interface NavItem {
     roles?: AuthUser["role"][];
 }
 
-export const navItems: NavItem[] = [
+/** Пункты бокового меню: разделы, не связанные с переключением рабочей области. */
+export const sidebarNavItems: NavItem[] = [
     {href: "/dashboard", label: "Рабочий стол", icon: Home},
+    {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
+    {href: "/notifications", label: "Уведомления", icon: Bell},
+];
+
+/** Верхние вкладки: переключают рабочую область между разделами ДТОиР. */
+export const topTabs: NavItem[] = [
     {href: "/planning", label: "План на 2027", icon: CalendarRange},
     {href: "/execution", label: "Выполнение", icon: PlayCircle},
     {href: "/dashboard", label: "Корректировка", icon: LayoutDashboard},
     {href: "/fact", label: "Факт", icon: ClipboardCheck},
-    {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
-    {href: "/notifications", label: "Уведомления", icon: Bell},
 ];
 
 

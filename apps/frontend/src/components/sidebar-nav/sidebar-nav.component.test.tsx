@@ -99,14 +99,6 @@ describe('<SidebarNav />', () => {
 			.toHaveAttribute('href', '/dashboard')
 	})
 
-	it('содержит пункт меню «Корректировка» со ссылкой на /dashboard', async () => {
-		const view = await render(<SidebarNav user={testUser} />)
-
-		await expect
-			.element(view.getByRole('link', { name: 'Корректировка' }))
-			.toHaveAttribute('href', '/dashboard')
-	})
-
 	it('содержит пункт меню «Уведомления» со ссылкой на /notifications', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
