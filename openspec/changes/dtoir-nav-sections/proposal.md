@@ -28,18 +28,30 @@ OpenAPI-контракта — самостоятельных change'ей вне
 
 ## What Changes
 
-- В `apps/frontend/app/(private)/constants.ts` пункты меню разделены на два
-  списка: `sidebarNavItems` (боковое меню — «Рабочий стол» `/dashboard`,
-  «Создать корректировку» `/corrections/create`, «Уведомления»
-  `/notifications`) и `topTabs` (верхние вкладки рабочей области — «План на
-  2027» `/planning`, «Выполнение» `/execution`, «Корректировка» `/dashboard`,
-  «Факт» `/fact`).
+- В `apps/frontend/app/(private)/constants.ts` состав интерфейса построен
+  вокруг понятия «модуль» (`ModuleTab`, элемент `topTabs`): у каждого модуля
+  («План на 2027» `/planning`, «Выполнение» `/execution`, «Корректировка»
+  `/dashboard` + `/corrections/*`, «Факт» `/fact`) — свой набор пунктов
+  бокового меню (`sidebarItems`), видимых только пока пользователь находится
+  внутри этого модуля. «Рабочий стол» и «Уведомления» — общие пункты бокового
+  меню, видны во всех модулях (`getSidebarItems(pathname)`).
+- Модуль «Корректировка» — единственный с непустым `sidebarItems` пока:
+  «Создать корректировку» (`/corrections/create`, роль FILIAL). У «План на
+  2027», «Выполнение», «Факт» сейчас `sidebarItems: []` — при живой работе с
+  разделом эти модули получат свои собственные пункты в последующих change'ах
+  (не общие с «Корректировкой»).
+- Функция `findActiveModule(pathname)` определяет, какому модулю принадлежит
+  текущий маршрут (по `href` или `matchPrefixes`, например `/corrections`
+  для модуля «Корректировка») — используется и в `TopTabs` (подсветка
+  активной вкладки), и в `SidebarNav` (состав бокового меню). Так переход на
+  «внутреннюю» страницу модуля (например, «Создать корректировку» из
+  «Корректировки») не переключает активный модуль — вкладка сверху остаётся
+  подсвеченной, а боковое меню — тем же, что и в модуле.
 - Добавлен компонент `TopTabs` (`apps/frontend/src/components/top-tabs`) —
   горизонтальная панель вкладок в шапке `app/(private)/layout.tsx`, рядом с
-  колокольчиком уведомлений. Активная вкладка определяется по текущему
-  маршруту (`usePathname`) и подсвечивается заливкой `bg-primary`.
-- `SidebarNav` больше не рендерит переключатели разделов рабочей области —
-  только `sidebarNavItems`.
+  колокольчиком уведомлений.
+- `SidebarNav` больше не рендерит статический список — состав меню зависит от
+  активного модуля через `getSidebarItems(pathname)`.
 - Компонент `SectionPlaceholder` (`apps/frontend/src/components/
   section-placeholder`), рендерящий заголовок, описание раздела и список форм
   документов Регламента со ссылкой на соответствующее приложение/пункт
@@ -65,12 +77,14 @@ _(нет)_
 
 ## Impact
 
-- `apps/frontend/app/(private)/constants.ts` (разделение `navItems` на
-  `sidebarNavItems` и `topTabs`)
+- `apps/frontend/app/(private)/constants.ts` (`ModuleTab`, `topTabs` с
+  `sidebarItems` и `matchPrefixes` на модуль, `findActiveModule`,
+  `getSidebarItems`)
 - `apps/frontend/app/(private)/layout.tsx` (подключение `TopTabs` в шапку)
-- `apps/frontend/src/components/sidebar-nav/*` (рендерит только
-  `sidebarNavItems`)
-- `apps/frontend/src/components/top-tabs/*` (новый компонент)
+- `apps/frontend/src/components/sidebar-nav/*` (меню зависит от активного
+  модуля через `getSidebarItems(pathname)`)
+- `apps/frontend/src/components/top-tabs/*` (новый компонент, активная
+  вкладка — через `findActiveModule`)
 - `apps/frontend/src/components/section-placeholder/*` (без изменений)
 - `apps/frontend/app/(private)/planning/page.tsx` (без изменений)
 - `apps/frontend/app/(private)/execution/page.tsx` (без изменений)

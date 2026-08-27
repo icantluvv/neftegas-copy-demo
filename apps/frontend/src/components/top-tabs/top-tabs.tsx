@@ -5,17 +5,16 @@ import {usePathname} from "next/navigation";
 
 import {cn} from "@/lib/utils";
 
-import {topTabs} from "@/app/(private)/constants";
+import {findActiveModule, topTabs} from "@/app/(private)/constants";
 
 export function TopTabs() {
     const pathname = usePathname();
+    const activeModule = findActiveModule(pathname);
 
     return (
         <nav className="flex shrink-0 flex-wrap items-center gap-2">
             {topTabs.map((tab) => {
-                const isActive =
-                    pathname === tab.href ||
-                    (tab.matchPrefixes?.some((prefix) => pathname.startsWith(prefix)) ?? false);
+                const isActive = tab === activeModule;
                 const Icon = tab.icon;
 
                 return (

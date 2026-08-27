@@ -12,17 +12,20 @@ _(нет задач)_
       (`apps/frontend/src/components/section-placeholder`)
 - [x] 1.2 [frontend] Добавить страницы `/planning`, `/execution`, `/fact`
       с использованием `SectionPlaceholder` и перечнем форм Регламента
-- [x] 1.3 [frontend] Разделить `navItems` на `sidebarNavItems` и `topTabs`
+- [x] 1.3 [frontend] Ввести модель `ModuleTab` (`topTabs` с `sidebarItems` и
+      `matchPrefixes` на модуль), `findActiveModule`, `getSidebarItems`
       (`apps/frontend/app/(private)/constants.ts`)
 - [x] 1.4 [frontend] Добавить компонент `TopTabs`
       (`apps/frontend/src/components/top-tabs`) и подключить его в шапку
-      `app/(private)/layout.tsx`
-- [x] 1.5 [frontend] Обновить `SidebarNav` — рендерить только
-      `sidebarNavItems` (боковое меню без переключателей разделов)
-- [x] 1.6 [frontend] Обновить тест `sidebar-nav.component.test.tsx` под
-      сокращённый список пунктов бокового меню
+      `app/(private)/layout.tsx`; активная вкладка — через `findActiveModule`
+- [x] 1.5 [frontend] Обновить `SidebarNav` — состав меню зависит от активного
+      модуля через `getSidebarItems(pathname)`, а не статический список
+- [x] 1.6 [frontend] Обновить тест `sidebar-nav.component.test.tsx`: пункт
+      «Создать корректировку» виден только внутри модуля «Корректировка»
+      (`/dashboard`, `/corrections/*`), не виден в других модулях
 - [x] 1.7 [frontend] Добавить тест `top-tabs.component.test.tsx` —
-      4 вкладки, подсветка активной по маршруту
+      4 вкладки, подсветка активной по маршруту, вкладка «Корректировка»
+      остаётся активной на `/corrections/*`
 
 ## Проверка
 

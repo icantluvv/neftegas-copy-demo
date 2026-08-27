@@ -17,28 +17,57 @@ export interface NavItem {
     icon: LucideIcon;
     /** Отсутствие поля — пункт виден всем ролям. */
     roles?: AuthUser["role"][];
+}
+
+export interface ModuleTab extends NavItem {
     /**
      * Доп. префиксы маршрутов модуля: вкладка остаётся активной на любой
      * странице внутри модуля (например, «Создать корректировку»), не только
      * на своём `href`.
      */
     matchPrefixes?: string[];
+    /**
+     * Пункты бокового меню, принадлежащие именно этому модулю — видны только
+     * пока пользователь находится внутри модуля. У каждого модуля будет свой
+     * набор (сейчас заполнен только для «Корректировки», остальные —
+     * заглушки без действий).
+     */
+    sidebarItems?: NavItem[];
 }
 
-/** Пункты бокового меню: разделы, не связанные с переключением рабочей области. */
-export const sidebarNavItems: NavItem[] = [
-    {href: "/dashboard", label: "Рабочий стол", icon: Home},
-    {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
-    {href: "/notifications", label: "Уведомления", icon: Bell},
-];
+const HOME_NAV_ITEM: NavItem = {href: "/dashboard", label: "Рабочий стол", icon: Home};
+const NOTIFICATIONS_NAV_ITEM: NavItem = {href: "/notifications", label: "Уведомления", icon: Bell};
 
 /** Верхние вкладки: переключают рабочую область между разделами ДТОиР. */
-export const topTabs: NavItem[] = [
-    {href: "/planning", label: "План на 2027", icon: CalendarRange},
-    {href: "/execution", label: "Выполнение", icon: PlayCircle},
-    {href: "/dashboard", label: "Корректировка", icon: LayoutDashboard, matchPrefixes: ["/corrections"]},
-    {href: "/fact", label: "Факт", icon: ClipboardCheck},
+export const topTabs: ModuleTab[] = [
+    {href: "/planning", label: "План на 2027", icon: CalendarRange, sidebarItems: []},
+    {href: "/execution", label: "Выполнение", icon: PlayCircle, sidebarItems: []},
+    {
+        href: "/dashboard",
+        label: "Корректировка",
+        icon: LayoutDashboard,
+        matchPrefixes: ["/corrections"],
+        sidebarItems: [{href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]}],
+    },
+    {href: "/fact", label: "Факт", icon: ClipboardCheck, sidebarItems: []},
 ];
+
+/** Модуль, которому принадлежит текущий маршрут (по `href` или `matchPrefixes`). */
+export function findActiveModule(pathname: string): ModuleTab | undefined {
+    return topTabs.find(
+        (tab) => pathname === tab.href || (tab.matchPrefixes?.some((prefix) => pathname.startsWith(prefix)) ?? false)
+    );
+}
+
+/**
+ * Пункты бокового меню для текущего маршрута: общие для всех модулей
+ * («Рабочий стол», «Уведомления») плюс собственные пункты активного модуля.
+ */
+export function getSidebarItems(pathname: string): NavItem[] {
+    const activeModule = findActiveModule(pathname);
+
+    return [HOME_NAV_ITEM, ...(activeModule?.sidebarItems ?? []), NOTIFICATIONS_NAV_ITEM];
+}
 
 
 export const READ_FILTER_LABELS = {

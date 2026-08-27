@@ -18,6 +18,7 @@ const testUser: AuthUser = {
 }
 
 const useLogoutMock = vi.hoisted(() => vi.fn())
+const usePathnameMock = vi.hoisted(() => vi.fn(() => '/dashboard'))
 
 vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@/packages/api/base/codegen')>()
@@ -25,6 +26,15 @@ vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	return {
 		...actual,
 		useLogout: useLogoutMock,
+	}
+})
+
+vi.mock('next/navigation', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('next/navigation')>()
+
+	return {
+		...actual,
+		usePathname: usePathnameMock,
 	}
 })
 
@@ -55,6 +65,7 @@ describe('<SidebarNav />', () => {
 		state.mutationState = { isPending: false, isError: false }
 		state.onSuccess = undefined
 		state.onError = undefined
+		usePathnameMock.mockReturnValue('/dashboard')
 		await page.viewport(DESKTOP_VIEWPORT.width, DESKTOP_VIEWPORT.height)
 	})
 
@@ -105,6 +116,24 @@ describe('<SidebarNav />', () => {
 		await expect
 			.element(view.getByRole('link', { name: 'Уведомления' }))
 			.toHaveAttribute('href', '/notifications')
+	})
+
+	it('показывает «Создать корректировку» внутри модуля «Корректировка» (/dashboard, /corrections/*)', async () => {
+		usePathnameMock.mockReturnValue('/corrections/create')
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect
+			.element(view.getByRole('link', { name: 'Создать корректировку' }))
+			.toHaveAttribute('href', '/corrections/create')
+	})
+
+	it('не показывает «Создать корректировку» вне модуля «Корректировка»', async () => {
+		usePathnameMock.mockReturnValue('/planning')
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect.element(view.getByRole('link', { name: 'Создать корректировку' })).not.toBeInTheDocument()
 	})
 
 	it('показывает блок профиля с инициалами и ФИО пользователя из пропа', async () => {
