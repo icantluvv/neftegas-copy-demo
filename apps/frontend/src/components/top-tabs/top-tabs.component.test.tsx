@@ -46,4 +46,12 @@ describe('<TopTabs />', () => {
 
 		await expect.element(notificationsView.getByRole('link', { name: 'Корректировка' })).toHaveClass(/bg-primary/)
 	})
+
+	it('оставляет вкладку «План на 2027» активной на /planning/create', async () => {
+		usePathnameMock.mockReturnValue('/planning/create')
+
+		const view = await render(<TopTabs />)
+
+		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toHaveClass(/bg-primary/)
+	})
 })

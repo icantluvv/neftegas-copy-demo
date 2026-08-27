@@ -39,7 +39,17 @@ const FALLBACK_HOME_HREF = "/dashboard";
 
 /** Верхние вкладки: переключают рабочую область между разделами ДТОиР. */
 export const topTabs: ModuleTab[] = [
-    {href: "/planning", label: "План на 2027", icon: CalendarRange, sidebarItems: []},
+    {
+        href: "/planning",
+        label: "План на 2027",
+        icon: CalendarRange,
+        matchPrefixes: ["/planning"],
+        // Визуальная копия «Создать корректировку» из модуля «Корректировка»:
+        // тот же вид формы и те же названия элементов пакета документов, но
+        // без реального сохранения — раздел «План на 2027» ещё не подключён
+        // к бэкенду и никак не связан с реальными корректировками.
+        sidebarItems: [{href: "/planning/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]}],
+    },
     {href: "/execution", label: "Выполнение", icon: PlayCircle, sidebarItems: []},
     {
         href: "/dashboard",

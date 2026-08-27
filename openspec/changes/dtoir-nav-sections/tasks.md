@@ -32,6 +32,19 @@ _(нет задач)_
 - [x] 1.9 [frontend] Перенести «Уведомления» из общих пунктов в
       `sidebarItems` модуля «Корректировка» (единственный модуль с реальными
       уведомлениями сегодня); тест на отсутствие пункта в других модулях
+- [x] 1.10 [frontend] Добавить компонент `CreateCorrectionStub`
+      (`apps/frontend/src/components/create-correction-stub`) — визуальная
+      копия `CreateCorrectionForm` без вызовов API, с задизейбленной кнопкой
+      «Создать» и статическим списком элементов пакета документов
+- [x] 1.11 [frontend] Добавить страницу `/planning/create` (роль FILIAL) на
+      основе `CreateCorrectionStub` с элементами «Excel корректировка»,
+      «Пакет документов», «Счета на оплату»; добавить пункт «Создать
+      корректировку» в `sidebarItems` модуля «План на 2027» и
+      `matchPrefixes: ["/planning"]`, чтобы вкладка не гасла на `/planning/create`
+- [x] 1.12 [frontend] Тесты: `create-correction-stub.component.test.tsx`
+      (заголовок, список документов, задизейбленная кнопка «Создать»,
+      «Отмена» → `cancelHref`); дополнены `sidebar-nav.component.test.tsx` и
+      `top-tabs.component.test.tsx` под новый пункт модуля «План на 2027»
 
 ## Проверка
 

@@ -146,8 +146,18 @@ describe('<SidebarNav />', () => {
 			.toHaveAttribute('href', '/corrections/create')
 	})
 
-	it('не показывает «Создать корректировку» вне модуля «Корректировка»', async () => {
+	it('показывает «Создать корректировку» модуля «План на 2027» со ссылкой на /planning/create', async () => {
 		usePathnameMock.mockReturnValue('/planning')
+
+		const view = await render(<SidebarNav user={testUser} />)
+
+		await expect
+			.element(view.getByRole('link', { name: 'Создать корректировку' }))
+			.toHaveAttribute('href', '/planning/create')
+	})
+
+	it('не показывает «Создать корректировку» в модуле «Выполнение» — своих пунктов у него пока нет', async () => {
+		usePathnameMock.mockReturnValue('/execution')
 
 		const view = await render(<SidebarNav user={testUser} />)
 
