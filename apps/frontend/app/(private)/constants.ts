@@ -1,4 +1,4 @@
-import {Bell, CalendarRange, ClipboardCheck, FilePlus, LayoutDashboard, PlayCircle, type LucideIcon} from "lucide-react";
+import {Bell, CalendarRange, ClipboardCheck, FilePlus, Home, LayoutDashboard, PlayCircle, type LucideIcon} from "lucide-react";
 
 import type {AuthUser} from "@/packages/api/base/codegen";
 
@@ -20,6 +20,7 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
+    {href: "/dashboard", label: "Рабочий стол", icon: Home},
     {href: "/planning", label: "План на 2027", icon: CalendarRange},
     {href: "/execution", label: "Выполнение", icon: PlayCircle},
     {href: "/dashboard", label: "Корректировка", icon: LayoutDashboard},
