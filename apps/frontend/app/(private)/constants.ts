@@ -17,6 +17,12 @@ export interface NavItem {
     icon: LucideIcon;
     /** Отсутствие поля — пункт виден всем ролям. */
     roles?: AuthUser["role"][];
+    /**
+     * Доп. префиксы маршрутов модуля: вкладка остаётся активной на любой
+     * странице внутри модуля (например, «Создать корректировку»), не только
+     * на своём `href`.
+     */
+    matchPrefixes?: string[];
 }
 
 /** Пункты бокового меню: разделы, не связанные с переключением рабочей области. */
@@ -30,7 +36,7 @@ export const sidebarNavItems: NavItem[] = [
 export const topTabs: NavItem[] = [
     {href: "/planning", label: "План на 2027", icon: CalendarRange},
     {href: "/execution", label: "Выполнение", icon: PlayCircle},
-    {href: "/dashboard", label: "Корректировка", icon: LayoutDashboard},
+    {href: "/dashboard", label: "Корректировка", icon: LayoutDashboard, matchPrefixes: ["/corrections"]},
     {href: "/fact", label: "Факт", icon: ClipboardCheck},
 ];
 

@@ -32,4 +32,12 @@ describe('<TopTabs />', () => {
 		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toHaveClass(/bg-primary/)
 		await expect.element(view.getByRole('link', { name: 'Выполнение' })).not.toHaveClass(/bg-primary/)
 	})
+
+	it('оставляет вкладку «Корректировка» активной на связанных страницах модуля (/corrections/*)', async () => {
+		usePathnameMock.mockReturnValue('/corrections/create')
+
+		const view = await render(<TopTabs />)
+
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).toHaveClass(/bg-primary/)
+	})
 })

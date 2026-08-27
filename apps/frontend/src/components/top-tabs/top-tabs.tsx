@@ -13,7 +13,9 @@ export function TopTabs() {
     return (
         <nav className="flex shrink-0 flex-wrap items-center gap-2">
             {topTabs.map((tab) => {
-                const isActive = pathname === tab.href;
+                const isActive =
+                    pathname === tab.href ||
+                    (tab.matchPrefixes?.some((prefix) => pathname.startsWith(prefix)) ?? false);
                 const Icon = tab.icon;
 
                 return (
