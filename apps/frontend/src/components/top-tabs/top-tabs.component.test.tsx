@@ -1,20 +1,15 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-react'
 
-const usePathnameMock = vi.hoisted(() => vi.fn(() => '/planning'))
-
-vi.mock('next/navigation', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('next/navigation')>()
-
-	return {
-		...actual,
-		usePathname: usePathnameMock,
-	}
-})
+import { nextNavigationMock, resetNextNavigationMock } from '#/test/mocks/next-navigation'
 
 const { TopTabs } = await import('./top-tabs')
 
 describe('<TopTabs />', () => {
+	beforeEach(() => {
+		resetNextNavigationMock()
+	})
+
 	it('показывает 4 вкладки разделов ДТОиР', async () => {
 		const view = await render(<TopTabs />)
 
@@ -25,7 +20,7 @@ describe('<TopTabs />', () => {
 	})
 
 	it('подсвечивает активную вкладку по текущему маршруту', async () => {
-		usePathnameMock.mockReturnValue('/planning')
+		nextNavigationMock.pathname = '/planning'
 
 		const view = await render(<TopTabs />)
 
@@ -33,22 +28,24 @@ describe('<TopTabs />', () => {
 		await expect.element(view.getByRole('link', { name: 'Выполнение' })).not.toHaveClass(/bg-primary/)
 	})
 
-	it('оставляет вкладку «Корректировка» активной на связанных страницах модуля (/corrections/*, /notifications)', async () => {
-		usePathnameMock.mockReturnValue('/corrections/create')
+	it('оставляет вкладку «Корректировка» активной на /corrections/*', async () => {
+		nextNavigationMock.pathname = '/corrections/create'
 
 		const view = await render(<TopTabs />)
 
 		await expect.element(view.getByRole('link', { name: 'Корректировка' })).toHaveClass(/bg-primary/)
+	})
 
-		usePathnameMock.mockReturnValue('/notifications')
+	it('оставляет вкладку «Корректировка» активной на /notifications', async () => {
+		nextNavigationMock.pathname = '/notifications'
 
-		const notificationsView = await render(<TopTabs />)
+		const view = await render(<TopTabs />)
 
-		await expect.element(notificationsView.getByRole('link', { name: 'Корректировка' })).toHaveClass(/bg-primary/)
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).toHaveClass(/bg-primary/)
 	})
 
 	it('оставляет вкладку «План на 2027» активной на /planning/create', async () => {
-		usePathnameMock.mockReturnValue('/planning/create')
+		nextNavigationMock.pathname = '/planning/create'
 
 		const view = await render(<TopTabs />)
 

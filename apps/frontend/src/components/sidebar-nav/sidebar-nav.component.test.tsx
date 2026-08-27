@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 
+import { nextNavigationMock, resetNextNavigationMock } from '#/test/mocks/next-navigation'
 import type { AuthUser } from '@/packages/api/base/codegen'
 
 const DESKTOP_VIEWPORT = { width: 1280, height: 800 } as const
@@ -18,7 +19,6 @@ const testUser: AuthUser = {
 }
 
 const useLogoutMock = vi.hoisted(() => vi.fn())
-const usePathnameMock = vi.hoisted(() => vi.fn(() => '/dashboard'))
 
 vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@/packages/api/base/codegen')>()
@@ -26,15 +26,6 @@ vi.mock('@/packages/api/base/codegen', async (importOriginal) => {
 	return {
 		...actual,
 		useLogout: useLogoutMock,
-	}
-})
-
-vi.mock('next/navigation', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('next/navigation')>()
-
-	return {
-		...actual,
-		usePathname: usePathnameMock,
 	}
 })
 
@@ -65,7 +56,8 @@ describe('<SidebarNav />', () => {
 		state.mutationState = { isPending: false, isError: false }
 		state.onSuccess = undefined
 		state.onError = undefined
-		usePathnameMock.mockReturnValue('/dashboard')
+		resetNextNavigationMock()
+		nextNavigationMock.pathname = '/dashboard'
 		await page.viewport(DESKTOP_VIEWPORT.width, DESKTOP_VIEWPORT.height)
 	})
 
@@ -111,7 +103,7 @@ describe('<SidebarNav />', () => {
 	})
 
 	it('«Рабочий стол» ведёт на домашнюю страницу активного модуля, а не в другой модуль', async () => {
-		usePathnameMock.mockReturnValue('/planning')
+		nextNavigationMock.pathname = '/planning'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
@@ -129,7 +121,7 @@ describe('<SidebarNav />', () => {
 	})
 
 	it('не показывает «Уведомления» вне модуля «Корректировка» — у других модулей своих уведомлений пока нет', async () => {
-		usePathnameMock.mockReturnValue('/planning')
+		nextNavigationMock.pathname = '/planning'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
@@ -137,7 +129,7 @@ describe('<SidebarNav />', () => {
 	})
 
 	it('показывает «Создать корректировку» внутри модуля «Корректировка» (/dashboard, /corrections/*)', async () => {
-		usePathnameMock.mockReturnValue('/corrections/create')
+		nextNavigationMock.pathname = '/corrections/create'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
@@ -147,7 +139,7 @@ describe('<SidebarNav />', () => {
 	})
 
 	it('показывает «Создать корректировку» модуля «План на 2027» со ссылкой на /planning/create', async () => {
-		usePathnameMock.mockReturnValue('/planning')
+		nextNavigationMock.pathname = '/planning'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
@@ -157,7 +149,7 @@ describe('<SidebarNav />', () => {
 	})
 
 	it('не показывает «Создать корректировку» в модуле «Выполнение» — своих пунктов у него пока нет', async () => {
-		usePathnameMock.mockReturnValue('/execution')
+		nextNavigationMock.pathname = '/execution'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
