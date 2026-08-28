@@ -7,11 +7,11 @@ import {useState} from "react";
 import {toast} from "sonner";
 
 import {Button} from "#/components/ui/button";
+import {isNavItemActive, sidebarItems} from "@/app/(private)/constants";
 import {cn} from "@/lib/utils";
 import {AuthUser, useLogout} from "@/packages/api/base/codegen";
 
 import {getInitials} from "#/utils/get-initials";
-import {getSidebarItems} from "#/utils/get-sidebar-items";
 
 export function SidebarNav({user}: { user: AuthUser }) {
     const pathname = usePathname();
@@ -63,10 +63,10 @@ export function SidebarNav({user}: { user: AuthUser }) {
                     </div>
 
                     <nav className="flex flex-col gap-1">
-                        {getSidebarItems(pathname)
+                        {sidebarItems
                             .filter((item) => !item.roles || item.roles.includes(user.role))
                             .map((item) => {
-                            const isActive = pathname === item.href;
+                            const isActive = isNavItemActive(item, pathname);
                             const Icon = item.icon;
                             return (
                                 <Link
