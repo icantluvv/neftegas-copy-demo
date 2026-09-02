@@ -33,6 +33,8 @@ function notification(overrides: Partial<Notification>): Notification {
 		userId: 1,
 		correctionId: 1,
 		correctionHumanId: 'COR-000001',
+		factPackageId: null,
+		factPackageHumanId: '',
 		text: 'Текст уведомления',
 		isRead: false,
 		createdAt: '2026-08-12T13:46:00.000Z',

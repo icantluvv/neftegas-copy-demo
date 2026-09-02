@@ -12,6 +12,7 @@ import {type Notification, useGetNotifications} from "@/packages/api/base/codege
 import {buttonVariants} from "#/components/ui/button";
 import {useDesktopNotifications} from "#/hooks/use-desktop-notifications";
 import {useMarkCorrectionNotificationsRead} from "#/hooks/use-mark-correction-notifications-read";
+import {useMarkFactPackageNotificationsRead} from "#/hooks/use-mark-fact-package-notifications-read";
 
 import {NotificationPanelList} from "./notification-panel-list";
 
@@ -26,19 +27,31 @@ export function NotificationBell() {
         query: {refetchInterval: POLL_INTERVAL_MS},
     });
     const markCorrectionRead = useMarkCorrectionNotificationsRead();
+    const markFactPackageRead = useMarkFactPackageNotificationsRead();
 
     const notifications = notificationsQuery.data ?? [];
     const unreadCount = notifications.filter((n) => !n.isRead).length;
     const panelItems = notifications.slice(0, PANEL_LIMIT);
     const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
 
+    /**
+     * Уведомление относится либо к корректировке, либо к факт-пакету (ровно
+     * одно из полей заполнено). Для корректировки — переход на карточку, как
+     * раньше. Для факт-пакета отдельной карточки по humanId в UI ещё нет
+     * (см. модуль «Факт» → «Файлы» — экран по направлениям, не по ID пакета),
+     * поэтому пока только помечаем прочитанным без перехода.
+     */
     const handleSelectNotification = useCallback(
         (notification: Notification) => {
-            markCorrectionRead(notification.correctionId);
             setOpen(false);
-            router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+            if (notification.correctionId != null) {
+                markCorrectionRead(notification.correctionId);
+                router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+            } else if (notification.factPackageId != null) {
+                markFactPackageRead(notification.factPackageId);
+            }
         },
-        [markCorrectionRead, router],
+        [markCorrectionRead, markFactPackageRead, router],
     );
 
     useDesktopNotifications(notifications, handleSelectNotification);

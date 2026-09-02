@@ -1,0 +1,1 @@
+{"type":"object","required":["relatedFormId","description","requiredAction"],"properties":{"relatedFormId":{"type":"integer"},"description":{"type":"string"},"requiredAction":{"type":"string"}},"x-readme-ref-name":"FactPackageRemarkCreateInput"}

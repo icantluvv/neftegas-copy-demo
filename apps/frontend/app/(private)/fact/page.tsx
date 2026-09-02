@@ -1,18 +1,31 @@
-import {ClipboardCheck} from "lucide-react";
+import {getMe} from "@repo/api/base/codegen/clients/authController/getMe";
 
-import {SectionPlaceholder} from "#/components/section-placeholder";
+import {AccessDeniedScreen} from "../components/access-denied-screen";
+import {CfoFactDashboard} from "./components/cfo-fact-dashboard";
+import {DtoeFactDashboard} from "./components/dtoe-fact-dashboard";
+import {FilialFactDashboard} from "./components/filial-fact-dashboard";
+import {getDashboardKind} from "#/utils/get-dashboard-kind";
 
-export default function FactPage() {
-    return (
-        <SectionPlaceholder
-            icon={ClipboardCheck}
-            title="Факт"
-            description="Отчётность о фактическом выполнении программы ДТОиР: план/факт по объёмам, стоимости и срокам, отклонения."
-            documents={[
-                {name: "Сводный отчёт о выполнении пообъектного плана ДТОиР (ДТОиР-Отчёт-1)", reference: "Приложение Б.10"},
-                {name: "Сводный отчёт о выполнении плана обеспечения МТР", reference: "Приложение Б.14"},
-                {name: "Пояснительная записка к сводному отчёту", reference: "п. 13.3.2 Регламента"},
-            ]}
-        />
-    );
+export const dynamic = "force-dynamic";
+
+/**
+ * «Рабочий стол» модуля «Факт» — зеркало `app/(private)/dashboard/page.tsx`
+ * для факт-пакетов: свод по направлениям (диаграмма + таблица), карточки
+ * с агрегированными счётчиками. Экран «Файлы» (создание/загрузка по
+ * направлению) — отдельно, `/fact/files`.
+ */
+export default async function FactPage() {
+    const user = await getMe();
+    const kind = getDashboardKind(user.role);
+
+    switch (kind) {
+        case "filial":
+            return <FilialFactDashboard/>;
+        case "cfo":
+            return <CfoFactDashboard/>;
+        case "dtoe":
+            return <DtoeFactDashboard/>;
+        default:
+            return <AccessDeniedScreen/>;
+    }
 }

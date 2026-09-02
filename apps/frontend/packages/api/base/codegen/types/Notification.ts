@@ -4,6 +4,9 @@
 */
 
 
+/**
+ * @description Уведомление относится ровно к одной сущности — либо к корректировке\n(correctionId), либо к факт-пакету (factPackageId); в паре полей заполнено\nровно одно, второе — null (openspec/changes/fact-package-review).\n
+*/
 export interface Notification {
     /**
      * @type integer
@@ -14,13 +17,21 @@ export interface Notification {
     */
     userId: number;
     /**
-     * @type integer
+     * @type integer,null
     */
-    correctionId: number;
+    correctionId: number | null;
     /**
      * @type string | undefined
     */
     correctionHumanId?: string;
+    /**
+     * @type integer,null
+    */
+    factPackageId: number | null;
+    /**
+     * @type string | undefined
+    */
+    factPackageHumanId?: string;
     /**
      * @type string
     */

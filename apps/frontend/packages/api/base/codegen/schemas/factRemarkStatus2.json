@@ -1,0 +1,1 @@
+{"type":"string","enum":["OPEN","FIXED_BY_FILIAL","CLOSED"],"x-readme-ref-name":"fact-remark-status"}

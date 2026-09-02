@@ -15,6 +15,7 @@ import {
 import {Button} from "#/components/ui/button";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "#/components/ui/select";
 import {useMarkCorrectionNotificationsRead} from "#/hooks/use-mark-correction-notifications-read";
+import {useMarkFactPackageNotificationsRead} from "#/hooks/use-mark-fact-package-notifications-read";
 
 import {notificationsColumns} from "./notifications-columns";
 import {NotificationsTable} from "./notifications-table";
@@ -28,6 +29,7 @@ export function NotificationsContent() {
 
     const notificationsQuery = useGetNotificationsSuspense();
     const markCorrectionRead = useMarkCorrectionNotificationsRead();
+    const markFactPackageRead = useMarkFactPackageNotificationsRead();
     const markAllRead = useMarkAllNotificationsRead();
 
     const notifications = notificationsQuery.data;
@@ -48,12 +50,17 @@ export function NotificationsContent() {
         void queryClient.invalidateQueries({queryKey: getNotificationsQueryKey()});
     }, [queryClient]);
 
+    /** Уведомление относится либо к корректировке, либо к факт-пакету — см. notification-bell.tsx. */
     const handleOpen = useCallback(
         (notification: Notification) => {
-            markCorrectionRead(notification.correctionId);
-            router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+            if (notification.correctionId != null) {
+                markCorrectionRead(notification.correctionId);
+                router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+            } else if (notification.factPackageId != null) {
+                markFactPackageRead(notification.factPackageId);
+            }
         },
-        [markCorrectionRead, router],
+        [markCorrectionRead, markFactPackageRead, router],
     );
 
     const handleMarkAllRead = useCallback(() => {
