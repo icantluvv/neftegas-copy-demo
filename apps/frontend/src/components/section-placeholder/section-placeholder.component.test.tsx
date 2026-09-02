@@ -19,4 +19,13 @@ describe("<SectionPlaceholder />", () => {
         await expect.element(view.getByText("Форма пообъектного плана ДТОиР")).toBeVisible();
         await expect.element(view.getByText("Приложение Б.4")).toBeVisible();
     });
+
+    it("без documents не показывает блок форм документов", async () => {
+        const view = await render(
+            <SectionPlaceholder icon={CalendarRange} title="Файлы" description="Архив документов раздела."/>
+        );
+
+        await expect.element(view.getByText("Файлы")).toBeVisible();
+        await expect.element(view.getByText("Формы документов раздела")).not.toBeInTheDocument();
+    });
 });

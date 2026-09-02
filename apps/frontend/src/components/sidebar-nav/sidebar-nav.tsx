@@ -7,16 +7,18 @@ import {useState} from "react";
 import {toast} from "sonner";
 
 import {Button} from "#/components/ui/button";
-import {isNavItemActive, sidebarItems} from "@/app/(private)/constants";
+import {modules} from "@/app/(private)/constants";
 import {cn} from "@/lib/utils";
 import {AuthUser, useLogout} from "@/packages/api/base/codegen";
 
+import {findActiveModule} from "#/utils/find-active-module";
 import {getInitials} from "#/utils/get-initials";
 
 export function SidebarNav({user}: { user: AuthUser }) {
     const pathname = usePathname();
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
+    const activeModule = findActiveModule(pathname);
 
     const logout = useLogout({
         mutation: {
@@ -63,15 +65,13 @@ export function SidebarNav({user}: { user: AuthUser }) {
                     </div>
 
                     <nav className="flex flex-col gap-1">
-                        {sidebarItems
-                            .filter((item) => !item.roles || item.roles.includes(user.role))
-                            .map((item) => {
-                            const isActive = isNavItemActive(item, pathname);
-                            const Icon = item.icon;
+                        {modules.map((module) => {
+                            const isActive = module === activeModule;
+                            const Icon = module.icon;
                             return (
                                 <Link
-                                    key={item.label}
-                                    href={item.href}
+                                    key={module.label}
+                                    href={module.href}
                                     onClick={() => setIsOpen(false)}
                                     className={cn(
                                         "flex min-h-12 items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-colors hover:bg-white/10",
@@ -79,7 +79,7 @@ export function SidebarNav({user}: { user: AuthUser }) {
                                     )}
                                 >
                                     <Icon className="size-5 shrink-0" aria-hidden="true"/>
-                                    {item.label}
+                                    {module.label}
                                 </Link>
                             );
                         })}
