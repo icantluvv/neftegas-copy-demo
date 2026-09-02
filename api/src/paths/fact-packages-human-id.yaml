@@ -1,0 +1,22 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string }, example: FCT-000123 }
+get:
+  summary: Детальная карточка факт-пакета
+  operationId: getFactPackage
+  tags: [FactPackages]
+  responses:
+    '200':
+      description: Детальная карточка факт-пакета
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '403':
+      description: Нет доступа к этому факт-пакету
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: Не найдено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

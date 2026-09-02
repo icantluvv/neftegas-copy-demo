@@ -1,0 +1,19 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: remarkId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Отметить замечание исправленным
+  operationId: fixFactPackageRemark
+  tags: [FactPackages]
+  description: Роль FILIAL, только владелец факт-пакета.
+  responses:
+    '200':
+      description: Замечание отмечено исправленным
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-remark.yaml#/FactPackageRemark' }
+    '403':
+      description: Нет доступа
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

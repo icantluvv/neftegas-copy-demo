@@ -1,0 +1,53 @@
+FactPackageDetail:
+  allOf:
+    - $ref: './fact-package.yaml#/FactPackage'
+    - type: object
+      required:
+        - filial
+        - author
+        - forms
+        - cfoStatuses
+        - remarks
+        - history
+        - packageComplete
+        - missingForms
+        - isFilialOwner
+        - isCfoReviewer
+        - isDtoe
+        - availableCfos
+        - returnedCfos
+      properties:
+        filial: { $ref: './filial.yaml#/Filial' }
+        author: { $ref: './user.yaml#/UserSummary' }
+        forms:
+          type: array
+          items: { $ref: './fact-form.yaml' }
+        cfoStatuses:
+          type: array
+          items: { $ref: './fact-package-cfo-status.yaml' }
+        remarks:
+          type: array
+          items: { $ref: './fact-package-remark.yaml#/FactPackageRemark' }
+        history:
+          type: array
+          items: { $ref: './fact-package-history-entry.yaml' }
+        packageComplete: { type: boolean }
+        missingForms:
+          type: array
+          items: { type: string }
+        myCfoStatus:
+          oneOf:
+            - $ref: './fact-package-cfo-status.yaml'
+            - type: 'null'
+        myOpenRemarksCount: { type: integer }
+        isFilialOwner: { type: boolean }
+        isCfoReviewer: { type: boolean }
+        isDtoe: { type: boolean }
+        availableCfos:
+          type: array
+          description: ЦФО, доступные для отправки (linked_cfos), для формы «Направить на проверку»
+          items: { $ref: './cfo.yaml#/Cfo' }
+        returnedCfos:
+          type: array
+          description: ЦФО в статусе RETURNED, для формы «Направить повторно»
+          items: { $ref: './cfo.yaml#/Cfo' }

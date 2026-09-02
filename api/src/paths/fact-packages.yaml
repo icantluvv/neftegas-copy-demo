@@ -1,0 +1,21 @@
+get:
+  summary: Список факт-пакетов (в рамках видимости роли)
+  operationId: getFactPackages
+  tags: [FactPackages]
+  description: >
+    Список автоматически ограничен ролью: FILIAL видит свои, CFO — направленные
+    его ЦФО, DTOE/ADMIN — все (аудит).
+  parameters:
+    - { name: direction, in: query, schema: { $ref: '../components/schemas/direction.yaml' } }
+    - { name: status, in: query, schema: { $ref: '../components/schemas/fact-package-status.yaml' } }
+    - { name: filialId, in: query, schema: { type: integer } }
+    - { name: cfoId, in: query, schema: { type: integer } }
+    - { name: q, in: query, description: Поиск по ID факт-пакета, schema: { type: string } }
+    - { name: page, in: query, schema: { type: integer, default: 1 } }
+    - { name: pageSize, in: query, schema: { type: integer, default: 20 } }
+  responses:
+    '200':
+      description: Страница факт-пакетов
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package.yaml#/PaginatedFactPackages' }

@@ -1,0 +1,16 @@
+type: object
+required: [id, factPackageId, code, label, isFilled]
+properties:
+  id: { type: integer }
+  factPackageId: { type: integer }
+  code: { $ref: './fact-form-code.yaml' }
+  label: { type: string }
+  isFilled: { type: boolean }
+  currentVersion:
+    oneOf:
+      - $ref: './fact-form-version.yaml'
+      - type: 'null'
+  versions:
+    type: array
+    description: Полная история версий формы, отсортирована по возрастанию versionNumber
+    items: { $ref: './fact-form-version.yaml' }

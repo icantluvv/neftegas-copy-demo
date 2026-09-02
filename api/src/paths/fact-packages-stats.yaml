@@ -1,0 +1,10 @@
+get:
+  summary: Статистика по факт-пакетам для карточек «Рабочего стола» модуля «Факт»
+  operationId: getFactPackageStats
+  tags: [FactPackages]
+  responses:
+    '200':
+      description: Агрегированные счётчики для карточек дашборда (в рамках видимости роли)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-stats.yaml' }

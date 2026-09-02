@@ -1,0 +1,32 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Финальное решение ДТОиР по факт-пакету
+  operationId: decideFactPackageByDtoe
+  tags: [FactPackages]
+  description: |
+    Роль DTOE. Факт-пакет должен быть в статусе UNDER_DTOE_REVIEW.
+    decision=APPROVE переводит факт-пакет в финальный неизменяемый статус
+    APPROVED. decision=RETURN требует хотя бы одного открытого замечания от
+    ДТОиР и переводит факт-пакет в RETURNED_BY_DTOE.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/fact-final-decision.yaml' }
+  responses:
+    '200':
+      description: Решение принято
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '400':
+      description: Факт-пакет не на проверке ДТОиР, либо RETURN без открытого замечания
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

@@ -1,0 +1,6 @@
+type: string
+enum:
+  - DO
+  - TOIR
+  - KR_PD
+  - KR_HS

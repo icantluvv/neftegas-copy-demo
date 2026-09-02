@@ -1,0 +1,28 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Направить факт-пакет на проверку выбранным ЦФО
+  operationId: submitFactPackage
+  tags: [FactPackages]
+  description: |
+    Филиал направляет укомплектованный пакет выбранным ЦФО. Обслуживает и
+    первичное направление (DRAFT), и повторное направление после доработки
+    (RETURNED_FOR_REVISION) — в этом случае доступно только когда все
+    замечания от вернувших ЦФО отмечены исправленными; статус
+    согласовавших ранее ЦФО не сбрасывается.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/correction-detail.yaml#/CfoSelectionInput' }
+  responses:
+    '200':
+      description: Направлено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '400':
+      description: Пакет не укомплектован, ЦФО не выбраны/не привязаны, либо есть неисправленные замечания
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

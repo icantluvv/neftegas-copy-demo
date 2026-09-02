@@ -1,0 +1,12 @@
+type: object
+required: [id, factPackageId, timestamp, text]
+properties:
+  id: { type: integer }
+  factPackageId: { type: integer }
+  userId: { type: [integer, 'null'] }
+  user:
+    oneOf:
+      - $ref: './user.yaml#/UserSummary'
+      - type: 'null'
+  timestamp: { type: string, format: date-time }
+  text: { type: string }

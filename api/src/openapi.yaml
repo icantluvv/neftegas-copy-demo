@@ -23,6 +23,11 @@ tags:
     description: Управление пользователями (роль ADMIN)
   - name: Corrections
     description: Жизненный цикл корректировок — создание, пакет документов, маршрут согласования, замечания
+  - name: FactPackages
+    description: >
+      Модуль «Факт» — экран «Файлы»: факт-пакеты по направлениям работ (ДО,
+      ТОиР, КР ПД, КР ХС), загрузка форм, маршрут согласования ЦФО/ДТОиР,
+      замечания
   - name: Notifications
     description: Уведомления пользователя
 
@@ -111,6 +116,40 @@ paths:
   /files/{id}/download:
     $ref: './paths/files-id-download.yaml'
 
+  /fact-packages:
+    $ref: './paths/fact-packages.yaml'
+  /fact-packages/by-direction/{direction}:
+    $ref: './paths/fact-packages-by-direction-direction.yaml'
+  /fact-packages/stats:
+    $ref: './paths/fact-packages-stats.yaml'
+  /fact-packages/stats/filial:
+    $ref: './paths/fact-packages-stats-filial.yaml'
+  /fact-packages/stats/cfo:
+    $ref: './paths/fact-packages-stats-cfo.yaml'
+  /fact-packages/stats/dtoe:
+    $ref: './paths/fact-packages-stats-dtoe.yaml'
+  /fact-packages/{humanId}:
+    $ref: './paths/fact-packages-human-id.yaml'
+  /fact-packages/{humanId}/forms/{formCode}/versions:
+    $ref: './paths/fact-packages-human-id-forms-form-code-versions.yaml'
+  /fact-packages/{humanId}/submit:
+    $ref: './paths/fact-packages-human-id-submit.yaml'
+  /fact-packages/{humanId}/cfo/{cfoId}/approve:
+    $ref: './paths/fact-packages-human-id-cfo-cfo-id-approve.yaml'
+  /fact-packages/{humanId}/remarks:
+    $ref: './paths/fact-packages-human-id-remarks.yaml'
+  /fact-packages/{humanId}/remarks/{remarkId}/fix:
+    $ref: './paths/fact-packages-human-id-remarks-remark-id-fix.yaml'
+  /fact-packages/{humanId}/remarks/{remarkId}:
+    $ref: './paths/fact-packages-human-id-remarks-remark-id.yaml'
+  /fact-packages/{humanId}/send-to-dtoe:
+    $ref: './paths/fact-packages-human-id-send-to-dtoe.yaml'
+  /fact-packages/{humanId}/final-decision:
+    $ref: './paths/fact-packages-human-id-final-decision.yaml'
+
+  /fact-files/{id}/download:
+    $ref: './paths/fact-files-id-download.yaml'
+
   /notifications:
     $ref: './paths/notifications.yaml'
   /notifications/{id}/open:
@@ -119,6 +158,8 @@ paths:
     $ref: './paths/notifications-read-all.yaml'
   /notifications/by-correction/{correctionId}/read:
     $ref: './paths/notifications-by-correction-correction-id-read.yaml'
+  /notifications/by-fact-package/{factPackageId}/read:
+    $ref: './paths/notifications-by-fact-package-fact-package-id-read.yaml'
 
 components:
   securitySchemes:
@@ -209,3 +250,37 @@ components:
 
     Notification:
       $ref: './components/schemas/notification.yaml'
+
+    Direction:
+      $ref: './components/schemas/direction.yaml'
+    FactFormCode:
+      $ref: './components/schemas/fact-form-code.yaml'
+    FactPackageStatus:
+      $ref: './components/schemas/fact-package-status.yaml'
+    FactCfoStatusValue:
+      $ref: './components/schemas/fact-cfo-status-value.yaml'
+    FactRemarkStatus:
+      $ref: './components/schemas/fact-remark-status.yaml'
+
+    FactPackage:
+      $ref: './components/schemas/fact-package.yaml#/FactPackage'
+    FactPackageListItem:
+      $ref: './components/schemas/fact-package.yaml#/FactPackageListItem'
+    PaginatedFactPackages:
+      $ref: './components/schemas/fact-package.yaml#/PaginatedFactPackages'
+    FactPackageDetail:
+      $ref: './components/schemas/fact-package-detail.yaml#/FactPackageDetail'
+    FactForm:
+      $ref: './components/schemas/fact-form.yaml'
+    FactFormVersion:
+      $ref: './components/schemas/fact-form-version.yaml'
+    FactPackageCfoStatus:
+      $ref: './components/schemas/fact-package-cfo-status.yaml'
+    FactPackageRemark:
+      $ref: './components/schemas/fact-package-remark.yaml#/FactPackageRemark'
+    FactPackageRemarkCreateInput:
+      $ref: './components/schemas/fact-package-remark.yaml#/FactPackageRemarkCreateInput'
+    FactPackageHistoryEntry:
+      $ref: './components/schemas/fact-package-history-entry.yaml'
+    FactFinalDecisionInput:
+      $ref: './components/schemas/fact-final-decision.yaml'

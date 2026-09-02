@@ -1,0 +1,16 @@
+get:
+  summary: Статистика по факт-пакетам для «Рабочего стола» ДТОиР
+  operationId: getFactPackageStatsDtoe
+  tags: [FactPackages]
+  description: Доступно только пользователю роли DTOE.
+  responses:
+    '200':
+      description: Агрегированные счётчики в рамках видимости роли DTOE
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-stats.yaml' }
+    '403':
+      description: У пользователя не роль DTOE
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

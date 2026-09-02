@@ -1,0 +1,20 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: remarkId, in: path, required: true, schema: { type: integer } }
+delete:
+  summary: Удалить замечание (только автор, только пока OPEN)
+  operationId: deleteFactPackageRemark
+  tags: [FactPackages]
+  description: Только автор замечания и только пока оно в статусе OPEN.
+  responses:
+    '204': { description: Замечание удалено }
+    '400':
+      description: Замечание не в статусе OPEN
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Не автор замечания
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

@@ -1,0 +1,6 @@
+type: object
+required: [decision]
+properties:
+  decision:
+    type: string
+    enum: [APPROVE, RETURN]
