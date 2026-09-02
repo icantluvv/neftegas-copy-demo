@@ -15,6 +15,8 @@ function toDto(notification: Notification) {
     userId: notification.userId,
     correctionId: notification.correctionId,
     correctionHumanId: notification.correction?.humanId ?? '',
+    factPackageId: notification.factPackageId,
+    factPackageHumanId: notification.factPackage?.humanId ?? '',
     text: notification.text,
     isRead: notification.isRead,
     createdAt: notification.createdAt,
@@ -31,7 +33,7 @@ export class NotificationsService {
   async findForUser(user: User) {
     const rows = await this.notifications.find({
       where: { userId: user.id },
-      relations: ['correction'],
+      relations: ['correction', 'factPackage'],
       order: { createdAt: 'DESC' },
     });
     return rows.map(toDto);
@@ -40,7 +42,7 @@ export class NotificationsService {
   async open(user: User, id: number) {
     const notification = await this.notifications.findOne({
       where: { id },
-      relations: ['correction'],
+      relations: ['correction', 'factPackage'],
     });
     if (!notification) throw new NotFoundException();
     if (notification.userId !== user.id) throw new ForbiddenException();
@@ -66,6 +68,15 @@ export class NotificationsService {
   async markReadByCorrection(user: User, correctionId: number) {
     const result = await this.notifications.update(
       { userId: user.id, correctionId, isRead: false },
+      { isRead: true },
+    );
+    return { updatedCount: result.affected ?? 0 };
+  }
+
+  /** Симметрично markReadByCorrection, для карточки факт-пакета. */
+  async markReadByFactPackage(user: User, factPackageId: number) {
+    const result = await this.notifications.update(
+      { userId: user.id, factPackageId, isRead: false },
       { isRead: true },
     );
     return { updatedCount: result.affected ?? 0 };

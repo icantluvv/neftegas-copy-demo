@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { SessionAuthGuard } from './common/guards/session-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { CorrectionsModule } from './corrections/corrections.module';
+import { FactPackagesModule } from './fact-packages/fact-packages.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OrgModule } from './org/org.module';
 import { RedisModule } from './redis/redis.module';
@@ -35,6 +36,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     CorrectionsModule,
+    FactPackagesModule,
     NotificationsModule,
     OrgModule,
   ],

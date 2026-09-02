@@ -19,6 +19,12 @@ import {
 import { DocumentSlot } from '../corrections/entities/document-slot.entity';
 import { FileVersion } from '../corrections/entities/file-version.entity';
 import { Remark, RemarkStatus } from '../corrections/entities/remark.entity';
+import { FactFormVersion } from '../fact-packages/entities/fact-form-version.entity';
+import { FactForm } from '../fact-packages/entities/fact-form.entity';
+import { FactPackageCfoStatus } from '../fact-packages/entities/fact-package-cfo-status.entity';
+import { FactPackageHistoryEntry } from '../fact-packages/entities/fact-package-history-entry.entity';
+import { FactPackage } from '../fact-packages/entities/fact-package.entity';
+import { FactPackageRemark } from '../fact-packages/entities/fact-package-remark.entity';
 import { Notification } from '../notifications/entities/notification.entity';
 import { Cfo } from '../org/entities/cfo.entity';
 import { CorrectionType } from '../org/entities/correction-type.entity';
@@ -58,6 +64,12 @@ const dataSource = new DataSource({
     CorrectionFilialStatus,
     Remark,
     CorrectionHistoryEntry,
+    FactPackage,
+    FactForm,
+    FactFormVersion,
+    FactPackageCfoStatus,
+    FactPackageRemark,
+    FactPackageHistoryEntry,
     Notification,
   ],
   synchronize: true,

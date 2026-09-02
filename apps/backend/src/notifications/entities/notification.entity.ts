@@ -9,8 +9,14 @@ import {
 } from 'typeorm';
 
 import { Correction } from '../../corrections/entities/correction.entity';
+import { FactPackage } from '../../fact-packages/entities/fact-package.entity';
 import { User } from '../../users/entities/user.entity';
 
+/**
+ * Ровно одно из correctionId/factPackageId заполнено — уведомление относится
+ * либо к корректировке (домен `corrections`), либо к факт-пакету (домен
+ * `fact-packages`); оба домена независимы и не смешиваются.
+ */
 @Entity('notifications')
 export class Notification {
   @PrimaryGeneratedColumn()
@@ -23,12 +29,19 @@ export class Notification {
   @Column()
   userId: number;
 
-  @ManyToOne(() => Correction, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Correction, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'correctionId' })
-  correction: Relation<Correction>;
+  correction: Relation<Correction> | null;
 
-  @Column()
-  correctionId: number;
+  @Column({ nullable: true })
+  correctionId: number | null;
+
+  @ManyToOne(() => FactPackage, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'factPackageId' })
+  factPackage: Relation<FactPackage> | null;
+
+  @Column({ nullable: true })
+  factPackageId: number | null;
 
   @Column({ length: 500 })
   text: string;
