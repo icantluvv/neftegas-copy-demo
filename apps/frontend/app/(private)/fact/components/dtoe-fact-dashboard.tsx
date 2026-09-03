@@ -1,28 +1,21 @@
 import {getFactPackageStatsDtoe} from "@repo/api/base/codegen/clients/factPackagesController/getFactPackageStatsDtoe";
 
-import {isForbiddenError, isUnauthorizedError} from "#/utils/http-error";
+import {StatsGrid} from "#/components/stats-grid";
 
-import {AccessDeniedScreen} from "../../components/access-denied-screen";
-import {FactStatsGrid} from "./fact-stats-grid";
+import {factDashboardErrorGuard} from "../lib/dashboard-error-guard";
 
 export async function DtoeFactDashboard() {
     let stats: Awaited<ReturnType<typeof getFactPackageStatsDtoe>>;
     try {
         stats = await getFactPackageStatsDtoe();
     } catch (error) {
-        if (isForbiddenError(error)) {
-            return <AccessDeniedScreen/>;
-        }
-        if (isUnauthorizedError(error)) {
-            return null;
-        }
-        throw error;
+        return factDashboardErrorGuard(error);
     }
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">ДТОиР — Факт</h1>
-            <FactStatsGrid
+            <StatsGrid
                 tiles={[
                     {label: "Всего факт-пакетов", value: stats.total},
                     {label: "На проверке у ЦФО", value: stats.inReview},

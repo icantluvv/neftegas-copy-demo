@@ -7,8 +7,6 @@ export interface FactCfoStatusGroup {
   dotClassName: string;
 }
 
-// Группировка по статусу СВОЕГО ЦФО (не общему статусу пакета) — зеркало
-// `dashboard/constants.ts` CFO_STATUS_GROUPS для факт-пакетов.
 export const FACT_CFO_STATUS_GROUPS: FactCfoStatusGroup[] = [
   { key: "PENDING", label: "На проверке у нас", strokeClassName: "stroke-sky-500", dotClassName: "bg-sky-500" },
   { key: "RETURNED", label: "Мы вернули", strokeClassName: "stroke-red-500", dotClassName: "bg-red-500" },
@@ -23,8 +21,6 @@ export interface FactStageGroup {
   dotClassName: string;
 }
 
-// Четыре укрупнённые группы девяти статусов факт-пакета — зеркало
-// `dashboard/constants.ts` STAGE_GROUPS.
 export const FACT_STAGE_GROUPS: FactStageGroup[] = [
   {
     key: "draft",

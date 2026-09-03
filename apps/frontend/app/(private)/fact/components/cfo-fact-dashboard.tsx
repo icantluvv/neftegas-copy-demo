@@ -1,29 +1,22 @@
 import {getFactPackageStatsCfo} from "@repo/api/base/codegen/clients/factPackagesController/getFactPackageStatsCfo";
 
-import {isForbiddenError, isUnauthorizedError} from "#/utils/http-error";
+import {StatsGrid} from "#/components/stats-grid";
 
-import {AccessDeniedScreen} from "../../components/access-denied-screen";
+import {factDashboardErrorGuard} from "../lib/dashboard-error-guard";
 import {CfoFactOverview} from "./cfo-fact-overview";
-import {FactStatsGrid} from "./fact-stats-grid";
 
 export async function CfoFactDashboard() {
     let stats: Awaited<ReturnType<typeof getFactPackageStatsCfo>>;
     try {
         stats = await getFactPackageStatsCfo();
     } catch (error) {
-        if (isForbiddenError(error)) {
-            return <AccessDeniedScreen/>;
-        }
-        if (isUnauthorizedError(error)) {
-            return null;
-        }
-        throw error;
+        return factDashboardErrorGuard(error);
     }
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">Факт-пакеты ЦФО</h1>
-            <FactStatsGrid
+            <StatsGrid
                 tiles={[
                     {label: "Всего направлено", value: stats.total},
                     {label: "На проверке у нас", value: stats.inReview, tone: "warning"},
