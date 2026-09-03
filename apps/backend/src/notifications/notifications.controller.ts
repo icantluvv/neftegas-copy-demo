@@ -42,4 +42,13 @@ export class NotificationsController {
   ) {
     return this.service.markReadByCorrection(user, correctionId);
   }
+
+  @Post('by-fact-package/:factPackageId/read')
+  @HttpCode(HttpStatus.OK)
+  readByFactPackage(
+    @CurrentUser() user: User,
+    @Param('factPackageId', ParseIntPipe) factPackageId: number,
+  ) {
+    return this.service.markReadByFactPackage(user, factPackageId);
+  }
 }

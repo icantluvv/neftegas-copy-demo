@@ -9,7 +9,7 @@ export interface SectionPlaceholderProps {
     icon: LucideIcon;
     title: string;
     description: string;
-    documents: SectionPlaceholderDocument[];
+    documents?: SectionPlaceholderDocument[];
 }
 
 export function SectionPlaceholder({icon: Icon, title, description, documents}: SectionPlaceholderProps) {
@@ -24,19 +24,21 @@ export function SectionPlaceholder({icon: Icon, title, description, documents}: 
                 <p className="text-sm text-muted-foreground">{description}</p>
             </div>
 
-            <div className="w-full rounded-lg border border-border p-4 text-left">
-                <h2 className="mb-3 text-xs font-medium uppercase text-muted-foreground">
-                    Формы документов раздела
-                </h2>
-                <ul className="flex flex-col gap-2">
-                    {documents.map((document) => (
-                        <li key={document.name} className="flex items-baseline justify-between gap-4 text-sm">
-                            <span>{document.name}</span>
-                            <span className="shrink-0 text-xs text-muted-foreground">{document.reference}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            {documents && documents.length > 0 && (
+                <div className="w-full rounded-lg border border-border p-4 text-left">
+                    <h2 className="mb-3 text-xs font-medium uppercase text-muted-foreground">
+                        Формы документов раздела
+                    </h2>
+                    <ul className="flex flex-col gap-2">
+                        {documents.map((document) => (
+                            <li key={document.name} className="flex items-baseline justify-between gap-4 text-sm">
+                                <span>{document.name}</span>
+                                <span className="shrink-0 text-xs text-muted-foreground">{document.reference}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             <p className="text-xs text-muted-foreground">Раздел в разработке</p>
         </div>

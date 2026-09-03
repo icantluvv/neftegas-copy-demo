@@ -1,0 +1,24 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: cfoId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Согласовать факт-пакет от лица ЦФО
+  operationId: approveFactPackageByCfo
+  tags: [FactPackages]
+  description: Роль CFO, только для назначенного ЦФО (cfoId должен совпадать с ЦФО пользователя). Закрывает открытые замечания своего ЦФО.
+  responses:
+    '200':
+      description: Согласовано
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '400':
+      description: Решение по этому факт-пакету уже принято этим ЦФО
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

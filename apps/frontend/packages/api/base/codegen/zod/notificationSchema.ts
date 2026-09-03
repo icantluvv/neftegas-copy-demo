@@ -5,11 +5,16 @@
 
 import * as z from "zod/mini";
 
+/**
+ * @description Уведомление относится ровно к одной сущности — либо к корректировке\n(correctionId), либо к факт-пакету (factPackageId); в паре полей заполнено\nровно одно, второе — null (openspec/changes/fact-package-review).\n
+ */
 export const notificationSchema = z.object({
     "id": z.int(),
 "userId": z.int(),
-"correctionId": z.int(),
+"correctionId": z.nullable(z.int()),
 "correctionHumanId": z.optional(z.string()),
+"factPackageId": z.nullable(z.int()),
+"factPackageHumanId": z.optional(z.string()),
 "text": z.string(),
 "isRead": z.boolean(),
 "createdAt": z.string()

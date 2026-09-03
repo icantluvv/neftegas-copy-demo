@@ -1,0 +1,23 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Отправить факт-пакет в ДТОиР
+  operationId: sendFactPackageToDtoe
+  tags: [FactPackages]
+  description: Доступно любому согласовавшему ЦФО этого факт-пакета, когда все обязательные ЦФО согласовали (canSendToDtoe).
+  responses:
+    '200':
+      description: Отправлено в ДТОиР
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '400':
+      description: Не все обязательные ЦФО согласовали пакет
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

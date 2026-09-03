@@ -3,6 +3,7 @@ import {redirect} from "next/navigation";
 
 import {NotificationBell} from "#/components/notification-bell";
 import {SidebarNav} from "#/components/sidebar-nav";
+import {TopQuickActions} from "#/components/top-quick-actions";
 import {getHttpErrorStatus} from "#/utils/http-error";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,8 @@ export default async function PrivateLayout({children}: { children: React.ReactN
             <SidebarNav user={user}/>
 
             <div className="flex h-full w-full flex-1 flex-col overflow-hidden md:w-4/5">
-                <header className="flex shrink-0 items-center justify-end gap-4 border-b border-border px-4 py-2">
+                <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border py-2 pr-4 pl-16 md:pl-4">
+                    <TopQuickActions user={user}/>
                     <NotificationBell/>
                 </header>
                 <div className="flex-1 overflow-y-auto">{children}</div>

@@ -2,6 +2,9 @@
 
 import { cn } from "@/lib/utils";
 
+import { CIRCUMFERENCE, RADIUS, SEGMENT_GAP, STROKE_WIDTH } from "./constants";
+import { layoutArcs } from "./layout-arcs";
+
 export interface DonutSegment {
   key: string;
   label: string;
@@ -15,41 +18,16 @@ interface DonutChartProps {
   total: number;
   selectedKey: string | null;
   onSegmentClick: (key: string) => void;
+  ariaLabel?: string;
 }
 
-const RADIUS = 40;
-const STROKE_WIDTH = 16;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const SEGMENT_GAP = 3;
-
-interface Arc {
-  segment: DonutSegment;
-  length: number;
-  dashOffset: number;
-}
-
-function layoutArcs(segments: DonutSegment[], total: number): Arc[] {
-  return segments.reduce<{ arcs: Arc[]; offset: number }>(
-    (acc, segment) => {
-      if (segment.value === 0) return acc;
-      const share = segment.value / total;
-      const length = Math.max(share * CIRCUMFERENCE - SEGMENT_GAP, 0);
-      return {
-        arcs: [...acc.arcs, { segment, length, dashOffset: -acc.offset }],
-        offset: acc.offset + share * CIRCUMFERENCE,
-      };
-    },
-    { arcs: [], offset: 0 },
-  ).arcs;
-}
-
-export function DonutChart({ segments, total, selectedKey, onSegmentClick }: DonutChartProps) {
-  const arcs = layoutArcs(segments, total);
+export function DonutChart({ segments, total, selectedKey, onSegmentClick, ariaLabel = "Распределение по статусам" }: DonutChartProps) {
+  const arcs = layoutArcs(segments, total, CIRCUMFERENCE, SEGMENT_GAP);
 
   return (
     <div className="flex flex-col items-center gap-6 sm:flex-row">
       <div className="relative flex size-40 shrink-0 items-center justify-center">
-        <svg viewBox="0 0 100 100" className="size-40 -rotate-90" role="img" aria-label="Распределение корректировок по статусам">
+        <svg viewBox="0 0 100 100" className="size-40 -rotate-90" role="img" aria-label={ariaLabel}>
           <circle cx="50" cy="50" r={RADIUS} fill="none" strokeWidth={STROKE_WIDTH} className="stroke-muted" />
           {arcs.map(({ segment, length, dashOffset }) => {
             const isDimmed = selectedKey !== null && selectedKey !== segment.key;

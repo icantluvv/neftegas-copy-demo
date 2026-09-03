@@ -6,10 +6,13 @@
 import type { Notification } from "../types/Notification";
 import { faker } from "@faker-js/faker";
 
+/**
+ * @description Уведомление относится ровно к одной сущности — либо к корректировке\n(correctionId), либо к факт-пакету (factPackageId); в паре полей заполнено\nровно одно, второе — null (openspec/changes/fact-package-review).\n
+ */
 export function createNotification(data?: Partial<Notification>): Notification {
 
   return {
-    ...{"id": faker.number.int(),"userId": faker.number.int(),"correctionId": faker.number.int(),"correctionHumanId": faker.string.alpha(),"text": faker.string.alpha(),"isRead": faker.datatype.boolean(),"createdAt": faker.date.anytime().toISOString()},
+    ...{"id": faker.number.int(),"userId": faker.number.int(),"correctionId": faker.number.int(),"correctionHumanId": faker.string.alpha(),"factPackageId": faker.number.int(),"factPackageHumanId": faker.string.alpha(),"text": faker.string.alpha(),"isRead": faker.datatype.boolean(),"createdAt": faker.date.anytime().toISOString()},
     ...data || {}
   }
 }

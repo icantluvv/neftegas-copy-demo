@@ -1,0 +1,16 @@
+get:
+  summary: Статистика по факт-пакетам для «Рабочего стола» ЦФО
+  operationId: getFactPackageStatsCfo
+  tags: [FactPackages]
+  description: Доступно только пользователю роли CFO.
+  responses:
+    '200':
+      description: Агрегированные счётчики в рамках видимости роли CFO
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-stats.yaml' }
+    '403':
+      description: У пользователя не роль CFO
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

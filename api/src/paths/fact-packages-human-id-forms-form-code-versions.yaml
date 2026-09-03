@@ -1,0 +1,38 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: formCode, in: path, required: true, schema: { $ref: '../components/schemas/fact-form-code.yaml' } }
+post:
+  summary: Загрузить версию файла формы факт-пакета
+  operationId: uploadFactFormVersion
+  tags: [FactPackages]
+  description: |
+    Доступно только автору-владельцу (роль FILIAL, свой филиал), пока
+    факт-пакет не в финальном статусе APPROVED. `formCode` должен входить в
+    каталог форм направления этого факт-пакета.
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required: [file]
+          properties:
+            file: { type: string, format: binary }
+            note: { type: string }
+            remarkId: { type: integer, description: 'Если файл загружен в ответ на замечание' }
+  responses:
+    '201':
+      description: Новая версия формы добавлена
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-form-version.yaml' }
+    '400':
+      description: Факт-пакет в финальном статусе либо formCode не входит в каталог направления
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа (не автор/не владелец филиала)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

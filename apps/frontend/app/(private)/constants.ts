@@ -1,4 +1,4 @@
-import {Bell, CalendarRange, ClipboardCheck, FilePlus, Home, PlayCircle, type LucideIcon} from "lucide-react";
+import {Bell, CalendarRange, ClipboardCheck, FilePlus, FileText, Home, LayoutDashboard, PlayCircle, type LucideIcon} from "lucide-react";
 
 import type {AuthUser} from "@/packages/api/base/codegen";
 
@@ -18,22 +18,59 @@ export interface NavItem {
     roles?: AuthUser["role"][];
 }
 
-export interface NavSection extends NavItem {
+export interface ModuleTab extends NavItem {
     matchPrefixes?: string[];
+    quickActions: NavItem[];
 }
 
-export const sidebarItems: NavSection[] = [
-    {href: "/dashboard", label: "Рабочий стол", icon: Home, matchPrefixes: ["/corrections"]},
-    {href: "/planning", label: "План на 2027", icon: CalendarRange, matchPrefixes: ["/planning"]},
-    {href: "/execution", label: "Выполнение", icon: PlayCircle},
-    {href: "/fact", label: "Факт", icon: ClipboardCheck},
-    {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
-    {href: "/notifications", label: "Уведомления", icon: Bell},
+export const FALLBACK_HOME_HREF = "/dashboard";
+
+export const modules: ModuleTab[] = [
+    {
+        href: "/planning",
+        label: "План на 2027",
+        icon: CalendarRange,
+        matchPrefixes: ["/planning"],
+        quickActions: [
+            {href: "/planning", label: "Рабочий стол", icon: Home},
+            {href: "/planning/files", label: "Файлы", icon: FileText},
+            {href: "/planning/notifications", label: "Уведомления", icon: Bell},
+        ],
+    },
+    {
+        href: "/execution",
+        label: "Выполнение",
+        icon: PlayCircle,
+        matchPrefixes: ["/execution"],
+        quickActions: [
+            {href: "/execution", label: "Рабочий стол", icon: Home},
+            {href: "/execution/files", label: "Файлы", icon: FileText},
+            {href: "/execution/notifications", label: "Уведомления", icon: Bell},
+        ],
+    },
+    {
+        href: "/dashboard",
+        label: "Корректировка",
+        icon: LayoutDashboard,
+        matchPrefixes: ["/corrections", "/notifications"],
+        quickActions: [
+            {href: "/dashboard", label: "Рабочий стол", icon: Home},
+            {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
+            {href: "/notifications", label: "Уведомления", icon: Bell},
+        ],
+    },
+    {
+        href: "/fact",
+        label: "Факт",
+        icon: ClipboardCheck,
+        matchPrefixes: ["/fact"],
+        quickActions: [
+            {href: "/fact", label: "Рабочий стол", icon: Home},
+            {href: "/fact/files", label: "Файлы", icon: FileText},
+            {href: "/fact/notifications", label: "Уведомления", icon: Bell},
+        ],
+    },
 ];
-
-export function isNavItemActive(item: NavSection, pathname: string): boolean {
-    return pathname === item.href || (item.matchPrefixes?.some((prefix) => pathname.startsWith(prefix)) ?? false);
-}
 
 
 export const READ_FILTER_LABELS = {

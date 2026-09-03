@@ -6,6 +6,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { CorrectionListItem } from "@/packages/api/base/codegen";
 import { useGetCorrections } from "@/packages/api/base/codegen";
 
+import { DonutChart, type DonutSegment } from "#/components/donut-chart";
 import { Badge } from "#/components/ui/badge";
 import { DataTable } from "#/components/ui/data-table";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "#/components/ui/select";
@@ -13,7 +14,6 @@ import { formatNotificationDateTime } from "#/utils/format-notification-date-tim
 
 import { getCfoStatusLabel, getCorrectionStatusLabel } from "../../lib/status-labels";
 import { CFO_STATUS_GROUPS } from "../constants";
-import { DonutChart, type DonutSegment } from "./donut-chart";
 import { OpenCorrectionLink } from "./open-correction-link";
 
 function correctionMatchesFilter(item: CorrectionListItem, statusFilter: string, filialFilter: string): boolean {

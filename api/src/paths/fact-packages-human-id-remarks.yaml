@@ -1,0 +1,32 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Оставить замечание к форме факт-пакета
+  operationId: leaveFactPackageRemark
+  tags: [FactPackages]
+  description: |
+    Роли CFO и DTOE. Доступно только пока факт-пакет находится на проверке у
+    автора замечания (для ЦФО — его статус проверки PENDING; для ДТОиР —
+    статус факт-пакета UNDER_DTOE_REVIEW). Атомарно переводит факт-пакет в
+    RETURNED_FOR_REVISION и статус проверки автора — в RETURNED.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/fact-package-remark.yaml#/FactPackageRemarkCreateInput' }
+  responses:
+    '200':
+      description: Замечание создано, факт-пакет возвращён на доработку
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '400':
+      description: Факт-пакет сейчас не на проверке этого проверяющего
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

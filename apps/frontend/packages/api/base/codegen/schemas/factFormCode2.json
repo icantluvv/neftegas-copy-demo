@@ -1,0 +1,1 @@
+{"type":"string","enum":["ACT_WORK","ACT_SERVICE","KS2","KS3","ACT_MATERIALS","INVOICE","PAYMENT_REQUEST"],"x-readme-ref-name":"fact-form-code"}

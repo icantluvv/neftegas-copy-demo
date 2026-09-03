@@ -12,6 +12,7 @@ import {type Notification, useGetNotifications} from "@/packages/api/base/codege
 import {buttonVariants} from "#/components/ui/button";
 import {useDesktopNotifications} from "#/hooks/use-desktop-notifications";
 import {useMarkCorrectionNotificationsRead} from "#/hooks/use-mark-correction-notifications-read";
+import {useMarkFactPackageNotificationsRead} from "#/hooks/use-mark-fact-package-notifications-read";
 
 import {NotificationPanelList} from "./notification-panel-list";
 
@@ -26,6 +27,7 @@ export function NotificationBell() {
         query: {refetchInterval: POLL_INTERVAL_MS},
     });
     const markCorrectionRead = useMarkCorrectionNotificationsRead();
+    const markFactPackageRead = useMarkFactPackageNotificationsRead();
 
     const notifications = notificationsQuery.data ?? [];
     const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -34,11 +36,16 @@ export function NotificationBell() {
 
     const handleSelectNotification = useCallback(
         (notification: Notification) => {
-            markCorrectionRead(notification.correctionId);
             setOpen(false);
-            router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+            if (notification.correctionId != null) {
+                markCorrectionRead(notification.correctionId);
+                router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
+            } else if (notification.factPackageId != null) {
+                markFactPackageRead(notification.factPackageId);
+                router.push(`/fact/files/${notification.factPackageHumanId ?? ""}`);
+            }
         },
-        [markCorrectionRead, router],
+        [markCorrectionRead, markFactPackageRead, router],
     );
 
     useDesktopNotifications(notifications, handleSelectNotification);

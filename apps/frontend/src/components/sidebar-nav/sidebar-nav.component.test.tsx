@@ -94,82 +94,59 @@ describe('<SidebarNav />', () => {
 		await expect.element(view.getByTestId('sidebar-logo')).toBeVisible()
 	})
 
-	it('содержит пункт меню «Рабочий стол» со ссылкой на /dashboard', async () => {
-		const view = await render(<SidebarNav user={testUser} />)
-
-		await expect
-			.element(view.getByRole('link', { name: 'Рабочий стол' }))
-			.toHaveAttribute('href', '/dashboard')
-	})
-
-	it('содержит пункты разделов «План на 2027», «Выполнение», «Факт»', async () => {
+	it('содержит 4 пункта-модуля с корректными ссылками', async () => {
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toHaveAttribute('href', '/planning')
 		await expect.element(view.getByRole('link', { name: 'Выполнение' })).toHaveAttribute('href', '/execution')
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).toHaveAttribute('href', '/dashboard')
 		await expect.element(view.getByRole('link', { name: 'Факт' })).toHaveAttribute('href', '/fact')
 	})
 
-	it('подсвечивает «Рабочий стол» на вложенных страницах корректировок', async () => {
+	it('подсвечивает модуль «Корректировка» на вложенных страницах корректировок и уведомлений', async () => {
 		nextNavigationMock.pathname = '/corrections/COR-000001'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
-		await expect
-			.element(view.getByRole('link', { name: 'Рабочий стол' }))
-			.toHaveClass('bg-white/10')
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).toHaveClass('bg-white/10')
 	})
 
-	it('подсвечивает активный пункт по точному совпадению маршрута', async () => {
-		nextNavigationMock.pathname = '/notifications'
+	it('подсвечивает модуль «План на 2027» на его собственной странице уведомлений', async () => {
+		nextNavigationMock.pathname = '/planning/notifications'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
-		await expect.element(view.getByRole('link', { name: 'Уведомления' })).toHaveClass('bg-white/10')
+		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toHaveClass('bg-white/10')
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).not.toHaveClass('bg-white/10')
 	})
 
-	it('не подсвечивает пункты, не соответствующие текущему маршруту', async () => {
+	it('подсвечивает активный модуль по точному совпадению маршрута', async () => {
 		nextNavigationMock.pathname = '/planning'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
 		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toHaveClass('bg-white/10')
-		await expect.element(view.getByRole('link', { name: 'Рабочий стол' })).not.toHaveClass('bg-white/10')
-		await expect.element(view.getByRole('link', { name: 'Уведомления' })).not.toHaveClass('bg-white/10')
 	})
 
-	it('содержит пункт меню «Уведомления» со ссылкой на /notifications', async () => {
-		const view = await render(<SidebarNav user={testUser} />)
-
-		await expect
-			.element(view.getByRole('link', { name: 'Уведомления' }))
-			.toHaveAttribute('href', '/notifications')
-	})
-
-	it('показывает те же пункты навигации независимо от текущей страницы', async () => {
+	it('не подсвечивает модули, не соответствующие текущему маршруту', async () => {
 		nextNavigationMock.pathname = '/planning'
 
 		const view = await render(<SidebarNav user={testUser} />)
 
-		await expect.element(view.getByRole('link', { name: 'Рабочий стол' })).toHaveAttribute('href', '/dashboard')
-		await expect.element(view.getByRole('link', { name: 'Уведомления' })).toHaveAttribute('href', '/notifications')
-		await expect
-			.element(view.getByRole('link', { name: 'Создать корректировку' }))
-			.toHaveAttribute('href', '/corrections/create')
+		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toHaveClass('bg-white/10')
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).not.toHaveClass('bg-white/10')
+		await expect.element(view.getByRole('link', { name: 'Факт' })).not.toHaveClass('bg-white/10')
 	})
 
-	it('показывает «Создать корректировку» со ссылкой на /corrections/create для роли «Филиал»', async () => {
+	it('показывает те же 4 модуля независимо от текущей страницы', async () => {
+		nextNavigationMock.pathname = '/notifications'
+
 		const view = await render(<SidebarNav user={testUser} />)
 
-		await expect
-			.element(view.getByRole('link', { name: 'Создать корректировку' }))
-			.toHaveAttribute('href', '/corrections/create')
-	})
-
-	it('не показывает «Создать корректировку» роли, отличной от «Филиал»', async () => {
-		const view = await render(<SidebarNav user={{ ...testUser, role: 'CFO' }} />)
-
-		await expect.element(view.getByRole('link', { name: 'Создать корректировку' })).not.toBeInTheDocument()
+		await expect.element(view.getByRole('link', { name: 'План на 2027' })).toBeVisible()
+		await expect.element(view.getByRole('link', { name: 'Выполнение' })).toBeVisible()
+		await expect.element(view.getByRole('link', { name: 'Корректировка' })).toBeVisible()
+		await expect.element(view.getByRole('link', { name: 'Факт' })).toBeVisible()
 	})
 
 	it('показывает блок профиля с инициалами и ФИО пользователя из пропа', async () => {

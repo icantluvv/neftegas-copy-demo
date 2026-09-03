@@ -1,0 +1,19 @@
+parameters:
+  - { name: factPackageId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Отметить прочитанными все уведомления пользователя по одному факт-пакету
+  operationId: markNotificationsReadByFactPackage
+  tags: [Notifications]
+  description: |
+    Симметрично markNotificationsReadByCorrection, для карточки факт-пакета
+    (openspec/changes/fact-package-review). Идемпотентно.
+  responses:
+    '200':
+      description: Уведомления помечены прочитанными
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [updatedCount]
+            properties:
+              updatedCount: { type: integer, description: 'Число записей, реально переведённых из непрочитанных в прочитанные' }

@@ -1,0 +1,14 @@
+type: object
+required: [id, factPackageId, cfoId, cfo, status]
+properties:
+  id: { type: integer }
+  factPackageId: { type: integer }
+  cfoId: { type: integer }
+  cfo: { $ref: './cfo.yaml#/Cfo' }
+  status: { $ref: './fact-cfo-status-value.yaml' }
+  decidedById: { type: [integer, 'null'] }
+  decidedBy:
+    oneOf:
+      - $ref: './user.yaml#/UserSummary'
+      - type: 'null'
+  decidedAt: { type: [string, 'null'], format: date-time }

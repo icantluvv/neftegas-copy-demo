@@ -100,6 +100,16 @@ export default defineConfig({
 					pattern: 'CorrectionTypeDetail',
 					options: { mini: false, importPath: 'zod' },
 				},
+				{
+					type: 'schemaName',
+					pattern: 'FactPackageDetail',
+					options: { mini: false, importPath: 'zod' },
+				},
+				{
+					type: 'schemaName',
+					pattern: 'FactPackageListItem',
+					options: { mini: false, importPath: 'zod' },
+				},
 			],
 		}),
 		pluginReactQuery({

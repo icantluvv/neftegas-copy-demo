@@ -1,0 +1,53 @@
+FactPackage:
+  type: object
+  required:
+    - id
+    - humanId
+    - filialId
+    - direction
+    - authorId
+    - status
+    - createdAt
+    - updatedAt
+    - canSubmit
+    - canSendToDtoe
+    - openRemarksCount
+  properties:
+    id: { type: integer }
+    humanId: { type: string, example: FCT-000123 }
+    filialId: { type: integer }
+    direction: { $ref: './direction.yaml' }
+    authorId: { type: integer }
+    status: { $ref: './fact-package-status.yaml' }
+    createdAt: { type: string, format: date-time }
+    updatedAt: { type: string, format: date-time }
+    sentToDtoeAt: { type: [string, 'null'], format: date-time }
+    decidedAt: { type: [string, 'null'], format: date-time }
+    canSubmit: { type: boolean, description: 'status === DRAFT || status === RETURNED_FOR_REVISION' }
+    canSendToDtoe: { type: boolean, description: 'status === ALL_CFO_APPROVED' }
+    openRemarksCount: { type: integer }
+
+FactPackageListItem:
+  allOf:
+    - $ref: './fact-package.yaml#/FactPackage'
+    - type: object
+      required: [filial, author]
+      properties:
+        filial: { $ref: './filial.yaml#/Filial' }
+        author: { $ref: './user.yaml#/UserSummary' }
+        myCfoStatus:
+          oneOf:
+            - $ref: './fact-cfo-status-value.yaml'
+            - type: 'null'
+          description: Заполняется только для роли CFO
+
+PaginatedFactPackages:
+  type: object
+  required: [items, total, page, pageSize]
+  properties:
+    items:
+      type: array
+      items: { $ref: './fact-package.yaml#/FactPackageListItem' }
+    total: { type: integer }
+    page: { type: integer }
+    pageSize: { type: integer }
