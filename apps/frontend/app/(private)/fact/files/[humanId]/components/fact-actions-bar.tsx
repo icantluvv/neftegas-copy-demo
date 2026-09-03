@@ -8,11 +8,6 @@ import { Button } from "#/components/ui/button";
 import { canApproveAsCfo, canFinalDecideAsDtoe, canSendToDtoe } from "../../lib/permissions";
 import { useInvalidateFactPackage } from "../../lib/use-invalidate-fact-package";
 
-/**
- * Решения ЦФО и ДТОиР по факт-пакету — согласование, отправка в ДТОиР,
- * финальное решение. Замечания оставляются из таблицы форм (fact-forms-table.tsx),
- * рядом с конкретной формой, а не здесь.
- */
 export function FactActionsBar({ detail }: { detail: FactPackageDetail }) {
   const invalidate = useInvalidateFactPackage(detail.humanId);
 

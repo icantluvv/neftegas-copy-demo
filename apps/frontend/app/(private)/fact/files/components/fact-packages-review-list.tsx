@@ -11,12 +11,6 @@ import { DataTable } from "#/components/ui/data-table";
 
 import { getDirectionLabel, getFactPackageStatusLabel } from "../../../lib/status-labels";
 
-/**
- * Что это: список факт-пакетов, доступных на проверку.
- * Кто видит: ЦФО — только пакеты, направленные его ЦФО; ДТОиР — все пакеты всех филиалов (аудит).
- * Когда активен: всегда — состав списка ограничивает бэкенд по роли, а не эта страница.
- * Что происходит: строка ведёт на карточку факт-пакета `/fact/files/{humanId}`.
- */
 export function FactPackagesReviewList() {
     const query = useGetFactPackages();
     const items = query.data?.items ?? [];

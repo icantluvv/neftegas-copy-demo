@@ -3,52 +3,22 @@
 import { useRef } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import type { FactForm2, FactPackageDetail, FactPackageRemarkCreateInput } from "@/packages/api/base/codegen";
-import { useLeaveFactPackageRemark, useUploadFactFormVersion } from "@/packages/api/base/codegen";
-import { clientEnvironment } from "#/env/client";
+import type { FactForm2, FactPackageDetail } from "@/packages/api/base/codegen";
+import { useUploadFactFormVersion } from "@/packages/api/base/codegen";
 
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { DataTable } from "#/components/ui/data-table";
-import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
-import { canLeaveRemarkAsCfo, canLeaveRemarkAsDtoe, canUploadFormVersion } from "../../lib/permissions";
+import { canUploadFormVersion } from "../../lib/permissions";
 import { useInvalidateFactPackage } from "../../lib/use-invalidate-fact-package";
-import { FactRemarkDialog } from "./fact-remark-dialog";
+import { CurrentVersionCell } from "./current-version-cell";
+import { LeaveRemarkCell } from "./leave-remark-cell";
 
 function openRemarkForForm(detail: FactPackageDetail, formId: number) {
   return detail.remarks.find((remark) => remark.relatedFormId === formId && remark.status !== "CLOSED");
 }
 
-function CurrentVersionCell({ form, canDownload }: { form: FactForm2; canDownload: boolean }) {
-  if (!form.currentVersion) {
-    return <span className="text-muted-foreground">Нет версий</span>;
-  }
-
-  return (
-    <div className="flex flex-col gap-1">
-      <span>Версия {form.currentVersion.versionNumber}</span>
-      <span className="text-xs text-muted-foreground">{formatNotificationDateTime(form.currentVersion.uploadedAt)}</span>
-      {canDownload && (
-        <a
-          href={`${clientEnvironment.NEXT_PUBLIC_BACK_URL}/fact-files/${form.currentVersion.id}/download`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-fit text-xs text-primary underline-offset-4 hover:underline"
-        >
-          Открыть / скачать
-        </a>
-      )}
-    </div>
-  );
-}
-
-/**
- * Что это: кнопка «Загрузить версию» формы факт-пакета.
- * Кто видит: Филиал — только владелец пакета (см. AGENTS.md, п. «Загрузить версию файла в слот»).
- * Когда активен: пока факт-пакет не в финальном статусе «Согласовано».
- * Что происходит: открывает системный диалог выбора файла; после выбора — сразу загружает новую версию формы (номер версии = максимальный существующий + 1), обновляет карточку.
- */
 function UploadFormVersionCell({ detail, form }: { detail: FactPackageDetail; form: FactForm2 }) {
   const invalidate = useInvalidateFactPackage(detail.humanId);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -88,33 +58,6 @@ function UploadFormVersionCell({ detail, form }: { detail: FactPackageDetail; fo
   );
 }
 
-function LeaveRemarkCell({ detail, form }: { detail: FactPackageDetail; form: FactForm2 }) {
-  const invalidate = useInvalidateFactPackage(detail.humanId);
-  const leaveRemark = useLeaveFactPackageRemark({ mutation: { onSuccess: invalidate } });
-
-  const asCfo = canLeaveRemarkAsCfo(detail);
-  const asDtoe = canLeaveRemarkAsDtoe(detail);
-  if (!asCfo && !asDtoe) {
-    return null;
-  }
-
-  function handleSubmit(data: FactPackageRemarkCreateInput) {
-    leaveRemark.mutate({ humanId: detail.humanId, data });
-  }
-
-  return (
-    <FactRemarkDialog
-      triggerLabel="Оставить замечание"
-      dialogTitle={`Замечание к форме: ${form.label}`}
-      submitLabel={asCfo ? "Сохранить и вернуть на доработку" : "Сохранить замечание"}
-      isSubmitting={leaveRemark.isPending}
-      onSubmit={handleSubmit}
-      formId={form.id}
-    />
-  );
-}
-
-/** Таблица форм каталога направления — центральный блок карточки факт-пакета (см. ЧТЗ, раздел 4). */
 export function FactFormsTable({ detail }: { detail: FactPackageDetail }) {
   const isReviewer = detail.isCfoReviewer || detail.isDtoe;
 

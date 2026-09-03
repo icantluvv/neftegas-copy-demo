@@ -25,16 +25,9 @@ interface FactRemarkDialogProps {
   submitLabel: string;
   isSubmitting: boolean;
   onSubmit: (data: FactPackageRemarkCreateInput) => void;
-  /** Форма пакета, к которой привязывается замечание — фиксируется кнопкой в строке, пользователь её не выбирает. */
   formId: number;
 }
 
-/**
- * Что это: диалог с формой замечания к форме факт-пакета.
- * Кто видит: ЦФО (пока пакет у него на проверке) и ДТОиР (пока пакет на проверке ДТОиР) — рендерится вызывающей стороной по правам.
- * Когда активен: кнопка-триггер всегда активна, когда показана; кнопка отправки — пока не идёт запрос.
- * Что происходит: у ЦФО отправка атомарно возвращает пакет на доработку; у ДТОиР — только фиксирует замечание (openspec/changes/fact-package-review/design.md).
- */
 export function FactRemarkDialog({
   triggerLabel,
   dialogTitle,

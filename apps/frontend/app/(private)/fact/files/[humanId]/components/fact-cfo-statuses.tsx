@@ -4,25 +4,9 @@ import type { FactPackageCfoStatus2, FactPackageDetail } from "@/packages/api/ba
 
 import { Badge } from "#/components/ui/badge";
 import { DataTable } from "#/components/ui/data-table";
-import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
 
 import { getFactCfoStatusLabel } from "../../../../lib/status-labels";
-
-function DecidedByCell({ cfoStatus }: { cfoStatus: FactPackageCfoStatus2 }) {
-  if (!cfoStatus.decidedBy || !cfoStatus.decidedAt) {
-    return "—";
-  }
-
-  return (
-    <div className="flex flex-col">
-      <span>
-        {cfoStatus.decidedBy.fullName}
-        {cfoStatus.decidedBy.position ? `, ${cfoStatus.decidedBy.position}` : ""}
-      </span>
-      <span className="text-xs text-muted-foreground">{formatNotificationDateTime(cfoStatus.decidedAt)}</span>
-    </div>
-  );
-}
+import { DecidedByCell } from "./decided-by-cell";
 
 export function FactCfoStatuses({ detail }: { detail: FactPackageDetail }) {
   if (detail.cfoStatuses.length === 0) {

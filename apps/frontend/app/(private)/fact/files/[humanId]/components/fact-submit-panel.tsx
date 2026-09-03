@@ -10,12 +10,6 @@ import { Button } from "#/components/ui/button";
 import { canSubmit } from "../../lib/permissions";
 import { useInvalidateFactPackage } from "../../lib/use-invalidate-fact-package";
 
-/**
- * Что это: блок «Направить на проверку» — выбор ЦФО и отправка.
- * Кто видит: Филиал, только владелец пакета.
- * Когда активен: пакет в статусе «Черновик» либо «Возвращён на доработку» и выбран хотя бы один ЦФО — полная комплектация форм не требуется, направить можно с любым числом загруженных файлов.
- * Что происходит: отправляет пакет выбранным ЦФО — один и тот же запрос обслуживает и первое, и повторное направление (openspec/changes/fact-package-review).
- */
 export function FactSubmitPanel({ detail }: { detail: FactPackageDetail }) {
   const invalidate = useInvalidateFactPackage(detail.humanId);
   const [selectedCfoIds, setSelectedCfoIds] = useState<number[]>([]);
