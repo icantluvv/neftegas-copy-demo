@@ -8,7 +8,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   type Relation,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -33,11 +32,11 @@ export enum FactPackageStatus {
 }
 
 /**
- * Факт-пакет — один долгоживущий пакет форм на пару «Филиал × Направление»,
- * без привязки к отчётному периоду (openspec/changes/fact-package-review).
+ * Факт-пакет — пакет форм по направлению, создаётся филиалом заново каждый
+ * раз (по аналогии с корректировкой): один филиал может одновременно иметь
+ * несколько факт-пакетов одного направления (openspec/changes/fact-package-review).
  */
 @Entity('fact_packages')
-@Unique(['filialId', 'direction'])
 export class FactPackage {
   @PrimaryGeneratedColumn()
   id: number;

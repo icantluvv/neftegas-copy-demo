@@ -94,12 +94,12 @@ function buildService(factPackage: FactPackage) {
   return { service, dataSource };
 }
 
-describe('FactPackagesService — getOrCreateByDirection', () => {
+describe('FactPackagesService — create', () => {
   it('отклоняет роль, отличную от FILIAL', async () => {
     const { service } = buildService(buildFactPackage());
 
     await expect(
-      service.getOrCreateByDirection(buildUser(Role.CFO), Direction.DO),
+      service.create(buildUser(Role.CFO), Direction.DO),
     ).rejects.toThrow(ForbiddenException);
   });
 });

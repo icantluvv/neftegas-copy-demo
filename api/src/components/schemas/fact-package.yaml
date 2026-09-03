@@ -41,6 +41,12 @@ FactPackageListItem:
             - type: 'null'
           description: Заполняется только для роли CFO
 
+FactPackageCreateInput:
+  type: object
+  required: [direction]
+  properties:
+    direction: { $ref: './direction.yaml' }
+
 PaginatedFactPackages:
   type: object
   required: [items, total, page, pageSize]

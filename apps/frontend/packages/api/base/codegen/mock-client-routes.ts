@@ -16,6 +16,7 @@ import { createGetFactPackageStatsQueryResponse } from './mocks/factPackagesCont
 import { createGetCorrectionStatsQueryResponse } from './mocks/correctionsController/createGetCorrectionStats'
 import { createLogoutAllMutationResponse } from './mocks/authController/createLogoutAll'
 import { createGetFactPackagesQueryResponse } from './mocks/factPackagesController/createGetFactPackages'
+import { createCreateFactPackageMutationResponse } from './mocks/factPackagesController/createCreateFactPackage'
 import { createGetNotificationsQueryResponse } from './mocks/notificationsController/createGetNotifications'
 import { createLogoutMutationResponse } from './mocks/authController/createLogout'
 import { createGetFilialsQueryResponse } from './mocks/orgController/createGetFilials'
@@ -32,7 +33,6 @@ import { createMarkNotificationsReadByFactPackageMutationResponse } from './mock
 import { createMarkNotificationsReadByCorrectionMutationResponse } from './mocks/notificationsController/createMarkNotificationsReadByCorrection'
 import { createCreatePackageRequirementMutationResponse } from './mocks/orgController/createCreatePackageRequirement'
 import { createResubmitCorrectionToDtoeMutationResponse } from './mocks/correctionsController/createResubmitCorrectionToDtoe'
-import { createGetOrCreateFactPackageByDirectionQueryResponse } from './mocks/factPackagesController/createGetOrCreateFactPackageByDirection'
 import { createDecideFactPackageByDtoeMutationResponse } from './mocks/factPackagesController/createDecideFactPackageByDtoe'
 import { createSendFactPackageToDtoeMutationResponse } from './mocks/factPackagesController/createSendFactPackageToDtoe'
 import { createSendCorrectionToDtoeMutationResponse } from './mocks/correctionsController/createSendCorrectionToDtoe'
@@ -91,6 +91,7 @@ export const mockRoutes = [
 	{ method: 'GET', pattern: /^\/corrections\/stats$/, create: createGetCorrectionStatsQueryResponse },
 	{ method: 'POST', pattern: /^\/auth\/logout-all$/, status: 204, create: createLogoutAllMutationResponse },
 	{ method: 'GET', pattern: /^\/fact-packages$/, create: createGetFactPackagesQueryResponse },
+	{ method: 'POST', pattern: /^\/fact-packages$/, status: 201, create: createCreateFactPackageMutationResponse },
 	{ method: 'GET', pattern: /^\/notifications$/, create: createGetNotificationsQueryResponse },
 	{ method: 'POST', pattern: /^\/auth\/logout$/, status: 204, create: createLogoutMutationResponse },
 	{ method: 'GET', pattern: /^\/org\/filials$/, create: createGetFilialsQueryResponse },
@@ -107,7 +108,6 @@ export const mockRoutes = [
 	{ method: 'POST', pattern: /^\/notifications\/by-correction\/[^/]+\/read$/, create: createMarkNotificationsReadByCorrectionMutationResponse },
 	{ method: 'POST', pattern: /^\/org\/correction-types\/[^/]+\/requirements$/, status: 201, create: createCreatePackageRequirementMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/resubmit-to-dtoe$/, create: createResubmitCorrectionToDtoeMutationResponse },
-	{ method: 'GET', pattern: /^\/fact-packages\/by-direction\/[^/]+$/, create: createGetOrCreateFactPackageByDirectionQueryResponse },
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/final-decision$/, create: createDecideFactPackageByDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/send-to-dtoe$/, create: createSendFactPackageToDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/send-to-dtoe$/, create: createSendCorrectionToDtoeMutationResponse },

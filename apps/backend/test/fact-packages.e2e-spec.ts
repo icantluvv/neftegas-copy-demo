@@ -126,9 +126,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     const dtoeAuth = await loginAs(Role.DTOE);
 
     const createRes = await request(app.getHttpServer())
-      .get('/api/fact-packages/by-direction/KR_HS')
+      .post('/api/fact-packages')
       .set('Cookie', filialAuth.cookie)
-      .expect(200);
+      .send({ direction: 'KR_HS' })
+      .expect(201);
     const created = createRes.body as FactPackageResponseBody;
     const humanId = created.humanId;
     expect(created.forms).toHaveLength(4);
@@ -190,9 +191,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     const otherFilialAuth = await loginAs(Role.FILIAL, otherFilial.id);
 
     const createRes = await request(app.getHttpServer())
-      .get('/api/fact-packages/by-direction/DO')
+      .post('/api/fact-packages')
       .set('Cookie', filialAuth.cookie)
-      .expect(200);
+      .send({ direction: 'DO' })
+      .expect(201);
     const humanId = (createRes.body as FactPackageResponseBody).humanId;
 
     await request(app.getHttpServer())
@@ -211,9 +213,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     const filialAuth = await loginAs(Role.FILIAL, filial.id);
 
     const createRes = await request(app.getHttpServer())
-      .get('/api/fact-packages/by-direction/TOIR')
+      .post('/api/fact-packages')
       .set('Cookie', filialAuth.cookie)
-      .expect(200);
+      .send({ direction: 'TOIR' })
+      .expect(201);
 
     const { humanId } = createRes.body as FactPackageResponseBody;
 

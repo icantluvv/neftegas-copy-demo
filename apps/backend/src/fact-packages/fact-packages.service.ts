@@ -174,18 +174,12 @@ export class FactPackagesService {
    * нет, создаётся атомарно вместе со всеми формами каталога направления.
    * Идемпотентно: повторный вызов для той же пары возвращает тот же пакет.
    */
-  async getOrCreateByDirection(user: User, direction: Direction) {
+  async create(user: User, direction: Direction) {
     if (user.role !== Role.FILIAL || user.filialId == null) {
       throw new ForbiddenException(
-        'Получить/создать факт-пакет может только роль FILIAL',
+        'Создавать факт-пакеты может только роль FILIAL',
       );
     }
-
-    const existing = await this.factPackages.findOne({
-      where: { filialId: user.filialId, direction },
-      relations: DETAIL_RELATIONS,
-    });
-    if (existing) return this.toDetailDto(existing, user);
 
     const id = await this.dataSource.transaction(async (manager) => {
       const humanId = await this.nextFactPackageHumanId(manager);

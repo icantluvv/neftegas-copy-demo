@@ -19,11 +19,12 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role, User } from '../users/entities/user.entity';
 import { CfoSelectionDto } from './dto/cfo-selection.dto';
+import { CreateFactPackageDto } from './dto/create-fact-package.dto';
 import { FinalDecisionDto } from './dto/final-decision.dto';
 import { FindFactPackagesQueryDto } from './dto/find-fact-packages-query.dto';
 import { RemarkCreateDto } from './dto/remark-create.dto';
 import { UploadFileDto } from './dto/upload-file.dto';
-import { Direction, FactFormCode } from './fact-form-catalog';
+import { FactFormCode } from './fact-form-catalog';
 import { FactPackagesService } from './fact-packages.service';
 
 @ApiTags('FactPackages')
@@ -37,12 +38,9 @@ export class FactPackagesController {
   }
 
   @Roles(Role.FILIAL)
-  @Get('by-direction/:direction')
-  getOrCreateByDirection(
-    @CurrentUser() user: User,
-    @Param('direction') direction: Direction,
-  ) {
-    return this.service.getOrCreateByDirection(user, direction);
+  @Post()
+  create(@CurrentUser() user: User, @Body() dto: CreateFactPackageDto) {
+    return this.service.create(user, dto.direction);
   }
 
   @Get('stats')
