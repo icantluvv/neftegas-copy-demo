@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useGetOrCreateFactPackageByDirection } from "@/packages/api/base/codegen";
 import type { Direction2 } from "@/packages/api/base/codegen";
 
-import { Badge } from "#/components/ui/badge";
-
-import { getDirectionLabel, getFactPackageStatusLabel } from "../../../lib/status-labels";
+import { getDirectionLabel } from "../../../lib/status-labels";
 
 export function DirectionCard({ direction }: { direction: Direction2 }) {
     const query = useGetOrCreateFactPackageByDirection({direction});
@@ -26,17 +24,13 @@ export function DirectionCard({ direction }: { direction: Direction2 }) {
     }
 
     const factPackage = query.data;
-    const statusLabel = getFactPackageStatusLabel(factPackage.status);
 
     return (
         <Link
             href={`/fact/files/${factPackage.humanId}`}
             className="flex h-28 flex-col justify-between gap-2 rounded-lg border border-border p-4 transition-colors hover:border-primary"
         >
-            <div className="flex items-start justify-between gap-2">
-                <span className="text-sm font-semibold">{getDirectionLabel(direction)}</span>
-                <Badge tone={statusLabel.tone}>{statusLabel.text}</Badge>
-            </div>
+            <span className="text-sm font-semibold">{getDirectionLabel(direction)}</span>
             <span className="text-xs text-muted-foreground">{factPackage.humanId}</span>
         </Link>
     );

@@ -15,7 +15,7 @@ vi.mock("@/packages/api/base/codegen", async (importOriginal) => {
 });
 
 describe("<FactDirectionsOverview />", () => {
-	it("показывает 4 карточки направлений со статусом и ссылкой на пакет", async () => {
+	it("показывает 4 карточки направлений со ссылкой на пакет, без статуса", async () => {
 		useGetOrCreateFactPackageByDirectionMock.mockImplementation(({ direction }: { direction: string }) => ({
 			isPending: false,
 			isError: false,
