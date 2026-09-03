@@ -3,7 +3,6 @@ export type StatTileTone = "neutral" | "warning" | "success" | "danger";
 export interface StatTileData {
   label: string;
   value: number;
-  /** Цвет значения — подчёркивает смысл цифры (требует внимания / хороший исход и т.п.). */
   tone?: StatTileTone;
 }
 
@@ -14,7 +13,7 @@ const TONE_CLASS_NAMES: Record<StatTileTone, string> = {
   danger: "text-destructive",
 };
 
-export function CorrectionStatsGrid({ tiles }: { tiles: StatTileData[] }) {
+export function StatsGrid({ tiles }: { tiles: StatTileData[] }) {
   return (
     <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {tiles.map((tile) => (

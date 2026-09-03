@@ -8,6 +8,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { CorrectionListItem, CorrectionStatus2 } from "@/packages/api/base/codegen";
 import { getCorrectionsQueryKey, useDeleteCorrection, useGetCorrections } from "@/packages/api/base/codegen";
 
+import { DonutChart, type DonutSegment } from "#/components/donut-chart";
 import { Badge } from "#/components/ui/badge";
 import { buttonVariants } from "#/components/ui/button";
 import { DataTable } from "#/components/ui/data-table";
@@ -16,7 +17,6 @@ import { formatNotificationDateTime } from "#/utils/format-notification-date-tim
 
 import { getCorrectionStatusLabel } from "../../lib/status-labels";
 import { STAGE_GROUPS } from "../constants";
-import { DonutChart, type DonutSegment } from "./donut-chart";
 import { OpenCorrectionLink } from "./open-correction-link";
 
 function groupKeyOfStatus(status: CorrectionStatus2): string {

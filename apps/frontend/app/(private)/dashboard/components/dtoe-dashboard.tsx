@@ -1,9 +1,9 @@
 import {getCorrectionStatsDtoe} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsDtoe";
 
+import {StatsGrid} from "#/components/stats-grid";
 import {isForbiddenError, isUnauthorizedError} from "#/utils/http-error";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
-import {CorrectionStatsGrid} from "./correction-stats-grid";
 
 export async function DtoeDashboard() {
     let stats: Awaited<ReturnType<typeof getCorrectionStatsDtoe>>;
@@ -26,7 +26,7 @@ export async function DtoeDashboard() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">ДТОиР</h1>
-            <CorrectionStatsGrid
+            <StatsGrid
                 tiles={[
                     {label: "Всего корректировок", value: stats.total},
                     {label: "На проверке у ЦФО", value: stats.inReview},

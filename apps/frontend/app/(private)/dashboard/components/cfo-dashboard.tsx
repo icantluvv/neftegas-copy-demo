@@ -1,10 +1,10 @@
 import {getCorrectionStatsCfo} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsCfo";
 
+import {StatsGrid} from "#/components/stats-grid";
 import {isForbiddenError, isUnauthorizedError} from "#/utils/http-error";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
 import {CfoCorrectionsOverview} from "./cfo-corrections-overview";
-import {CorrectionStatsGrid} from "./correction-stats-grid";
 
 export async function CfoDashboard() {
     let stats: Awaited<ReturnType<typeof getCorrectionStatsCfo>>;
@@ -27,7 +27,7 @@ export async function CfoDashboard() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">Кабинет ЦФО</h1>
-            <CorrectionStatsGrid
+            <StatsGrid
                 tiles={[
                     {label: "Всего направлено", value: stats.total},
                     {label: "На проверке у нас", value: stats.inReview, tone: "warning"},

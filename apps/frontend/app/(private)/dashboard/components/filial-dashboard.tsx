@@ -1,9 +1,9 @@
 import {getCorrectionStatsFilial} from "@repo/api/base/codegen/clients/correctionsController/getCorrectionStatsFilial";
 
+import {StatsGrid} from "#/components/stats-grid";
 import {isForbiddenError, isUnauthorizedError} from "#/utils/http-error";
 
 import {AccessDeniedScreen} from "../../components/access-denied-screen";
-import {CorrectionStatsGrid} from "./correction-stats-grid";
 import {FilialCorrectionsOverview} from "./filial-corrections-overview";
 
 export async function FilialDashboard() {
@@ -27,7 +27,7 @@ export async function FilialDashboard() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 pt-5 md:p-8">
             <h1 className="text-2xl font-semibold">Мои корректировки</h1>
-            <CorrectionStatsGrid
+            <StatsGrid
                 tiles={[
                     {label: "Всего", value: stats.total},
                     {label: "На проверке", value: stats.inReview, tone: "warning"},
