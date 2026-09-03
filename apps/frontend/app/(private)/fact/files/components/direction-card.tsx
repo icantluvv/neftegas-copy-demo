@@ -1,37 +1,31 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { useGetOrCreateFactPackageByDirection } from "@/packages/api/base/codegen";
+import { useCreateFactPackage } from "@/packages/api/base/codegen";
 import type { Direction2 } from "@/packages/api/base/codegen";
 
 import { getDirectionLabel } from "../../../lib/status-labels";
 
 export function DirectionCard({ direction }: { direction: Direction2 }) {
-    const query = useGetOrCreateFactPackageByDirection({direction});
-
-    if (query.isPending) {
-        return <div className="h-28 animate-pulse rounded-lg bg-muted"/>;
-    }
-
-    if (query.isError || !query.data) {
-        return (
-            <div className="flex h-28 flex-col justify-center gap-1 rounded-lg border border-border p-4">
-                <span className="text-sm font-semibold">{getDirectionLabel(direction)}</span>
-                <span className="text-sm text-destructive">Не удалось загрузить</span>
-            </div>
-        );
-    }
-
-    const factPackage = query.data;
+    const router = useRouter();
+    const createFactPackage = useCreateFactPackage({
+        mutation: {
+            onSuccess: (detail) => router.push(`/fact/files/${detail.humanId}`),
+        },
+    });
 
     return (
-        <Link
-            href={`/fact/files/${factPackage.humanId}`}
-            className="flex h-28 flex-col justify-between gap-2 rounded-lg border border-border p-4 transition-colors hover:border-primary"
+        <button
+            type="button"
+            onClick={() => createFactPackage.mutate({data: {direction}})}
+            disabled={createFactPackage.isPending}
+            className="flex h-28 flex-col justify-between gap-2 rounded-lg border border-border p-4 text-left transition-colors hover:border-primary disabled:opacity-60"
         >
             <span className="text-sm font-semibold">{getDirectionLabel(direction)}</span>
-            <span className="text-xs text-muted-foreground">{factPackage.humanId}</span>
-        </Link>
+            <span className="text-xs text-muted-foreground">
+                {createFactPackage.isPending ? "Создаём…" : "Создать новый пакет"}
+            </span>
+        </button>
     );
 }
