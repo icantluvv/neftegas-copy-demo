@@ -5,11 +5,6 @@ import { useCallback } from "react";
 
 import { getNotificationsQueryKey, useMarkNotificationsReadByFactPackage } from "@/packages/api/base/codegen";
 
-/**
- * Помечает прочитанными все уведомления пользователя по факт-пакету.
- * Симметрично {@link useMarkCorrectionNotificationsRead} — тот же принцип:
- * вызывать в обработчике клика, а не при монтировании карточки.
- */
 export function useMarkFactPackageNotificationsRead() {
   const queryClient = useQueryClient();
   const markRead = useMarkNotificationsReadByFactPackage();

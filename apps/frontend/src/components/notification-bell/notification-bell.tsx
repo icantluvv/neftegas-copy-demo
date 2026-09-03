@@ -34,13 +34,6 @@ export function NotificationBell() {
     const panelItems = notifications.slice(0, PANEL_LIMIT);
     const badgeLabel = unreadCount > 9 ? "9+" : String(unreadCount);
 
-    /**
-     * Уведомление относится либо к корректировке, либо к факт-пакету (ровно
-     * одно из полей заполнено). Для корректировки — переход на карточку, как
-     * раньше. Для факт-пакета отдельной карточки по humanId в UI ещё нет
-     * (см. модуль «Факт» → «Файлы» — экран по направлениям, не по ID пакета),
-     * поэтому пока только помечаем прочитанным без перехода.
-     */
     const handleSelectNotification = useCallback(
         (notification: Notification) => {
             setOpen(false);
@@ -49,6 +42,7 @@ export function NotificationBell() {
                 router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
             } else if (notification.factPackageId != null) {
                 markFactPackageRead(notification.factPackageId);
+                router.push(`/fact/files/${notification.factPackageHumanId ?? ""}`);
             }
         },
         [markCorrectionRead, markFactPackageRead, router],

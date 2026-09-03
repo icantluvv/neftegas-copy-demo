@@ -50,7 +50,6 @@ export function NotificationsContent() {
         void queryClient.invalidateQueries({queryKey: getNotificationsQueryKey()});
     }, [queryClient]);
 
-    /** Уведомление относится либо к корректировке, либо к факт-пакету — см. notification-bell.tsx. */
     const handleOpen = useCallback(
         (notification: Notification) => {
             if (notification.correctionId != null) {
@@ -58,6 +57,7 @@ export function NotificationsContent() {
                 router.push(`/corrections/${notification.correctionHumanId ?? ""}`);
             } else if (notification.factPackageId != null) {
                 markFactPackageRead(notification.factPackageId);
+                router.push(`/fact/files/${notification.factPackageHumanId ?? ""}`);
             }
         },
         [markCorrectionRead, markFactPackageRead, router],
