@@ -4,15 +4,16 @@ import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { useGetFactPackages } from "@/packages/api/base/codegen";
-import type { FactPackageListItem } from "@/packages/api/base/codegen";
+import type { Direction2, FactPackageListItem } from "@/packages/api/base/codegen";
 
 import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
 import { DataTable } from "#/components/ui/data-table";
 
 import { getDirectionLabel, getFactPackageStatusLabel } from "../../../lib/status-labels";
 
-export function FactPackagesReviewList() {
-    const query = useGetFactPackages();
+export function FactPackagesReviewList({ direction, onBack }: { direction?: Direction2; onBack?: () => void }) {
+    const query = useGetFactPackages({params: direction ? {direction} : undefined});
     const items = query.data?.items ?? [];
 
     const columns: ColumnDef<FactPackageListItem, unknown>[] = [
@@ -39,7 +40,14 @@ export function FactPackagesReviewList() {
 
     return (
         <div className="flex flex-col gap-4 p-4 pt-5 md:p-8">
-            <h1 className="text-2xl font-semibold">Файлы</h1>
+            {onBack ? (
+                <Button type="button" variant="outline" className="w-fit" onClick={onBack}>
+                    ← Все направления
+                </Button>
+            ) : null}
+            <h1 className="text-2xl font-semibold">
+                {direction ? `Файлы — ${getDirectionLabel(direction)}` : "Файлы"}
+            </h1>
             <DataTable
                 columns={columns}
                 data={items}
