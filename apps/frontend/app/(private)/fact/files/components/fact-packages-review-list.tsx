@@ -12,7 +12,15 @@ import { DataTable } from "#/components/ui/data-table";
 
 import { getDirectionLabel, getFactPackageStatusLabel } from "../../../lib/status-labels";
 
-export function FactPackagesReviewList({ direction, onBack }: { direction?: Direction2; onBack?: () => void }) {
+export function FactPackagesReviewList({
+    direction,
+    onBack,
+    headerAction,
+}: {
+    direction?: Direction2;
+    onBack?: () => void;
+    headerAction?: React.ReactNode;
+}) {
     const query = useGetFactPackages({params: direction ? {direction} : undefined});
     const items = query.data?.items ?? [];
 
@@ -26,7 +34,7 @@ export function FactPackagesReviewList({ direction, onBack }: { direction?: Dire
                 </Link>
             ),
         },
-        {id: "filial", header: "Филиал", cell: ({row}) => row.original.filial.name},
+        {id: "filial", header: "Филиал", cell: ({row}) => row.original.filial?.name ?? `ЦФО «${row.original.cfo?.name}»`},
         {id: "direction", header: "Направление", cell: ({row}) => getDirectionLabel(row.original.direction)},
         {
             id: "status",
@@ -45,9 +53,12 @@ export function FactPackagesReviewList({ direction, onBack }: { direction?: Dire
                     ← Все направления
                 </Button>
             ) : null}
-            <h1 className="text-2xl font-semibold">
-                {direction ? `Файлы — ${getDirectionLabel(direction)}` : "Файлы"}
-            </h1>
+            <div className="flex items-center justify-between gap-2">
+                <h1 className="text-2xl font-semibold">
+                    {direction ? `Файлы — ${getDirectionLabel(direction)}` : "Файлы"}
+                </h1>
+                {headerAction}
+            </div>
             <DataTable
                 columns={columns}
                 data={items}

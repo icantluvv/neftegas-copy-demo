@@ -16,6 +16,6 @@ export function factPackageMatchesStageFilter(status: FactPackageStatus2, filter
 
 export function factPackageMatchesCfoFilter(item: FactPackageListItem, statusFilter: string, filialFilter: string): boolean {
   if (statusFilter !== "all" && item.myCfoStatus !== statusFilter) return false;
-  if (filialFilter !== "all" && String(item.filial.id) !== filialFilter) return false;
+  if (filialFilter !== "all" && String(item.filial?.id) !== filialFilter) return false;
   return true;
 }
