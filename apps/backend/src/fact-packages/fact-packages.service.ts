@@ -9,7 +9,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, In, Repository } from 'typeorm';
+import {
+  Brackets,
+  DataSource,
+  EntityManager,
+  In,
+  Repository,
+  WhereExpressionBuilder,
+} from 'typeorm';
 
 import { Notification } from '../notifications/entities/notification.entity';
 import { Cfo } from '../org/entities/cfo.entity';
@@ -51,6 +58,7 @@ import {
 
 const DETAIL_RELATIONS = [
   'filial',
+  'cfo',
   'author',
   'forms',
   'forms.versions',
@@ -97,15 +105,27 @@ export class FactPackagesService {
     const qb = this.factPackages
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.filial', 'filial')
+      .leftJoinAndSelect('p.cfo', 'cfo')
       .leftJoinAndSelect('p.author', 'author')
       .leftJoinAndSelect('p.remarks', 'remarks');
 
     if (user.role === Role.FILIAL) {
       qb.andWhere('p.filialId = :filialId', { filialId: user.filialId });
     } else if (user.role === Role.CFO) {
-      qb.innerJoin('p.cfoStatuses', 'myStatus', 'myStatus.cfoId = :myCfoId', {
-        myCfoId: user.cfoId ?? -1,
-      });
+      const myCfoId = user.cfoId ?? -1;
+      const reviewedSubQuery = qb
+        .subQuery()
+        .select('1')
+        .from(FactPackageCfoStatus, 'myStatus')
+        .where('myStatus.factPackageId = p.id AND myStatus.cfoId = :myCfoId')
+        .getQuery();
+      qb.andWhere(
+        new Brackets((qb2: WhereExpressionBuilder) => {
+          qb2
+            .where('p.cfoId = :myCfoId', { myCfoId })
+            .orWhere(`EXISTS ${reviewedSubQuery}`, { myCfoId });
+        }),
+      );
     }
 
     if (query.direction)
@@ -170,22 +190,30 @@ export class FactPackagesService {
   }
 
   /**
-   * Один факт-пакет на пару «Филиал × Направление», без периода — если его ещё
-   * нет, создаётся атомарно вместе со всеми формами каталога направления.
-   * Идемпотентно: повторный вызов для той же пары возвращает тот же пакет.
+   * Создаёт новый факт-пакет по направлению — каждый вызов создаёт отдельную
+   * запись (не get-or-create). Владелец — Филиал (идёт на проверку выбранным
+   * ЦФО) либо ЦФО (свой пакет, без проверки ЦФО, направляется сразу в ДТОиР);
+   * ровно один из `filialId`/`cfoId` заполняется в зависимости от роли автора.
    */
   async create(user: User, direction: Direction) {
-    if (user.role !== Role.FILIAL || user.filialId == null) {
+    if (user.role !== Role.FILIAL && user.role !== Role.CFO) {
       throw new ForbiddenException(
-        'Создавать факт-пакеты может только роль FILIAL',
+        'Создавать факт-пакеты могут только роли FILIAL и CFO',
       );
+    }
+    if (user.role === Role.FILIAL && user.filialId == null) {
+      throw new ForbiddenException('У пользователя не указан филиал');
+    }
+    if (user.role === Role.CFO && user.cfoId == null) {
+      throw new ForbiddenException('У пользователя не указан ЦФО');
     }
 
     const id = await this.dataSource.transaction(async (manager) => {
       const humanId = await this.nextFactPackageHumanId(manager);
       const factPackage = await manager.getRepository(FactPackage).save({
         humanId,
-        filialId: user.filialId!,
+        filialId: user.role === Role.FILIAL ? user.filialId! : null,
+        cfoId: user.role === Role.CFO ? user.cfoId! : null,
         direction,
         authorId: user.id,
         status: FactPackageStatus.DRAFT,
@@ -203,7 +231,7 @@ export class FactPackagesService {
         manager,
         factPackage.id,
         user,
-        `Филиал создал факт-пакет ${humanId}.`,
+        `${user.role === Role.FILIAL ? 'Филиал' : 'ЦФО'} создал факт-пакет ${humanId}.`,
       );
       return factPackage.id;
     });
@@ -220,9 +248,7 @@ export class FactPackagesService {
     remarkId: number | undefined,
   ) {
     const factPackage = await this.findByHumanIdOrThrow(humanId);
-    if (!(
-      user.role === Role.FILIAL && user.filialId === factPackage.filialId
-    )) {
+    if (!this.isPackageOwner(user, factPackage)) {
       throw new ForbiddenException();
     }
     if (factPackage.status === FactPackageStatus.APPROVED) {
@@ -308,13 +334,19 @@ export class FactPackagesService {
    * Обслуживает и первичное направление (DRAFT), и повторное после доработки
    * (RETURNED_FOR_REVISION) — один эндпоинт вместо пары send/resubmit
    * «Корректировки»: статус согласовавших ранее ЦФО не сбрасывается (rule 6
-   * AGENTS.md), т.к. трогаются только строки выбранных cfoIds.
+   * AGENTS.md), т.к. трогаются только строки выбранных cfoIds. Для пакета,
+   * созданного ЦФО (`cfoId` заполнен), выбор ЦФО не нужен — `dto.cfoIds`
+   * игнорируется, пакет уходит сразу в ДТОиР (см. `submitCfoOwnPackage`).
    */
   async submit(user: User, humanId: string, dto: CfoSelectionDto) {
     const factPackage = await this.findByHumanIdOrThrow(humanId);
-    if (!(
-      user.role === Role.FILIAL && user.filialId === factPackage.filialId
-    )) {
+    const isFilialOwner =
+      user.role === Role.FILIAL && user.filialId === factPackage.filialId;
+    const isCfoOwner =
+      user.role === Role.CFO &&
+      factPackage.cfoId != null &&
+      user.cfoId === factPackage.cfoId;
+    if (!isFilialOwner && !isCfoOwner) {
       throw new ForbiddenException();
     }
     if (!factPackage.canSubmit) {
@@ -322,6 +354,15 @@ export class FactPackagesService {
         'Направить на проверку можно только черновик либо пакет, возвращённый на доработку.',
       );
     }
+
+    if (isCfoOwner) {
+      return this.submitCfoOwnPackage(user, factPackage);
+    }
+
+    if (!dto.cfoIds || dto.cfoIds.length === 0) {
+      throw new BadRequestException('Выберите хотя бы один ЦФО.');
+    }
+    const cfoIds = dto.cfoIds;
 
     if (factPackage.status === FactPackageStatus.RETURNED_FOR_REVISION) {
       const returnedCfoIds = factPackage.cfoStatuses
@@ -341,9 +382,9 @@ export class FactPackagesService {
 
     const allowedIds = await this.linkedCfoIds(
       this.dataSource.manager,
-      factPackage.filialId,
+      factPackage.filialId!,
     );
-    for (const cfoId of dto.cfoIds) {
+    for (const cfoId of cfoIds) {
       if (!allowedIds.includes(cfoId)) {
         throw new BadRequestException(
           'Выбранный ЦФО не привязан к филиалу. Обратитесь к администратору.',
@@ -355,7 +396,7 @@ export class FactPackagesService {
       factPackage.status === FactPackageStatus.RETURNED_FOR_REVISION;
 
     await this.dataSource.transaction(async (manager) => {
-      for (const cfoId of dto.cfoIds) {
+      for (const cfoId of cfoIds) {
         const existing = await manager
           .getRepository(FactPackageCfoStatus)
           .findOne({ where: { factPackageId: factPackage.id, cfoId } });
@@ -382,8 +423,8 @@ export class FactPackagesService {
           cfoUsers,
           factPackage.id,
           isResubmit
-            ? `Филиал «${factPackage.filial.code}» повторно направил факт-пакет ${factPackage.humanId}. Проверьте исправления.`
-            : `Новый факт-пакет от филиала «${factPackage.filial.code}». ID: ${factPackage.humanId}. Статус: На проверке.`,
+            ? `Филиал «${factPackage.filial!.code}» повторно направил факт-пакет ${factPackage.humanId}. Проверьте исправления.`
+            : `Новый факт-пакет от филиала «${factPackage.filial!.code}». ID: ${factPackage.humanId}. Статус: На проверке.`,
         );
       }
       await manager.getRepository(FactPackage).update(factPackage.id, {
@@ -393,7 +434,36 @@ export class FactPackagesService {
         manager,
         factPackage.id,
         user,
-        `${isResubmit ? 'Повторно направлено' : 'Направлено'} ЦФО: ${dto.cfoIds.join(', ')}.`,
+        `${isResubmit ? 'Повторно направлено' : 'Направлено'} ЦФО: ${cfoIds.join(', ')}.`,
+      );
+    });
+
+    return this.toDetailDto(await this.loadDetail(factPackage.id), user);
+  }
+
+  /**
+   * Пакет, созданный самим ЦФО, не проходит через проверку ЦФО (это уже он
+   * сам) — направление сразу переводит его в `UNDER_DTOE_REVIEW`, минуя
+   * `UNDER_CFO_REVIEW`/`ALL_CFO_APPROVED`.
+   */
+  private async submitCfoOwnPackage(user: User, factPackage: FactPackage) {
+    await this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(FactPackage).update(factPackage.id, {
+        status: FactPackageStatus.UNDER_DTOE_REVIEW,
+        sentToDtoeAt: new Date(),
+      });
+      const dtoeUsers = await this.dtoeUsers(manager);
+      await this.notifyUsers(
+        manager,
+        dtoeUsers,
+        factPackage.id,
+        `Новый факт-пакет от ЦФО «${factPackage.cfo!.code}». ID: ${factPackage.humanId}. Статус: На проверке ДТОиР.`,
+      );
+      await this.log(
+        manager,
+        factPackage.id,
+        user,
+        'ЦФО направил факт-пакет в ДТОиР.',
       );
     });
 
@@ -503,7 +573,7 @@ export class FactPackagesService {
         });
         const filialUsers = await this.filialUsers(
           manager,
-          factPackage.filialId,
+          factPackage.filialId!,
         );
         await this.notifyUsers(
           manager,
@@ -526,9 +596,7 @@ export class FactPackagesService {
 
   async fixRemark(user: User, humanId: string, remarkId: number) {
     const factPackage = await this.findByHumanIdOrThrow(humanId);
-    if (!(
-      user.role === Role.FILIAL && user.filialId === factPackage.filialId
-    )) {
+    if (!this.isPackageOwner(user, factPackage)) {
       throw new ForbiddenException();
     }
     const remark = factPackage.remarks.find((r) => r.id === remarkId);
@@ -542,7 +610,7 @@ export class FactPackagesService {
         manager,
         factPackage.id,
         user,
-        `Филиал отметил ${remark.humanId} как исправленное.`,
+        `${user.role === Role.CFO ? 'ЦФО' : 'Филиал'} отметил ${remark.humanId} как исправленное.`,
       );
     });
 
@@ -606,7 +674,7 @@ export class FactPackagesService {
         manager,
         dtoeUsers,
         factPackage.id,
-        `Факт-пакет ${factPackage.humanId} полностью проверен и согласован всеми ЦФО. Филиал: ${factPackage.filial.code}.`,
+        `Факт-пакет ${factPackage.humanId} полностью проверен и согласован всеми ЦФО. Филиал: ${factPackage.filial!.code}.`,
       );
       await this.log(manager, factPackage.id, user, 'Отправлено в ДТОиР.');
     });
@@ -629,13 +697,9 @@ export class FactPackagesService {
           status: FactPackageStatus.APPROVED,
           decidedAt: new Date(),
         });
-        const filialUsers = await this.filialUsers(
-          manager,
-          factPackage.filialId,
-        );
         await this.notifyUsers(
           manager,
-          filialUsers,
+          await this.ownerUsers(manager, factPackage),
           factPackage.id,
           `ДТОиР согласовало факт-пакет ${factPackage.humanId}.`,
         );
@@ -660,13 +724,9 @@ export class FactPackagesService {
           status: FactPackageStatus.RETURNED_BY_DTOE,
         });
         const remarksList = openRemarks.map((r) => r.humanId).join(', ');
-        const filialUsers = await this.filialUsers(
-          manager,
-          factPackage.filialId,
-        );
         await this.notifyUsers(
           manager,
-          filialUsers,
+          await this.ownerUsers(manager, factPackage),
           factPackage.id,
           `ДТОиР вернуло факт-пакет ${factPackage.humanId} на доработку. Замечания: ${remarksList}.`,
         );
@@ -817,6 +877,27 @@ export class FactPackagesService {
       .find({ where: { role: Role.DTOE, isActive: true } });
   }
 
+  /** Пользователи-владельцы пакета: Филиал или ЦФО — какое поле заполнено. */
+  private ownerUsers(manager: EntityManager, factPackage: FactPackage) {
+    if (factPackage.filialId != null) {
+      return this.filialUsers(manager, factPackage.filialId);
+    }
+    if (factPackage.cfoId != null) {
+      return this.cfoUsers(manager, factPackage.cfoId);
+    }
+    return Promise.resolve([]);
+  }
+
+  private isPackageOwner(user: User, factPackage: FactPackage): boolean {
+    if (user.role === Role.FILIAL) {
+      return user.filialId === factPackage.filialId;
+    }
+    if (user.role === Role.CFO) {
+      return factPackage.cfoId != null && user.cfoId === factPackage.cfoId;
+    }
+    return false;
+  }
+
   private async linkedCfoIds(
     manager: EntityManager,
     filialId: number,
@@ -835,6 +916,7 @@ export class FactPackagesService {
       return user.filialId === factPackage.filialId;
     if (user.role === Role.CFO) {
       if (user.cfoId == null) return false;
+      if (factPackage.cfoId === user.cfoId) return true;
       return this.cfoStatuses.exist({
         where: { factPackageId: factPackage.id, cfoId: user.cfoId },
       });
@@ -887,22 +969,25 @@ export class FactPackagesService {
     const returnedCfos = factPackage.cfoStatuses
       .filter((s) => s.status === FactCfoStatusValue.RETURNED)
       .map((s) => s.cfo);
-    const availableCfoIds = await this.linkedCfoIds(
-      this.dataSource.manager,
-      factPackage.filialId,
-    );
+    const availableCfoIds =
+      factPackage.filialId != null
+        ? await this.linkedCfoIds(this.dataSource.manager, factPackage.filialId)
+        : [];
     const availableCfos = await this.cfos.find({
       where: { id: In(availableCfoIds.length ? availableCfoIds : [-1]) },
     });
 
     return {
       ...toFactPackageBaseDto(factPackage),
-      filial: {
-        id: factPackage.filial.id,
-        code: factPackage.filial.code,
-        name: factPackage.filial.name,
-        isActive: factPackage.filial.isActive,
-      },
+      filial: factPackage.filial
+        ? {
+            id: factPackage.filial.id,
+            code: factPackage.filial.code,
+            name: factPackage.filial.name,
+            isActive: factPackage.filial.isActive,
+          }
+        : null,
+      cfo: factPackage.cfo ? toCfoDto(factPackage.cfo) : null,
       author: {
         id: factPackage.author.id,
         username: factPackage.author.username,
@@ -925,6 +1010,10 @@ export class FactPackagesService {
       myOpenRemarksCount,
       isFilialOwner:
         user.role === Role.FILIAL && user.filialId === factPackage.filialId,
+      isCfoOwner:
+        user.role === Role.CFO &&
+        factPackage.cfoId != null &&
+        user.cfoId === factPackage.cfoId,
       isCfoReviewer: user.role === Role.CFO && myCfoStatus != null,
       isDtoe: user.role === Role.DTOE,
       availableCfos: availableCfos.map(toCfoDto),
@@ -958,7 +1047,10 @@ export class FactPackagesService {
       const factPackage = await manager
         .getRepository(FactPackage)
         .findOneOrFail({ where: { id: factPackageId } });
-      const filialUsers = await this.filialUsers(manager, factPackage.filialId);
+      const filialUsers = await this.filialUsers(
+        manager,
+        factPackage.filialId!,
+      );
       await this.notifyUsers(
         manager,
         filialUsers,

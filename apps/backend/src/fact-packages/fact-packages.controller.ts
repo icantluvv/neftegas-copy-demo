@@ -37,7 +37,7 @@ export class FactPackagesController {
     return this.service.findAll(user, query);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateFactPackageDto) {
     return this.service.create(user, dto.direction);
@@ -71,7 +71,7 @@ export class FactPackagesController {
     return this.service.findOne(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @UseInterceptors(FileInterceptor('file'))
   @Post(':humanId/forms/:formCode/versions')
   @HttpCode(HttpStatus.CREATED)
@@ -92,7 +92,7 @@ export class FactPackagesController {
     );
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/submit')
   submit(
     @CurrentUser() user: User,
@@ -122,7 +122,7 @@ export class FactPackagesController {
     return this.service.leaveRemark(user, humanId, dto);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/remarks/:remarkId/fix')
   fixRemark(
     @CurrentUser() user: User,

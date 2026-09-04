@@ -29,7 +29,8 @@ function buildFactPackage(
   overrides: {
     status?: FactPackageStatus;
     direction?: Direction;
-    filialId?: number;
+    filialId?: number | null;
+    cfoId?: number | null;
     myCfoStatus?: { id: number; cfoId: number; status: FactCfoStatusValue };
     cfoStatuses?: { id: number; cfoId: number; status: FactCfoStatusValue }[];
     remarks?: {
@@ -47,20 +48,27 @@ function buildFactPackage(
   } = {},
 ): FactPackage {
   const status = overrides.status ?? FactPackageStatus.UNDER_CFO_REVIEW;
+  const cfoId = overrides.cfoId ?? null;
+  const filialId = cfoId != null ? null : (overrides.filialId ?? 1);
+  const canSubmit =
+    cfoId != null
+      ? status === FactPackageStatus.DRAFT ||
+        status === FactPackageStatus.RETURNED_BY_DTOE
+      : status === FactPackageStatus.DRAFT ||
+        status === FactPackageStatus.RETURNED_FOR_REVISION;
   return {
     id: 1,
     humanId: 'FCT-000001',
     status,
     direction: overrides.direction ?? Direction.DO,
-    filialId: overrides.filialId ?? 1,
+    filialId,
+    cfoId,
     cfoStatuses:
       overrides.cfoStatuses ??
       (overrides.myCfoStatus ? [overrides.myCfoStatus] : []),
     remarks: overrides.remarks ?? [],
     forms: overrides.forms ?? [],
-    canSubmit:
-      status === FactPackageStatus.DRAFT ||
-      status === FactPackageStatus.RETURNED_FOR_REVISION,
+    canSubmit,
     canSendToDtoe: status === FactPackageStatus.ALL_CFO_APPROVED,
   } as unknown as FactPackage;
 }
@@ -95,11 +103,19 @@ function buildService(factPackage: FactPackage) {
 }
 
 describe('FactPackagesService — create', () => {
-  it('отклоняет роль, отличную от FILIAL', async () => {
+  it('отклоняет роль, отличную от FILIAL/CFO', async () => {
     const { service } = buildService(buildFactPackage());
 
     await expect(
-      service.create(buildUser(Role.CFO), Direction.DO),
+      service.create(buildUser(Role.DTOE), Direction.DO),
+    ).rejects.toThrow(ForbiddenException);
+  });
+
+  it('отклоняет ЦФО без указанного cfoId', async () => {
+    const { service } = buildService(buildFactPackage());
+
+    await expect(
+      service.create(buildUser(Role.CFO, { cfoId: undefined }), Direction.DO),
     ).rejects.toThrow(ForbiddenException);
   });
 });
@@ -161,6 +177,23 @@ describe('FactPackagesService — uploadFormVersion', () => {
     ).rejects.toThrow(BadRequestException);
     expect(dataSource.transaction).not.toHaveBeenCalled();
   });
+
+  it('отклоняет ЦФО, не являющегося владельцем пакета', async () => {
+    const factPackage = buildFactPackage({ cfoId: 5 });
+    const { service, dataSource } = buildService(factPackage);
+
+    await expect(
+      service.uploadFormVersion(
+        buildCfoUser(9),
+        'FCT-000001',
+        FactFormCode.ACT_WORK,
+        {} as never,
+        undefined,
+        undefined,
+      ),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
 });
 
 describe('FactPackagesService — submit', () => {
@@ -215,6 +248,47 @@ describe('FactPackagesService — submit', () => {
       service.submit(buildUser(Role.FILIAL, { filialId: 1 }), 'FCT-000001', {
         cfoIds: [5],
       }),
+    ).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет отправку филиалом без выбранного ЦФО', async () => {
+    const factPackage = buildFactPackage({
+      status: FactPackageStatus.DRAFT,
+      filialId: 1,
+    });
+    const { service, dataSource } = buildService(factPackage);
+
+    await expect(
+      service.submit(buildUser(Role.FILIAL, { filialId: 1 }), 'FCT-000001', {
+        cfoIds: [],
+      }),
+    ).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет ЦФО, не являющегося владельцем пакета', async () => {
+    const factPackage = buildFactPackage({
+      status: FactPackageStatus.DRAFT,
+      cfoId: 5,
+    });
+    const { service, dataSource } = buildService(factPackage);
+
+    await expect(
+      service.submit(buildCfoUser(9), 'FCT-000001', {}),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет направление пакета ЦФО не в DRAFT/RETURNED_BY_DTOE', async () => {
+    const factPackage = buildFactPackage({
+      status: FactPackageStatus.UNDER_DTOE_REVIEW,
+      cfoId: 5,
+    });
+    const { service, dataSource } = buildService(factPackage);
+
+    await expect(
+      service.submit(buildCfoUser(5), 'FCT-000001', {}),
     ).rejects.toThrow(BadRequestException);
     expect(dataSource.transaction).not.toHaveBeenCalled();
   });
