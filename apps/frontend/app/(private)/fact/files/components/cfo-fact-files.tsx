@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import type { Direction2 } from "@/packages/api/base/codegen";
 
+import { CfoCreateOwnPackageButton } from "./cfo-create-own-package-button";
 import { CfoDirectionCard } from "./cfo-direction-card";
 import { FactPackagesReviewList } from "./fact-packages-review-list";
 
@@ -13,7 +14,13 @@ export function CfoFactFiles() {
     const [direction, setDirection] = useState<Direction2 | null>(null);
 
     if (direction) {
-        return <FactPackagesReviewList direction={direction} onBack={() => setDirection(null)}/>;
+        return (
+            <FactPackagesReviewList
+                direction={direction}
+                onBack={() => setDirection(null)}
+                headerAction={<CfoCreateOwnPackageButton direction={direction}/>}
+            />
+        );
     }
 
     return (
