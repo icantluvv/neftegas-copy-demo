@@ -4,6 +4,7 @@ FactPackageDetail:
     - type: object
       required:
         - filial
+        - cfo
         - author
         - forms
         - cfoStatuses
@@ -12,12 +13,20 @@ FactPackageDetail:
         - packageComplete
         - missingForms
         - isFilialOwner
+        - isCfoOwner
         - isCfoReviewer
         - isDtoe
         - availableCfos
         - returnedCfos
       properties:
-        filial: { $ref: './filial.yaml#/Filial' }
+        filial:
+          oneOf:
+            - $ref: './filial.yaml#/Filial'
+            - type: 'null'
+        cfo:
+          oneOf:
+            - $ref: './cfo.yaml#/Cfo'
+            - type: 'null'
         author: { $ref: './user.yaml#/UserSummary' }
         forms:
           type: array
@@ -41,6 +50,7 @@ FactPackageDetail:
             - type: 'null'
         myOpenRemarksCount: { type: integer }
         isFilialOwner: { type: boolean }
+        isCfoOwner: { type: boolean, description: 'Пакет создан этим ЦФО (свой, без проверки ЦФО)' }
         isCfoReviewer: { type: boolean }
         isDtoe: { type: boolean }
         availableCfos:
