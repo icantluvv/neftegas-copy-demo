@@ -144,6 +144,7 @@ export type { FactPackageRemarkCreateInput } from "./types/FactPackageRemarkCrea
 export type { FactPackageStats } from "./types/FactPackageStats";
 export type { FactPackageStatus } from "./types/FactPackageStatus";
 export type { FactPackageStatus2 } from "./types/FactPackageStatus2";
+export type { FactPackageSubmitInput } from "./types/FactPackageSubmitInput";
 export type { FactRemarkStatus } from "./types/FactRemarkStatus";
 export type { FactRemarkStatus2 } from "./types/FactRemarkStatus2";
 export type { FileVersion } from "./types/FileVersion";
@@ -682,6 +683,7 @@ export { factPackageSchema } from "./zod/factPackageSchema";
 export { factPackageStatsSchema } from "./zod/factPackageStatsSchema";
 export { factPackageStatus2Schema } from "./zod/factPackageStatus2Schema";
 export { factPackageStatusSchema } from "./zod/factPackageStatusSchema";
+export { factPackageSubmitInputSchema } from "./zod/factPackageSubmitInputSchema";
 export { approveFactPackageByCfo200Schema, approveFactPackageByCfo400Schema, approveFactPackageByCfo403Schema, approveFactPackageByCfoMutationResponseSchema, approveFactPackageByCfoPathParamsSchema } from "./zod/factPackagesController/approveFactPackageByCfoSchema";
 export { createFactPackage201Schema, createFactPackage403Schema, createFactPackageMutationRequestSchema, createFactPackageMutationResponseSchema } from "./zod/factPackagesController/createFactPackageSchema";
 export { decideFactPackageByDtoe200Schema, decideFactPackageByDtoe400Schema, decideFactPackageByDtoe403Schema, decideFactPackageByDtoeMutationRequestSchema, decideFactPackageByDtoeMutationResponseSchema, decideFactPackageByDtoePathParamsSchema } from "./zod/factPackagesController/decideFactPackageByDtoeSchema";

@@ -1,0 +1,1 @@
+{"type":"object","description":"Для пакета, созданного Филиалом, cfoIds обязателен (кому направить на проверку). Для пакета, созданного ЦФО, cfoIds не нужен — пакет уходит сразу в ДТОиР.\n","properties":{"cfoIds":{"type":"array","items":{"type":"integer"}}},"x-readme-ref-name":"FactPackageSubmitInput"}
