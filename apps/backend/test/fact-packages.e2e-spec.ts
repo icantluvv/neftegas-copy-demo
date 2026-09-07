@@ -122,6 +122,12 @@ describe('FactPackages lifecycle (e2e)', () => {
       username: `${suffix}-filial-${otherFilial.id}@example.com`,
     });
     await users.delete({
+      username: `${suffix}-filial-${filial.id}-partial@example.com`,
+    });
+    await users.delete({
+      username: `${suffix}-filial-${filial.id}-owner@example.com`,
+    });
+    await users.delete({
       username: `${suffix}-cfo-${cfo.id}-own@example.com`,
     });
     await users.delete({ username: `${suffix}-dtoe-x-own@example.com` });
@@ -197,7 +203,12 @@ describe('FactPackages lifecycle (e2e)', () => {
   });
 
   it('чужой филиал не видит и не может отправлять на проверку факт-пакет', async () => {
-    const filialAuth = await loginAs(Role.FILIAL, filial.id);
+    const filialAuth = await loginAs(
+      Role.FILIAL,
+      filial.id,
+      undefined,
+      '-owner',
+    );
     const otherFilialAuth = await loginAs(Role.FILIAL, otherFilial.id);
 
     const createRes = await request(app.getHttpServer())
@@ -220,7 +231,12 @@ describe('FactPackages lifecycle (e2e)', () => {
   });
 
   it('разрешает отправку неукомплектованного пакета — полная комплектация форм не требуется', async () => {
-    const filialAuth = await loginAs(Role.FILIAL, filial.id);
+    const filialAuth = await loginAs(
+      Role.FILIAL,
+      filial.id,
+      undefined,
+      '-partial',
+    );
 
     const createRes = await request(app.getHttpServer())
       .post('/api/fact-packages')
@@ -264,7 +280,7 @@ describe('FactPackages lifecycle (e2e)', () => {
       .post(`/api/fact-packages/${created.humanId}/submit`)
       .set('Cookie', cfoAuth.cookie)
       .send({})
-      .expect(201);
+      .expect(200);
     expect((submitRes.body as FactPackageResponseBody).status).toBe(
       'UNDER_DTOE_REVIEW',
     );
@@ -273,7 +289,7 @@ describe('FactPackages lifecycle (e2e)', () => {
       .post(`/api/fact-packages/${created.humanId}/final-decision`)
       .set('Cookie', dtoeAuth.cookie)
       .send({ decision: 'APPROVE' })
-      .expect(201);
+      .expect(200);
     expect((decisionRes.body as FactPackageResponseBody).status).toBe(
       'APPROVED',
     );

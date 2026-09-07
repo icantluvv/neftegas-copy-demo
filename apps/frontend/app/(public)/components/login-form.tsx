@@ -49,7 +49,7 @@ export function LoginForm() {
   return (
       <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-black/10 p-8"
+          className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-black/10 bg-card p-8 shadow-sm"
       >
         <h1 className="text-xl font-semibold">Вход</h1>
 
