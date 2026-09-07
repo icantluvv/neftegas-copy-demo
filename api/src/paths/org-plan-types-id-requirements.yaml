@@ -1,0 +1,17 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Добавить требование в пакет типа плана
+  operationId: createPlanPackageRequirement
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan-package-requirement.yaml#/PlanPackageRequirementInput' }
+  responses:
+    '201':
+      description: Требование добавлено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-package-requirement.yaml#/PlanPackageRequirement' }

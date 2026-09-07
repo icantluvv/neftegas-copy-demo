@@ -1,0 +1,33 @@
+parameters:
+  - { name: id, in: path, required: true, schema: { type: integer } }
+get:
+  summary: Тип плана с требованиями пакета
+  operationId: getPlanType
+  tags: [Org]
+  responses:
+    '200':
+      description: Тип плана с требованиями пакета
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-type.yaml#/PlanTypeDetail' }
+patch:
+  summary: Обновить тип плана
+  operationId: updatePlanType
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan-type.yaml#/PlanTypeInput' }
+  responses:
+    '200':
+      description: Тип обновлён
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-type.yaml#/PlanType' }
+delete:
+  summary: Удалить тип плана
+  operationId: deletePlanType
+  tags: [Org]
+  responses:
+    '204': { description: Удалено }
