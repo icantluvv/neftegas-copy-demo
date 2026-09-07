@@ -248,27 +248,49 @@ async function main() {
         '(openspec/changes/planning-2027-package-review)',
     })
     .then((planType) =>
+      // Состав пакета зеркалит демо-тип корректировки 1:1 (тот же набор и
+      // количество слотов, включая группу выбора «один из») — план является
+      // независимым доменом, но комплектность пакета для демо-данных
+      // намеренно одинаковая.
       planReqRepo.save([
         {
           planTypeId: planType.id,
           kind: PlanRequirementKind.DOCUMENT,
-          name: 'Акт обследования объекта основных фондов',
+          name: 'Согласованная служебная записка',
           isRequired: true,
           order: 1,
         },
         {
           planTypeId: planType.id,
           kind: PlanRequirementKind.DOCUMENT,
-          name: 'Форма пообъектного плана ДТОиР (КР / ТОиТР / ДО)',
+          name: 'Пакет обосновывающих документов',
           isRequired: true,
           order: 2,
         },
         {
           planTypeId: planType.id,
           kind: PlanRequirementKind.DOCUMENT,
-          name: 'Технические требования на проектирование',
+          name: 'Перечень комплекта МТР (ХС)',
           isRequired: true,
           order: 3,
+        },
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'Локальный сметный расчёт (ПД)',
+          isRequired: true,
+          order: 4,
+          choiceGroupKey: MTR_CHOICE_GROUP,
+          groupLabel: MTR_GROUP_LABEL,
+        },
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'ХЗ-х ТКП',
+          isRequired: true,
+          order: 5,
+          choiceGroupKey: MTR_CHOICE_GROUP,
+          groupLabel: MTR_GROUP_LABEL,
         },
       ]),
     );
