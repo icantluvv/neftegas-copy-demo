@@ -94,6 +94,7 @@ export class FactPackagesController {
 
   @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/submit')
+  @HttpCode(HttpStatus.OK)
   submit(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -104,6 +105,7 @@ export class FactPackagesController {
 
   @Roles(Role.CFO)
   @Post(':humanId/cfo/:cfoId/approve')
+  @HttpCode(HttpStatus.OK)
   approveByCfo(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -114,6 +116,7 @@ export class FactPackagesController {
 
   @Roles(Role.CFO, Role.DTOE)
   @Post(':humanId/remarks')
+  @HttpCode(HttpStatus.OK)
   leaveRemark(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -124,6 +127,7 @@ export class FactPackagesController {
 
   @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/remarks/:remarkId/fix')
+  @HttpCode(HttpStatus.OK)
   fixRemark(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -144,12 +148,14 @@ export class FactPackagesController {
 
   @Roles(Role.CFO)
   @Post(':humanId/send-to-dtoe')
+  @HttpCode(HttpStatus.OK)
   sendToDtoe(@CurrentUser() user: User, @Param('humanId') humanId: string) {
     return this.service.sendToDtoe(user, humanId);
   }
 
   @Roles(Role.DTOE)
   @Post(':humanId/final-decision')
+  @HttpCode(HttpStatus.OK)
   finalDecision(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
