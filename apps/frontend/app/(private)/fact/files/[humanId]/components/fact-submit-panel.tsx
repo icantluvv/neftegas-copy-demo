@@ -15,7 +15,26 @@ export function FactSubmitPanel({ detail }: { detail: FactPackageDetail }) {
   const [selectedCfoIds, setSelectedCfoIds] = useState<number[]>([]);
   const submit = useSubmitFactPackage({ mutation: { onSuccess: invalidate } });
 
-  if (!detail.isFilialOwner || !detail.canSubmit) {
+  if (!canSubmit(detail)) {
+    return null;
+  }
+
+  if (detail.isCfoOwner) {
+    return (
+      <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+        <h2 className="text-base font-semibold">Направить в ДТОиР</h2>
+        <Button
+          type="button"
+          disabled={submit.isPending}
+          onClick={() => submit.mutate({ humanId: detail.humanId, data: {} })}
+        >
+          Направить
+        </Button>
+      </div>
+    );
+  }
+
+  if (!detail.isFilialOwner) {
     return null;
   }
 
@@ -25,7 +44,7 @@ export function FactSubmitPanel({ detail }: { detail: FactPackageDetail }) {
     );
   }
 
-  const submitAllowed = canSubmit(detail) && selectedCfoIds.length > 0;
+  const submitAllowed = selectedCfoIds.length > 0;
   const hint = selectedCfoIds.length === 0 ? "Выберите хотя бы один ЦФО" : undefined;
 
   const isResubmit = detail.status === "RETURNED_FOR_REVISION";

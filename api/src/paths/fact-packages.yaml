@@ -19,3 +19,30 @@ get:
       content:
         application/json:
           schema: { $ref: '../components/schemas/fact-package.yaml#/PaginatedFactPackages' }
+post:
+  summary: Создать факт-пакет по направлению
+  operationId: createFactPackage
+  tags: [FactPackages]
+  description: >
+    Доступно только роли FILIAL. Каждый вызов создаёт новый факт-пакет своего
+    филиала для указанного направления в статусе DRAFT вместе со всеми формами
+    каталога направления (без версий файлов) — по аналогии с созданием
+    корректировки: один филиал может иметь одновременно несколько факт-пакетов
+    одного направления (разных периодов), «Файлы» — точка входа для создания
+    нового, существующие смотрят на «Рабочем столе».
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/fact-package.yaml#/FactPackageCreateInput' }
+  responses:
+    '201':
+      description: Факт-пакет создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/fact-package-detail.yaml#/FactPackageDetail' }
+    '403':
+      description: Доступно только роли FILIAL
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

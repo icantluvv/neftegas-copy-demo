@@ -44,4 +44,17 @@ describe("<FactPackagesReviewList />", () => {
 
 		await expect.element(view.getByText("Нет факт-пакетов")).toBeVisible();
 	});
+
+	it("передаёт direction в запрос и показывает его в заголовке с кнопкой назад", async () => {
+		useGetFactPackagesMock.mockReturnValue({ data: { items: [] } });
+		const onBack = vi.fn();
+
+		const view = await render(<FactPackagesReviewList direction="KR_HS" onBack={onBack} />);
+
+		expect(useGetFactPackagesMock).toHaveBeenCalledWith({ params: { direction: "KR_HS" } });
+		await expect.element(view.getByText("Файлы — Капитальный ремонт — хозяйственный способ")).toBeVisible();
+
+		await view.getByRole("button", { name: "← Все направления" }).click();
+		expect(onBack).toHaveBeenCalled();
+	});
 });

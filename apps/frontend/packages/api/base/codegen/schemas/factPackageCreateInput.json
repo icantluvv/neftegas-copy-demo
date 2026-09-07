@@ -1,0 +1,1 @@
+{"type":"object","required":["direction"],"properties":{"direction":{"type":"string","enum":["DO","TOIR","KR_PD","KR_HS"],"x-readme-ref-name":"direction"}},"x-readme-ref-name":"FactPackageCreateInput"}
