@@ -1,0 +1,1 @@
+{"type":"object","required":["description","requiredAction"],"properties":{"description":{"type":"string"},"requiredAction":{"type":"string"}},"x-readme-ref-name":"PlanRemarkReopenInput"}

@@ -110,6 +110,21 @@ export default defineConfig({
 					pattern: 'FactPackageListItem',
 					options: { mini: false, importPath: 'zod' },
 				},
+				{
+					type: 'schemaName',
+					pattern: 'PlanDetail',
+					options: { mini: false, importPath: 'zod' },
+				},
+				{
+					type: 'schemaName',
+					pattern: 'PlanListItem',
+					options: { mini: false, importPath: 'zod' },
+				},
+				{
+					type: 'schemaName',
+					pattern: 'PlanTypeDetail',
+					options: { mini: false, importPath: 'zod' },
+				},
 			],
 		}),
 		pluginReactQuery({

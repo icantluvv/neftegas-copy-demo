@@ -13,8 +13,13 @@ import { createCreateFilialCfoLinkMutationResponse } from './mocks/orgController
 import { createGetCorrectionTypesQueryResponse } from './mocks/orgController/createGetCorrectionTypes'
 import { createCreateCorrectionTypeMutationResponse } from './mocks/orgController/createCreateCorrectionType'
 import { createGetFactPackageStatsQueryResponse } from './mocks/factPackagesController/createGetFactPackageStats'
+import { createGetPlanStatsFilialQueryResponse } from './mocks/plansController/createGetPlanStatsFilial'
 import { createGetCorrectionStatsQueryResponse } from './mocks/correctionsController/createGetCorrectionStats'
+import { createGetPlanStatsDtoeQueryResponse } from './mocks/plansController/createGetPlanStatsDtoe'
 import { createLogoutAllMutationResponse } from './mocks/authController/createLogoutAll'
+import { createGetPlanStatsCfoQueryResponse } from './mocks/plansController/createGetPlanStatsCfo'
+import { createGetPlanTypesQueryResponse } from './mocks/orgController/createGetPlanTypes'
+import { createCreatePlanTypeMutationResponse } from './mocks/orgController/createCreatePlanType'
 import { createGetFactPackagesQueryResponse } from './mocks/factPackagesController/createGetFactPackages'
 import { createCreateFactPackageMutationResponse } from './mocks/factPackagesController/createCreateFactPackage'
 import { createGetNotificationsQueryResponse } from './mocks/notificationsController/createGetNotifications'
@@ -23,45 +28,67 @@ import { createGetFilialsQueryResponse } from './mocks/orgController/createGetFi
 import { createCreateFilialMutationResponse } from './mocks/orgController/createCreateFilial'
 import { createGetCorrectionsQueryResponse } from './mocks/correctionsController/createGetCorrections'
 import { createCreateCorrectionMutationResponse } from './mocks/correctionsController/createCreateCorrection'
+import { createGetPlanStatsQueryResponse } from './mocks/plansController/createGetPlanStats'
 import { createLoginMutationResponse } from './mocks/authController/createLogin'
 import { createGetCfosQueryResponse } from './mocks/orgController/createGetCfos'
 import { createCreateCfoMutationResponse } from './mocks/orgController/createCreateCfo'
 import { createGetMeQueryResponse } from './mocks/authController/createGetMe'
 import { createGetUsersQueryResponse } from './mocks/usersController/createGetUsers'
 import { createCreateUserMutationResponse } from './mocks/usersController/createCreateUser'
+import { createGetPlansQueryResponse } from './mocks/plansController/createGetPlans'
+import { createCreatePlanMutationResponse } from './mocks/plansController/createCreatePlan'
 import { createMarkNotificationsReadByFactPackageMutationResponse } from './mocks/notificationsController/createMarkNotificationsReadByFactPackage'
 import { createMarkNotificationsReadByCorrectionMutationResponse } from './mocks/notificationsController/createMarkNotificationsReadByCorrection'
 import { createCreatePackageRequirementMutationResponse } from './mocks/orgController/createCreatePackageRequirement'
 import { createResubmitCorrectionToDtoeMutationResponse } from './mocks/correctionsController/createResubmitCorrectionToDtoe'
 import { createDecideFactPackageByDtoeMutationResponse } from './mocks/factPackagesController/createDecideFactPackageByDtoe'
 import { createSendFactPackageToDtoeMutationResponse } from './mocks/factPackagesController/createSendFactPackageToDtoe'
+import { createMarkNotificationsReadByPlanMutationResponse } from './mocks/notificationsController/createMarkNotificationsReadByPlan'
 import { createSendCorrectionToDtoeMutationResponse } from './mocks/correctionsController/createSendCorrectionToDtoe'
 import { createApproveCorrectionByDtoeMutationResponse } from './mocks/correctionsController/createApproveCorrectionByDtoe'
 import { createChangeCorrectionTypeMutationResponse } from './mocks/correctionsController/createChangeCorrectionType'
 import { createApproveCorrectionByCfoMutationResponse } from './mocks/correctionsController/createApproveCorrectionByCfo'
 import { createReturnCorrectionByDtoeMutationResponse } from './mocks/correctionsController/createReturnCorrectionByDtoe'
+import { createCreatePlanPackageRequirementMutationResponse } from './mocks/orgController/createCreatePlanPackageRequirement'
 import { createReturnCorrectionByCfoMutationResponse } from './mocks/correctionsController/createReturnCorrectionByCfo'
 import { createCancelCfoDecisionMutationResponse } from './mocks/correctionsController/createCancelCfoDecision'
+import { createResubmitPlanToDtoeMutationResponse } from './mocks/plansController/createResubmitPlanToDtoe'
 import { createLeaveFactPackageRemarkMutationResponse } from './mocks/factPackagesController/createLeaveFactPackageRemark'
 import { createResubmitCorrectionMutationResponse } from './mocks/correctionsController/createResubmitCorrection'
 import { createSubmitFactPackageMutationResponse } from './mocks/factPackagesController/createSubmitFactPackage'
 import { createLeaveRemarkMutationResponse } from './mocks/correctionsController/createLeaveRemark'
+import { createSendPlanToDtoeMutationResponse } from './mocks/plansController/createSendPlanToDtoe'
+import { createApprovePlanByDtoeMutationResponse } from './mocks/plansController/createApprovePlanByDtoe'
+import { createChangePlanTypeMutationResponse } from './mocks/plansController/createChangePlanType'
+import { createApprovePlanByCfoMutationResponse } from './mocks/plansController/createApprovePlanByCfo'
+import { createReturnPlanByDtoeMutationResponse } from './mocks/plansController/createReturnPlanByDtoe'
 import { createSendCorrectionMutationResponse } from './mocks/correctionsController/createSendCorrection'
+import { createReturnPlanByCfoMutationResponse } from './mocks/plansController/createReturnPlanByCfo'
+import { createCancelPlanCfoDecisionMutationResponse } from './mocks/plansController/createCancelPlanCfoDecision'
 import { createUpdateFilialCfoLinkMutationResponse } from './mocks/orgController/createUpdateFilialCfoLink'
 import { createDeleteFilialCfoLinkMutationResponse } from './mocks/orgController/createDeleteFilialCfoLink'
 import { createGetCorrectionTypeQueryResponse } from './mocks/orgController/createGetCorrectionType'
 import { createUpdateCorrectionTypeMutationResponse } from './mocks/orgController/createUpdateCorrectionType'
 import { createDeleteCorrectionTypeMutationResponse } from './mocks/orgController/createDeleteCorrectionType'
 import { createDownloadFactFormVersionQueryResponse } from './mocks/factPackagesController/createDownloadFactFormVersion'
+import { createResubmitPlanMutationResponse } from './mocks/plansController/createResubmitPlan'
+import { createDownloadPlanFileVersionQueryResponse } from './mocks/plansController/createDownloadPlanFileVersion'
 import { createGetFactPackageQueryResponse } from './mocks/factPackagesController/createGetFactPackage'
+import { createLeavePlanRemarkMutationResponse } from './mocks/plansController/createLeavePlanRemark'
 import { createOpenNotificationMutationResponse } from './mocks/notificationsController/createOpenNotification'
 import { createUpdatePackageRequirementMutationResponse } from './mocks/orgController/createUpdatePackageRequirement'
 import { createDeletePackageRequirementMutationResponse } from './mocks/orgController/createDeletePackageRequirement'
 import { createGetCorrectionQueryResponse } from './mocks/correctionsController/createGetCorrection'
 import { createDeleteCorrectionMutationResponse } from './mocks/correctionsController/createDeleteCorrection'
+import { createSendPlanMutationResponse } from './mocks/plansController/createSendPlan'
+import { createGetPlanTypeQueryResponse } from './mocks/orgController/createGetPlanType'
+import { createUpdatePlanTypeMutationResponse } from './mocks/orgController/createUpdatePlanType'
+import { createDeletePlanTypeMutationResponse } from './mocks/orgController/createDeletePlanType'
 import { createDownloadFileVersionQueryResponse } from './mocks/correctionsController/createDownloadFileVersion'
 import { createUpdateFilialMutationResponse } from './mocks/orgController/createUpdateFilial'
 import { createDeleteFilialMutationResponse } from './mocks/orgController/createDeleteFilial'
+import { createGetPlanQueryResponse } from './mocks/plansController/createGetPlan'
+import { createDeletePlanMutationResponse } from './mocks/plansController/createDeletePlan'
 import { createUpdateCfoMutationResponse } from './mocks/orgController/createUpdateCfo'
 import { createDeleteCfoMutationResponse } from './mocks/orgController/createDeleteCfo'
 import { createUpdateUserMutationResponse } from './mocks/usersController/createUpdateUser'
@@ -73,7 +100,11 @@ import { createMarkRemarkFixedMutationResponse } from './mocks/correctionsContro
 import { createApproveFactPackageByCfoMutationResponse } from './mocks/factPackagesController/createApproveFactPackageByCfo'
 import { createUploadFileVersionMutationResponse } from './mocks/correctionsController/createUploadFileVersion'
 import { createDeleteFactPackageRemarkMutationResponse } from './mocks/factPackagesController/createDeleteFactPackageRemark'
+import { createReopenPlanRemarkMutationResponse } from './mocks/plansController/createReopenPlanRemark'
 import { createDeleteRemarkMutationResponse } from './mocks/correctionsController/createDeleteRemark'
+import { createMarkPlanRemarkFixedMutationResponse } from './mocks/plansController/createMarkPlanRemarkFixed'
+import { createUploadPlanFileVersionMutationResponse } from './mocks/plansController/createUploadPlanFileVersion'
+import { createDeletePlanRemarkMutationResponse } from './mocks/plansController/createDeletePlanRemark'
 
 export const mockRoutes = [
 	{ method: 'GET', pattern: /^\/fact-packages\/stats\/filial$/, create: createGetFactPackageStatsFilialQueryResponse },
@@ -88,8 +119,13 @@ export const mockRoutes = [
 	{ method: 'GET', pattern: /^\/org\/correction-types$/, create: createGetCorrectionTypesQueryResponse },
 	{ method: 'POST', pattern: /^\/org\/correction-types$/, status: 201, create: createCreateCorrectionTypeMutationResponse },
 	{ method: 'GET', pattern: /^\/fact-packages\/stats$/, create: createGetFactPackageStatsQueryResponse },
+	{ method: 'GET', pattern: /^\/plans\/stats\/filial$/, create: createGetPlanStatsFilialQueryResponse },
 	{ method: 'GET', pattern: /^\/corrections\/stats$/, create: createGetCorrectionStatsQueryResponse },
+	{ method: 'GET', pattern: /^\/plans\/stats\/dtoe$/, create: createGetPlanStatsDtoeQueryResponse },
 	{ method: 'POST', pattern: /^\/auth\/logout-all$/, status: 204, create: createLogoutAllMutationResponse },
+	{ method: 'GET', pattern: /^\/plans\/stats\/cfo$/, create: createGetPlanStatsCfoQueryResponse },
+	{ method: 'GET', pattern: /^\/org\/plan-types$/, create: createGetPlanTypesQueryResponse },
+	{ method: 'POST', pattern: /^\/org\/plan-types$/, status: 201, create: createCreatePlanTypeMutationResponse },
 	{ method: 'GET', pattern: /^\/fact-packages$/, create: createGetFactPackagesQueryResponse },
 	{ method: 'POST', pattern: /^\/fact-packages$/, status: 201, create: createCreateFactPackageMutationResponse },
 	{ method: 'GET', pattern: /^\/notifications$/, create: createGetNotificationsQueryResponse },
@@ -98,45 +134,67 @@ export const mockRoutes = [
 	{ method: 'POST', pattern: /^\/org\/filials$/, status: 201, create: createCreateFilialMutationResponse },
 	{ method: 'GET', pattern: /^\/corrections$/, create: createGetCorrectionsQueryResponse },
 	{ method: 'POST', pattern: /^\/corrections$/, status: 201, create: createCreateCorrectionMutationResponse },
+	{ method: 'GET', pattern: /^\/plans\/stats$/, create: createGetPlanStatsQueryResponse },
 	{ method: 'POST', pattern: /^\/auth\/login$/, create: createLoginMutationResponse },
 	{ method: 'GET', pattern: /^\/org\/cfos$/, create: createGetCfosQueryResponse },
 	{ method: 'POST', pattern: /^\/org\/cfos$/, status: 201, create: createCreateCfoMutationResponse },
 	{ method: 'GET', pattern: /^\/auth\/me$/, create: createGetMeQueryResponse },
 	{ method: 'GET', pattern: /^\/users$/, create: createGetUsersQueryResponse },
 	{ method: 'POST', pattern: /^\/users$/, status: 201, create: createCreateUserMutationResponse },
+	{ method: 'GET', pattern: /^\/plans$/, create: createGetPlansQueryResponse },
+	{ method: 'POST', pattern: /^\/plans$/, status: 201, create: createCreatePlanMutationResponse },
 	{ method: 'POST', pattern: /^\/notifications\/by-fact-package\/[^/]+\/read$/, create: createMarkNotificationsReadByFactPackageMutationResponse },
 	{ method: 'POST', pattern: /^\/notifications\/by-correction\/[^/]+\/read$/, create: createMarkNotificationsReadByCorrectionMutationResponse },
 	{ method: 'POST', pattern: /^\/org\/correction-types\/[^/]+\/requirements$/, status: 201, create: createCreatePackageRequirementMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/resubmit-to-dtoe$/, create: createResubmitCorrectionToDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/final-decision$/, create: createDecideFactPackageByDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/send-to-dtoe$/, create: createSendFactPackageToDtoeMutationResponse },
+	{ method: 'POST', pattern: /^\/notifications\/by-plan\/[^/]+\/read$/, create: createMarkNotificationsReadByPlanMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/send-to-dtoe$/, create: createSendCorrectionToDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/dtoe-approve$/, create: createApproveCorrectionByDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/change-type$/, create: createChangeCorrectionTypeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/cfo-approve$/, create: createApproveCorrectionByCfoMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/dtoe-return$/, create: createReturnCorrectionByDtoeMutationResponse },
+	{ method: 'POST', pattern: /^\/org\/plan-types\/[^/]+\/requirements$/, status: 201, create: createCreatePlanPackageRequirementMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/cfo-return$/, create: createReturnCorrectionByCfoMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/cfo-cancel$/, create: createCancelCfoDecisionMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/resubmit-to-dtoe$/, create: createResubmitPlanToDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/remarks$/, create: createLeaveFactPackageRemarkMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/resubmit$/, create: createResubmitCorrectionMutationResponse },
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/submit$/, create: createSubmitFactPackageMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/remarks$/, create: createLeaveRemarkMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/send-to-dtoe$/, create: createSendPlanToDtoeMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/dtoe-approve$/, create: createApprovePlanByDtoeMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/change-type$/, create: createChangePlanTypeMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/cfo-approve$/, create: createApprovePlanByCfoMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/dtoe-return$/, create: createReturnPlanByDtoeMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/send$/, create: createSendCorrectionMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/cfo-return$/, create: createReturnPlanByCfoMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/cfo-cancel$/, create: createCancelPlanCfoDecisionMutationResponse },
 	{ method: 'PATCH', pattern: /^\/org\/filial-cfo-links\/[^/]+$/, create: createUpdateFilialCfoLinkMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/filial-cfo-links\/[^/]+$/, status: 204, create: createDeleteFilialCfoLinkMutationResponse },
 	{ method: 'GET', pattern: /^\/org\/correction-types\/[^/]+$/, create: createGetCorrectionTypeQueryResponse },
 	{ method: 'PATCH', pattern: /^\/org\/correction-types\/[^/]+$/, create: createUpdateCorrectionTypeMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/correction-types\/[^/]+$/, status: 204, create: createDeleteCorrectionTypeMutationResponse },
 	{ method: 'GET', pattern: /^\/fact-files\/[^/]+\/download$/, create: createDownloadFactFormVersionQueryResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/resubmit$/, create: createResubmitPlanMutationResponse },
+	{ method: 'GET', pattern: /^\/plan-files\/[^/]+\/download$/, create: createDownloadPlanFileVersionQueryResponse },
 	{ method: 'GET', pattern: /^\/fact-packages\/[^/]+$/, create: createGetFactPackageQueryResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/remarks$/, create: createLeavePlanRemarkMutationResponse },
 	{ method: 'POST', pattern: /^\/notifications\/[^/]+\/open$/, create: createOpenNotificationMutationResponse },
 	{ method: 'PATCH', pattern: /^\/org\/requirements\/[^/]+$/, create: createUpdatePackageRequirementMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/requirements\/[^/]+$/, status: 204, create: createDeletePackageRequirementMutationResponse },
 	{ method: 'GET', pattern: /^\/corrections\/[^/]+$/, create: createGetCorrectionQueryResponse },
 	{ method: 'DELETE', pattern: /^\/corrections\/[^/]+$/, status: 204, create: createDeleteCorrectionMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/send$/, create: createSendPlanMutationResponse },
+	{ method: 'GET', pattern: /^\/org\/plan-types\/[^/]+$/, create: createGetPlanTypeQueryResponse },
+	{ method: 'PATCH', pattern: /^\/org\/plan-types\/[^/]+$/, create: createUpdatePlanTypeMutationResponse },
+	{ method: 'DELETE', pattern: /^\/org\/plan-types\/[^/]+$/, status: 204, create: createDeletePlanTypeMutationResponse },
 	{ method: 'GET', pattern: /^\/files\/[^/]+\/download$/, create: createDownloadFileVersionQueryResponse },
 	{ method: 'PATCH', pattern: /^\/org\/filials\/[^/]+$/, create: createUpdateFilialMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/filials\/[^/]+$/, status: 204, create: createDeleteFilialMutationResponse },
+	{ method: 'GET', pattern: /^\/plans\/[^/]+$/, create: createGetPlanQueryResponse },
+	{ method: 'DELETE', pattern: /^\/plans\/[^/]+$/, status: 204, create: createDeletePlanMutationResponse },
 	{ method: 'PATCH', pattern: /^\/org\/cfos\/[^/]+$/, create: createUpdateCfoMutationResponse },
 	{ method: 'DELETE', pattern: /^\/org\/cfos\/[^/]+$/, status: 204, create: createDeleteCfoMutationResponse },
 	{ method: 'PATCH', pattern: /^\/users\/[^/]+$/, create: createUpdateUserMutationResponse },
@@ -148,5 +206,9 @@ export const mockRoutes = [
 	{ method: 'POST', pattern: /^\/fact-packages\/[^/]+\/cfo\/[^/]+\/approve$/, create: createApproveFactPackageByCfoMutationResponse },
 	{ method: 'POST', pattern: /^\/corrections\/[^/]+\/slots\/[^/]+\/files$/, status: 201, create: createUploadFileVersionMutationResponse },
 	{ method: 'DELETE', pattern: /^\/fact-packages\/[^/]+\/remarks\/[^/]+$/, status: 204, create: createDeleteFactPackageRemarkMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/remarks\/[^/]+\/reopen$/, create: createReopenPlanRemarkMutationResponse },
 	{ method: 'DELETE', pattern: /^\/corrections\/[^/]+\/remarks\/[^/]+$/, status: 204, create: createDeleteRemarkMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/remarks\/[^/]+\/fix$/, create: createMarkPlanRemarkFixedMutationResponse },
+	{ method: 'POST', pattern: /^\/plans\/[^/]+\/slots\/[^/]+\/files$/, status: 201, create: createUploadPlanFileVersionMutationResponse },
+	{ method: 'DELETE', pattern: /^\/plans\/[^/]+\/remarks\/[^/]+$/, status: 204, create: createDeletePlanRemarkMutationResponse },
 ] satisfies MockRoute[]
