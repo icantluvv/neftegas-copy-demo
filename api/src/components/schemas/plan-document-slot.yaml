@@ -1,0 +1,30 @@
+type: object
+required: [id, planId, requirementId, label, isFilled, isRequired, responsibleCfo]
+properties:
+  id: { type: integer }
+  planId: { type: integer }
+  requirementId:
+    type: [integer, 'null']
+    description: null — основной Excel-файл плана
+  label: { type: string }
+  isFilled: { type: boolean }
+  isRequired:
+    type: boolean
+    description: Пока не заполнены все обязательные слоты, направить план нельзя
+  responsibleCfo:
+    description: null — элемент проверяют все ЦФО маршрута, а не конкретное подразделение
+    oneOf:
+      - $ref: './cfo.yaml#/Cfo'
+      - type: 'null'
+  currentVersion:
+    oneOf:
+      - $ref: './plan-file-version.yaml'
+      - type: 'null'
+  choiceGroupKey:
+    type: [string, 'null']
+    description: >-
+      Общий ключ для слотов-альтернатив («выбери один из группы»); null —
+      слот не входит в группу
+  groupLabel:
+    type: [string, 'null']
+    description: Заголовок группы для UI; null — слот не входит в группу

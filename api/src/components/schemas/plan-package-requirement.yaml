@@ -1,0 +1,29 @@
+PlanPackageRequirement:
+  type: object
+  required: [id, planTypeId, kind, name, isRequired, order]
+  properties:
+    id: { type: integer }
+    planTypeId: { type: integer }
+    kind: { $ref: './plan-package-requirement-kind.yaml' }
+    name: { type: string }
+    isRequired: { type: boolean }
+    responsibleCfoId: { type: [integer, 'null'] }
+    namePattern: { type: string }
+    fileFormat: { type: string }
+    order: { type: integer }
+    choiceGroupKey: { type: [string, 'null'] }
+    groupLabel: { type: [string, 'null'] }
+
+PlanPackageRequirementInput:
+  type: object
+  required: [kind, name]
+  properties:
+    kind: { $ref: './plan-package-requirement-kind.yaml' }
+    name: { type: string }
+    isRequired: { type: boolean, default: true }
+    responsibleCfoId: { type: [integer, 'null'] }
+    namePattern: { type: string }
+    fileFormat: { type: string }
+    order: { type: integer, default: 0 }
+    choiceGroupKey: { type: [string, 'null'] }
+    groupLabel: { type: [string, 'null'] }

@@ -1,0 +1,15 @@
+type: object
+required: [id, planId, cfoId, status, isRequired, cfo]
+properties:
+  id: { type: integer }
+  planId: { type: integer }
+  cfoId: { type: integer }
+  cfo: { $ref: './cfo.yaml#/Cfo' }
+  status: { $ref: './plan-cfo-status-value.yaml' }
+  isRequired: { type: boolean }
+  decidedById: { type: [integer, 'null'] }
+  decidedBy:
+    oneOf:
+      - $ref: './user.yaml#/UserSummary'
+      - type: 'null'
+  decidedAt: { type: [string, 'null'], format: date-time }

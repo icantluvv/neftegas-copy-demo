@@ -1,0 +1,64 @@
+PlanDetail:
+  allOf:
+    - $ref: './plan.yaml#/Plan'
+    - type: object
+      required:
+        - filial
+        - planType
+        - author
+        - slots
+        - cfoStatuses
+        - remarks
+        - history
+        - packageComplete
+        - missingRequirements
+        - isFilialOwner
+        - isCfoReviewer
+        - isDtoe
+        - availableCfos
+        - returnedCfos
+      properties:
+        filial: { $ref: './filial.yaml#/Filial' }
+        planType: { $ref: './plan-type.yaml#/PlanType' }
+        author: { $ref: './user.yaml#/UserSummary' }
+        slots:
+          type: array
+          items: { $ref: './plan-document-slot.yaml' }
+        cfoStatuses:
+          type: array
+          items: { $ref: './plan-cfo-status.yaml' }
+        remarks:
+          type: array
+          items: { $ref: './plan-remark.yaml#/PlanRemark' }
+        history:
+          type: array
+          items: { $ref: './plan-history-entry.yaml' }
+        packageComplete: { type: boolean }
+        missingRequirements:
+          type: array
+          items: { type: string }
+        myCfoStatus:
+          oneOf:
+            - $ref: './plan-cfo-status.yaml'
+            - type: 'null'
+        myOpenRemarksCount: { type: integer }
+        isFilialOwner: { type: boolean }
+        isCfoReviewer: { type: boolean }
+        isDtoe: { type: boolean }
+        availableCfos:
+          type: array
+          description: ЦФО, доступные для отправки (linked_cfos), для формы «Направить»
+          items: { $ref: './cfo.yaml#/Cfo' }
+        returnedCfos:
+          type: array
+          description: ЦФО в статусе RETURNED, для формы «Направить повторно»
+          items: { $ref: './cfo.yaml#/Cfo' }
+
+PlanCfoSelectionInput:
+  type: object
+  required: [cfoIds]
+  properties:
+    cfoIds:
+      type: array
+      items: { type: integer }
+      minItems: 1

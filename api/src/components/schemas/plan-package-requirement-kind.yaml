@@ -1,0 +1,2 @@
+type: string
+enum: [MAIN_EXCEL, EXCEL_SHEET, DOCUMENT]
