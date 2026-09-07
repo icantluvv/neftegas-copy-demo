@@ -10,5 +10,5 @@ import { faker } from "@faker-js/faker";
 
 export function createFactPackage(data?: Partial<FactPackage>): FactPackage {
 
-  return { ...{"id": faker.number.int(),"humanId": faker.string.alpha(),"filialId": faker.number.int(),get "direction"() { return createDirection2() },"authorId": faker.number.int(),get "status"() { return createFactPackageStatus2() },"createdAt": faker.date.anytime().toISOString(),"updatedAt": faker.date.anytime().toISOString(),"sentToDtoeAt": faker.date.anytime().toISOString(),"decidedAt": faker.date.anytime().toISOString(),"canSubmit": faker.datatype.boolean(),"canSendToDtoe": faker.datatype.boolean(),"openRemarksCount": faker.number.int(),...(data || {})} }
+  return { ...{"id": faker.number.int(),"humanId": faker.string.alpha(),"filialId": faker.number.int(),"cfoId": faker.number.int(),get "direction"() { return createDirection2() },"authorId": faker.number.int(),get "status"() { return createFactPackageStatus2() },"createdAt": faker.date.anytime().toISOString(),"updatedAt": faker.date.anytime().toISOString(),"sentToDtoeAt": faker.date.anytime().toISOString(),"decidedAt": faker.date.anytime().toISOString(),"canSubmit": faker.datatype.boolean(),"canSendToDtoe": faker.datatype.boolean(),"openRemarksCount": faker.number.int(),...(data || {})} }
 }

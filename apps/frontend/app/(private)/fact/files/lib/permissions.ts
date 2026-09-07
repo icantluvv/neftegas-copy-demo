@@ -1,11 +1,11 @@
 import type { FactPackageDetail, FactPackageRemark } from "@/packages/api/base/codegen";
 
 export function canUploadFormVersion(detail: FactPackageDetail): boolean {
-  return detail.isFilialOwner && detail.status !== "APPROVED";
+  return (detail.isFilialOwner || detail.isCfoOwner) && detail.status !== "APPROVED";
 }
 
 export function canSubmit(detail: FactPackageDetail): boolean {
-  return detail.isFilialOwner && detail.canSubmit;
+  return (detail.isFilialOwner || detail.isCfoOwner) && detail.canSubmit;
 }
 
 export function canApproveAsCfo(detail: FactPackageDetail): boolean {
@@ -29,7 +29,7 @@ export function canFinalDecideAsDtoe(detail: FactPackageDetail): boolean {
 }
 
 export function canMarkRemarkFixed(detail: FactPackageDetail, remark: FactPackageRemark): boolean {
-  return detail.isFilialOwner && remark.status === "OPEN";
+  return (detail.isFilialOwner || detail.isCfoOwner) && remark.status === "OPEN";
 }
 
 export function canDeleteRemark(remark: FactPackageRemark, currentUserId: number): boolean {

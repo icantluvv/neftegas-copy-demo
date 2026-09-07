@@ -4,6 +4,7 @@
 */
 
 import * as z from "zod";
+import { cfoSchema } from "./cfoSchema";
 import { factCfoStatusValue2Schema } from "./factCfoStatusValue2Schema";
 import { factPackageSchema } from "./factPackageSchema";
 import { filialSchema } from "./filialSchema";
@@ -11,7 +12,10 @@ import { userSummarySchema } from "./userSummarySchema";
 
 export const factPackageListItemSchema = z.lazy(() => factPackageSchema).and(z.object({
     get "filial"(){
-                return filialSchema
+                return z.union([filialSchema, z.null()])
+              },
+get "cfo"(){
+                return z.union([cfoSchema, z.null()])
               },
 get "author"(){
                 return userSummarySchema

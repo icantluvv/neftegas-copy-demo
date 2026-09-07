@@ -43,8 +43,13 @@ describe('FactPackages lifecycle (e2e)', () => {
   let otherFilial: Filial;
   let cfo: Cfo;
 
-  async function loginAs(role: Role, filialId?: number, cfoId?: number) {
-    const email = `${suffix}-${role.toLowerCase()}-${filialId ?? cfoId ?? 'x'}@example.com`;
+  async function loginAs(
+    role: Role,
+    filialId?: number,
+    cfoId?: number,
+    tag = '',
+  ) {
+    const email = `${suffix}-${role.toLowerCase()}-${filialId ?? cfoId ?? 'x'}${tag}@example.com`;
     const passwordHash = await bcrypt.hash(password, 10);
     await users.save(
       users.create({
@@ -106,6 +111,7 @@ describe('FactPackages lifecycle (e2e)', () => {
 
   afterAll(async () => {
     await factPackages.delete({ filialId: filial.id });
+    await factPackages.delete({ cfoId: cfo.id });
     await links.delete({ filialId: filial.id });
     await users.delete({
       username: `${suffix}-filial-${filial.id}@example.com`,
@@ -115,6 +121,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     await users.delete({
       username: `${suffix}-filial-${otherFilial.id}@example.com`,
     });
+    await users.delete({
+      username: `${suffix}-cfo-${cfo.id}-own@example.com`,
+    });
+    await users.delete({ username: `${suffix}-dtoe-x-own@example.com` });
     await cfos.delete(cfo.id);
     await filials.delete([filial.id, otherFilial.id]);
     await app.close();
@@ -126,9 +136,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     const dtoeAuth = await loginAs(Role.DTOE);
 
     const createRes = await request(app.getHttpServer())
-      .get('/api/fact-packages/by-direction/KR_HS')
+      .post('/api/fact-packages')
       .set('Cookie', filialAuth.cookie)
-      .expect(200);
+      .send({ direction: 'KR_HS' })
+      .expect(201);
     const created = createRes.body as FactPackageResponseBody;
     const humanId = created.humanId;
     expect(created.forms).toHaveLength(4);
@@ -190,9 +201,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     const otherFilialAuth = await loginAs(Role.FILIAL, otherFilial.id);
 
     const createRes = await request(app.getHttpServer())
-      .get('/api/fact-packages/by-direction/DO')
+      .post('/api/fact-packages')
       .set('Cookie', filialAuth.cookie)
-      .expect(200);
+      .send({ direction: 'DO' })
+      .expect(201);
     const humanId = (createRes.body as FactPackageResponseBody).humanId;
 
     await request(app.getHttpServer())
@@ -211,9 +223,10 @@ describe('FactPackages lifecycle (e2e)', () => {
     const filialAuth = await loginAs(Role.FILIAL, filial.id);
 
     const createRes = await request(app.getHttpServer())
-      .get('/api/fact-packages/by-direction/TOIR')
+      .post('/api/fact-packages')
       .set('Cookie', filialAuth.cookie)
-      .expect(200);
+      .send({ direction: 'TOIR' })
+      .expect(201);
 
     const { humanId } = createRes.body as FactPackageResponseBody;
 
@@ -224,6 +237,45 @@ describe('FactPackages lifecycle (e2e)', () => {
       .expect(200);
     expect((submitRes.body as FactPackageResponseBody).status).toBe(
       'UNDER_CFO_REVIEW',
+    );
+  });
+
+  it('ЦФО создаёт свой факт-пакет и направляет его напрямую в ДТОиР, минуя проверку ЦФО', async () => {
+    const cfoAuth = await loginAs(Role.CFO, undefined, cfo.id, '-own');
+    const dtoeAuth = await loginAs(Role.DTOE, undefined, undefined, '-own');
+
+    const createRes = await request(app.getHttpServer())
+      .post('/api/fact-packages')
+      .set('Cookie', cfoAuth.cookie)
+      .send({ direction: 'DO' })
+      .expect(201);
+    const created = createRes.body as FactPackageResponseBody;
+    expect(created.status).toBe('DRAFT');
+
+    await request(app.getHttpServer())
+      .post(
+        `/api/fact-packages/${created.humanId}/forms/${created.forms[0].code}/versions`,
+      )
+      .set('Cookie', cfoAuth.cookie)
+      .attach('file', Buffer.from('test'), 'test.txt')
+      .expect(201);
+
+    const submitRes = await request(app.getHttpServer())
+      .post(`/api/fact-packages/${created.humanId}/submit`)
+      .set('Cookie', cfoAuth.cookie)
+      .send({})
+      .expect(201);
+    expect((submitRes.body as FactPackageResponseBody).status).toBe(
+      'UNDER_DTOE_REVIEW',
+    );
+
+    const decisionRes = await request(app.getHttpServer())
+      .post(`/api/fact-packages/${created.humanId}/final-decision`)
+      .set('Cookie', dtoeAuth.cookie)
+      .send({ decision: 'APPROVE' })
+      .expect(201);
+    expect((decisionRes.body as FactPackageResponseBody).status).toBe(
+      'APPROVED',
     );
   });
 });
