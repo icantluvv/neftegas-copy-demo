@@ -1,0 +1,16 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Финализировать возврат плана на доработку от лица ДТОиР
+  operationId: returnPlanByDtoe
+  tags: [Plans]
+  description: |
+    Роль DTOE. Переводит план в «Возвращено ДТОиР». Требует, чтобы ДТОиР уже
+    оставил хотя бы одно открытое замечание по этому плану
+    (`POST /plans/{humanId}/remarks`) — иначе `400`.
+  responses:
+    '200':
+      description: Возвращено ДТОиР на доработку
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }

@@ -1,0 +1,25 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: slotId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Загрузить версию файла в ячейку пакета плана
+  operationId: uploadPlanFileVersion
+  tags: [Plans]
+  description: Доступно только автору-владельцу (роль FILIAL, свой филиал).
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required: [file]
+          properties:
+            file: { type: string, format: binary }
+            note: { type: string }
+            remarkId: { type: integer, description: 'Если файл загружен в ответ на замечание' }
+  responses:
+    '201':
+      description: Новая версия файла добавлена в ячейку
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-file-version.yaml' }

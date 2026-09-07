@@ -1,0 +1,13 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Согласовать план от лица ЦФО
+  operationId: approvePlanByCfo
+  tags: [Plans]
+  description: Роль CFO, только для назначенного ЦФО. Закрывает открытые замечания своего ЦФО.
+  responses:
+    '200':
+      description: Согласовано
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }

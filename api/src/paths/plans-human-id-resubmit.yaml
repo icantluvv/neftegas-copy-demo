@@ -1,0 +1,18 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Повторно направить ЦФО после исправления замечаний
+  operationId: resubmitPlan
+  tags: [Plans]
+  description: Повторное направление только тем ЦФО, которые вернули замечания.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanCfoSelectionInput' }
+  responses:
+    '200':
+      description: Повторно направлено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }

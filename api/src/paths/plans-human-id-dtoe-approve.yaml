@@ -1,0 +1,13 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Финально согласовать план (ДТОиР)
+  operationId: approvePlanByDtoe
+  tags: [Plans]
+  description: Роль DTOE. Финальное согласование.
+  responses:
+    '200':
+      description: Согласовано ДТОиР
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }

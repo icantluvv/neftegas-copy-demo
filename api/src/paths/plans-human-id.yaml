@@ -1,0 +1,51 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string }, example: PLN-000123 }
+get:
+  summary: Детальная карточка плана
+  operationId: getPlan
+  tags: [Plans]
+  responses:
+    '200':
+      description: Детальная карточка плана
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }
+    '403':
+      description: Нет доступа к этому плану
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: Не найдено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+delete:
+  summary: Удалить план
+  operationId: deletePlan
+  tags: [Plans]
+  description: |
+    Роль FILIAL, только автор/владелец. Доступно только для плана в статусе
+    `DRAFT` — направленный (любой другой статус) удалить нельзя, `400`.
+    Удаляет план целиком: слоты, версии файлов, замечания, статусы ЦФО,
+    историю и уведомления по каскаду. `DRAFT`-план не может иметь ни одного
+    статуса ЦФО (они создаются только `POST .../send`), поэтому удаление
+    черновика не затрагивает решений проверяющих и не требует их уведомления.
+  responses:
+    '204':
+      description: План удалён
+    '400':
+      description: План не в статусе «Черновик»
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа (не автор/не владелец филиала)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: Не найдено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

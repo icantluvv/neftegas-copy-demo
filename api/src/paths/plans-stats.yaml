@@ -1,0 +1,10 @@
+get:
+  summary: Статистика по планам для карточек дашборда
+  operationId: getPlanStats
+  tags: [Plans]
+  responses:
+    '200':
+      description: Агрегированные счётчики для карточек дашборда (в рамках видимости роли)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-stats.yaml' }

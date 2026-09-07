@@ -1,0 +1,23 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Направить план на проверку выбранным ЦФО
+  operationId: sendPlan
+  tags: [Plans]
+  description: Филиал направляет укомплектованный пакет выбранным ЦФО.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanCfoSelectionInput' }
+  responses:
+    '200':
+      description: Направлено
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }
+    '400':
+      description: Пакет не укомплектован либо ЦФО не выбраны/не привязаны
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

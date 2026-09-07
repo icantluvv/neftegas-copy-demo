@@ -1,0 +1,18 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Отправить план в ДТОиР
+  operationId: sendPlanToDtoe
+  tags: [Plans]
+  description: Доступно, когда все обязательные ЦФО согласовали (canSendToDtoe).
+  responses:
+    '200':
+      description: Отправлено в ДТОиР
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }
+    '400':
+      description: Не все обязательные ЦФО согласовали пакет
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

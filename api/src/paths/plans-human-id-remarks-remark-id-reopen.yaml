@@ -1,0 +1,19 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: remarkId, in: path, required: true, schema: { type: integer } }
+post:
+  summary: Переоткрыть замечание плана (исправление не принято)
+  operationId: reopenPlanRemark
+  tags: [Plans]
+  description: Роль CFO (владелец замечания). Исправление не принято — переоткрыть.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan-remark.yaml#/PlanRemarkReopenInput' }
+  responses:
+    '200':
+      description: Замечание переоткрыто
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-remark.yaml#/PlanRemark' }

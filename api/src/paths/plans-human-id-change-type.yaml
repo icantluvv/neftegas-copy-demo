@@ -1,0 +1,39 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Изменить тип плана
+  operationId: changePlanType
+  tags: [Plans]
+  description: |
+    Роль FILIAL, только автор/владелец, только пока статус `DRAFT` — после
+    направления маршрут недоступен даже при прямом вызове, `400`. Слоты
+    пакета, привязанные к прежнему типу, удаляются вместе с уже
+    загруженными в них версиями файлов; для нового типа слоты создаются
+    заново тем же алгоритмом, что при создании плана. Общий слот
+    «Excel плана» от типа не зависит и не затрагивается.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan.yaml#/PlanTypeChangeInput' }
+  responses:
+    '200':
+      description: Тип изменён
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }
+    '400':
+      description: План не в статусе «Черновик»
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '403':
+      description: Нет доступа (не автор/не владелец филиала)
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
+    '404':
+      description: План или тип плана не найдены
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }
