@@ -34,6 +34,17 @@ import {
   PackageRequirement,
   PackageRequirementKind,
 } from '../org/entities/package-requirement.entity';
+import { PlanCfoStatus } from '../planning/entities/plan-cfo-status.entity';
+import { PlanDocumentSlot } from '../planning/entities/plan-document-slot.entity';
+import { PlanFileVersion } from '../planning/entities/plan-file-version.entity';
+import { PlanHistoryEntry } from '../planning/entities/plan-history-entry.entity';
+import {
+  PlanPackageRequirement,
+  PlanRequirementKind,
+} from '../planning/entities/plan-package-requirement.entity';
+import { PlanRemark } from '../planning/entities/plan-remark.entity';
+import { PlanType } from '../planning/entities/plan-type.entity';
+import { Plan } from '../planning/entities/plan.entity';
 import { Role, User } from '../users/entities/user.entity';
 
 /**
@@ -71,6 +82,14 @@ const dataSource = new DataSource({
     FactPackageRemark,
     FactPackageHistoryEntry,
     Notification,
+    Plan,
+    PlanType,
+    PlanPackageRequirement,
+    PlanDocumentSlot,
+    PlanFileVersion,
+    PlanCfoStatus,
+    PlanRemark,
+    PlanHistoryEntry,
   ],
   synchronize: true,
 });
@@ -132,6 +151,8 @@ async function main() {
   const linkRepo = dataSource.getRepository(FilialCfoLink);
   const typeRepo = dataSource.getRepository(CorrectionType);
   const reqRepo = dataSource.getRepository(PackageRequirement);
+  const planTypeRepo = dataSource.getRepository(PlanType);
+  const planReqRepo = dataSource.getRepository(PlanPackageRequirement);
   const userRepo = dataSource.getRepository(User);
   const correctionRepo = dataSource.getRepository(Correction);
   const slotRepo = dataSource.getRepository(DocumentSlot);
@@ -216,6 +237,63 @@ async function main() {
     },
   ]);
   const [reqNote, reqPackage, reqMtrList, reqLsr, reqTkp] = requirements;
+
+  await planTypeRepo
+    .save({
+      code: 'DTOIR_2027',
+      name: 'Пообъектный план ДТОиР на 2027 год',
+      description:
+        'Сводный пообъектный план ДТОиР на планируемый год: капитальный ремонт, ' +
+        'техническое обслуживание и текущий ремонт, диагностическое обследование ' +
+        '(openspec/changes/planning-2027-package-review)',
+    })
+    .then((planType) =>
+      // Состав пакета зеркалит демо-тип корректировки 1:1 (тот же набор и
+      // количество слотов, включая группу выбора «один из») — план является
+      // независимым доменом, но комплектность пакета для демо-данных
+      // намеренно одинаковая.
+      planReqRepo.save([
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'Согласованная служебная записка',
+          isRequired: true,
+          order: 1,
+        },
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'Пакет обосновывающих документов',
+          isRequired: true,
+          order: 2,
+        },
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'Перечень комплекта МТР (ХС)',
+          isRequired: true,
+          order: 3,
+        },
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'Локальный сметный расчёт (ПД)',
+          isRequired: true,
+          order: 4,
+          choiceGroupKey: MTR_CHOICE_GROUP,
+          groupLabel: MTR_GROUP_LABEL,
+        },
+        {
+          planTypeId: planType.id,
+          kind: PlanRequirementKind.DOCUMENT,
+          name: 'ХЗ-х ТКП',
+          isRequired: true,
+          order: 5,
+          choiceGroupKey: MTR_CHOICE_GROUP,
+          groupLabel: MTR_GROUP_LABEL,
+        },
+      ]),
+    );
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
 
