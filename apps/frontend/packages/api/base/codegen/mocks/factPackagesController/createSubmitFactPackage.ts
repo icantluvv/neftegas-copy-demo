@@ -4,9 +4,9 @@
 */
 
 import type { SubmitFactPackage200, SubmitFactPackage400, SubmitFactPackageMutationRequest, SubmitFactPackageMutationResponse, SubmitFactPackagePathParams } from "../../types/factPackagesController/SubmitFactPackage";
-import { createCfoSelectionInput } from "../createCfoSelectionInput";
 import { createErrorResponse2 } from "../createErrorResponse2";
 import { createFactPackageDetail } from "../createFactPackageDetail";
+import { createFactPackageSubmitInput } from "../createFactPackageSubmitInput";
 import { faker } from "@faker-js/faker";
 
 export function createSubmitFactPackagePathParams(data?: Partial<SubmitFactPackagePathParams>): SubmitFactPackagePathParams {
@@ -35,7 +35,7 @@ export function createSubmitFactPackage400(data?: Partial<SubmitFactPackage400>)
 
 export function createSubmitFactPackageMutationRequest(data?: Partial<SubmitFactPackageMutationRequest>): SubmitFactPackageMutationRequest {
 
-  return createCfoSelectionInput(data)
+  return createFactPackageSubmitInput(data)
 }
 
 export function createSubmitFactPackageMutationResponse(data?: Partial<SubmitFactPackageMutationResponse>): SubmitFactPackageMutationResponse {

@@ -14,12 +14,13 @@ function getSubmitFactPackageUrl({ humanId }: { humanId: SubmitFactPackagePathPa
 }
 
 /**
- * @description Филиал направляет укомплектованный пакет выбранным ЦФО. Обслуживает и
- * первичное направление (DRAFT), и повторное направление после доработки
- * (RETURNED_FOR_REVISION) — в этом случае доступно только когда все
- * замечания от вернувших ЦФО отмечены исправленными; статус
- * согласовавших ранее ЦФО не сбрасывается.
- * @summary Направить факт-пакет на проверку выбранным ЦФО
+ * @description Филиал направляет укомплектованный пакет выбранным ЦФО (cfoIds
+ * обязателен). Обслуживает и первичное направление (DRAFT), и повторное
+ * направление после доработки (RETURNED_FOR_REVISION) — в этом случае
+ * доступно только когда все замечания от вернувших ЦФО отмечены
+ * исправленными; статус согласовавших ранее ЦФО не сбрасывается. Для
+ * пакета, созданного самим ЦФО, cfoIds не нужен — уходит сразу в ДТОиР.
+ * @summary Направить факт-пакет — Филиал выбранным ЦФО, ЦФО сразу в ДТОиР
  * {@link /fact-packages/:humanId/submit}
  */
 export async function submitFactPackage({ humanId, data }: { humanId: SubmitFactPackagePathParams["humanId"]; data: SubmitFactPackageMutationRequest }, config: Partial<RequestConfig<SubmitFactPackageMutationRequest>> & { client?: Client } = {}) {

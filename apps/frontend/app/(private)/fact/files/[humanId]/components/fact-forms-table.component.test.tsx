@@ -24,6 +24,7 @@ function makeDetail(overrides: Partial<FactPackageDetail> = {}): FactPackageDeta
 		id: 1,
 		humanId: "FCT-000002",
 		filialId: 1,
+		cfoId: null,
 		direction: "DO",
 		authorId: 5,
 		status: "DRAFT",
@@ -35,6 +36,7 @@ function makeDetail(overrides: Partial<FactPackageDetail> = {}): FactPackageDeta
 		canSendToDtoe: false,
 		openRemarksCount: 0,
 		filial: { id: 1, code: "ЧФ", name: "Черноморнефтегаз", isActive: true },
+		cfo: null,
 		author: { id: 5, username: "author", fullName: "Автор Автор Автор" },
 		forms: [
 			{
@@ -54,6 +56,7 @@ function makeDetail(overrides: Partial<FactPackageDetail> = {}): FactPackageDeta
 		myCfoStatus: null,
 		myOpenRemarksCount: 0,
 		isFilialOwner: true,
+		isCfoOwner: false,
 		isCfoReviewer: false,
 		isDtoe: false,
 		availableCfos: [],

@@ -16,9 +16,15 @@ export interface FactPackage {
     */
     humanId: string;
     /**
-     * @type integer
+     * @description Владелец-Филиал — заполнено, если пакет создан Филиалом (идёт на проверку ЦФО)
+     * @type integer,null
     */
-    filialId: number;
+    filialId: number | null;
+    /**
+     * @description Владелец-ЦФО — заполнено, если пакет создан ЦФО (свой, сразу в ДТОиР). Ровно одно из filialId/cfoId заполнено
+     * @type integer,null
+    */
+    cfoId: number | null;
     /**
      * @type string
     */

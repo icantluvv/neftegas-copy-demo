@@ -136,6 +136,7 @@ export function toFactPackageBaseDto(factPackage: FactPackage) {
     id: factPackage.id,
     humanId: factPackage.humanId,
     filialId: factPackage.filialId,
+    cfoId: factPackage.cfoId,
     direction: factPackage.direction,
     authorId: factPackage.authorId,
     status: factPackage.status,
@@ -157,7 +158,8 @@ export function toFactPackageListItemDto(
 ) {
   return {
     ...toFactPackageBaseDto(factPackage),
-    filial: toFilialDto(factPackage.filial),
+    filial: factPackage.filial ? toFilialDto(factPackage.filial) : null,
+    cfo: factPackage.cfo ? toCfoDto(factPackage.cfo) : null,
     author: toUserSummaryDto(factPackage.author),
     myCfoStatus: opts.myCfoStatus ?? null,
   };

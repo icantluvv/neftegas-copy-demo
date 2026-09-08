@@ -16,7 +16,7 @@ import { OpenFactPackageLink } from "./open-fact-package-link";
 
 const columns: ColumnDef<FactPackageListItem, unknown>[] = [
   { accessorKey: "humanId", header: "ID" },
-  { id: "filial", header: "Филиал", cell: ({ row }) => row.original.filial.name },
+  { id: "filial", header: "Филиал", cell: ({ row }) => row.original.filial?.name ?? `ЦФО «${row.original.cfo?.name}»` },
   { id: "direction", header: "Направление", cell: ({ row }) => getDirectionLabel(row.original.direction) },
   {
     id: "status",

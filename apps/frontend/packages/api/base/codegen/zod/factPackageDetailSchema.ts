@@ -15,7 +15,10 @@ import { userSummarySchema } from "./userSummarySchema";
 
 export const factPackageDetailSchema = z.lazy(() => factPackageSchema).and(z.object({
     get "filial"(){
-                return filialSchema
+                return z.union([filialSchema, z.null()])
+              },
+get "cfo"(){
+                return z.union([cfoSchema, z.null()])
               },
 get "author"(){
                 return userSummarySchema
@@ -39,6 +42,7 @@ get "myCfoStatus"(){
               },
 "myOpenRemarksCount": z.optional(z.int()),
 "isFilialOwner": z.boolean(),
+"isCfoOwner": z.boolean().describe("Пакет создан этим ЦФО (свой, без проверки ЦФО)"),
 "isCfoReviewer": z.boolean(),
 "isDtoe": z.boolean(),
 get "availableCfos"(){

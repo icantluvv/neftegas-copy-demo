@@ -8,10 +8,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   type Relation,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Cfo } from '../../org/entities/cfo.entity';
 import { Filial } from '../../org/entities/filial.entity';
 import { User } from '../../users/entities/user.entity';
 import { Direction } from '../fact-form-catalog';
@@ -33,11 +33,13 @@ export enum FactPackageStatus {
 }
 
 /**
- * Факт-пакет — один долгоживущий пакет форм на пару «Филиал × Направление»,
- * без привязки к отчётному периоду (openspec/changes/fact-package-review).
+ * Факт-пакет — пакет форм по направлению, создаётся заново каждый раз
+ * автором-владельцем (по аналогии с корректировкой). Владелец — либо Филиал
+ * (`filialId`, идёт на проверку выбранным ЦФО), либо ЦФО (`cfoId`, свой пакет
+ * без проверки ЦФО, направляется сразу в ДТОиР) — ровно один из двух
+ * заполнен (openspec/changes/fact-package-review).
  */
 @Entity('fact_packages')
-@Unique(['filialId', 'direction'])
 export class FactPackage {
   @PrimaryGeneratedColumn()
   id: number;
@@ -46,12 +48,19 @@ export class FactPackage {
   @Column()
   humanId: string;
 
-  @ManyToOne(() => Filial, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => Filial, { onDelete: 'RESTRICT', nullable: true })
   @JoinColumn({ name: 'filialId' })
-  filial: Relation<Filial>;
+  filial: Relation<Filial> | null;
 
-  @Column()
-  filialId: number;
+  @Column({ nullable: true })
+  filialId: number | null;
+
+  @ManyToOne(() => Cfo, { onDelete: 'RESTRICT', nullable: true })
+  @JoinColumn({ name: 'cfoId' })
+  cfo: Relation<Cfo> | null;
+
+  @Column({ nullable: true })
+  cfoId: number | null;
 
   @Column({ type: 'enum', enum: Direction })
   direction: Direction;
@@ -95,6 +104,12 @@ export class FactPackage {
   history: FactPackageHistoryEntry[];
 
   get canSubmit(): boolean {
+    if (this.cfoId != null) {
+      return (
+        this.status === FactPackageStatus.DRAFT ||
+        this.status === FactPackageStatus.RETURNED_BY_DTOE
+      );
+    }
     return (
       this.status === FactPackageStatus.DRAFT ||
       this.status === FactPackageStatus.RETURNED_FOR_REVISION
