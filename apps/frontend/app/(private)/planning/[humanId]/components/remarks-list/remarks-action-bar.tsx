@@ -22,7 +22,6 @@ import {
 } from "../../lib/permissions";
 import { useInvalidatePlan } from "../../lib/use-invalidate-plan";
 
-/** Решения ЦФО и ДТОиР по плану — шапка блока замечаний. */
 export function RemarksActionBar({ detail }: { detail: PlanDetail }) {
   const invalidate = useInvalidatePlan(detail.humanId);
 

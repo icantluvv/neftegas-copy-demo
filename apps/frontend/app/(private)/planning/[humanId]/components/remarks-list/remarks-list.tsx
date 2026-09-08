@@ -12,7 +12,6 @@ interface RemarksListProps {
   currentUserId: number;
 }
 
-/** Блок замечаний карточки плана: решения проверяющего и таблица замечаний. */
 export function RemarksList({ detail, currentUserId }: RemarksListProps) {
   const columns = createRemarksColumns({ detail, currentUserId });
 

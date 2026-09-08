@@ -14,7 +14,6 @@ interface RemarkActionsCellProps {
   currentUserId: number;
 }
 
-/** Действия филиала и автора над одним замечанием — рендерится в ячейке таблицы. */
 export function RemarkActionsCell({ detail, remark, currentUserId }: RemarkActionsCellProps) {
   const invalidate = useInvalidatePlan(detail.humanId);
 

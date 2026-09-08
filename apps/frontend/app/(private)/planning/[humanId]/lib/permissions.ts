@@ -17,12 +17,10 @@ export function canApproveAsCfo(detail: PlanDetail): boolean {
   return detail.isCfoReviewer && detail.myCfoStatus?.status === "PENDING";
 }
 
-/** Пока статус этого ЦФО = PENDING, можно оставлять замечания к элементам пакета — сколько угодно за один заход. */
 export function canLeaveRemarkAsCfo(detail: PlanDetail): boolean {
   return detail.isCfoReviewer && detail.myCfoStatus?.status === "PENDING";
 }
 
-/** Финализирует возврат — доступно, только когда этот ЦФО уже оставил хотя бы одно открытое замечание. */
 export function canFinalizeReturnAsCfo(detail: PlanDetail): boolean {
   const cfoId = detail.myCfoStatus?.cfoId;
   if (!canLeaveRemarkAsCfo(detail) || cfoId == null) return false;
@@ -33,12 +31,10 @@ export function canApproveAsDtoe(detail: PlanDetail): boolean {
   return detail.isDtoe && detail.status === "UNDER_DTOE_REVIEW";
 }
 
-/** Пока план на проверке ДТОиР, можно оставлять замечания к элементам пакета — сколько угодно за один заход. */
 export function canLeaveRemarkAsDtoe(detail: PlanDetail): boolean {
   return detail.isDtoe && detail.status === "UNDER_DTOE_REVIEW";
 }
 
-/** Финализирует возврат — доступно, только когда ДТОиР уже оставил хотя бы одно открытое замечание. */
 export function canFinalizeReturnAsDtoe(detail: PlanDetail): boolean {
   if (!canLeaveRemarkAsDtoe(detail)) return false;
   return detail.remarks.some((remark) => remark.cfoId === null && remark.status === "OPEN");

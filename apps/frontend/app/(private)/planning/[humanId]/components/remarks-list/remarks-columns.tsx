@@ -20,7 +20,6 @@ interface RemarksColumnsParams {
   currentUserId: number;
 }
 
-/** Колонки таблицы замечаний; зависят от карточки — поэтому фабрика, а не константа. */
 export function createRemarksColumns({ detail, currentUserId }: RemarksColumnsParams): ColumnDef<PlanRemark, unknown>[] {
   return [
     { accessorKey: "humanId", header: "ID" },
