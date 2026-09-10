@@ -10,7 +10,8 @@ import { factPackageStatus2Schema } from "./factPackageStatus2Schema";
 export const factPackageSchema = z.object({
     "id": z.int(),
 "humanId": z.string(),
-"filialId": z.int(),
+"filialId": z.nullable(z.int()),
+"cfoId": z.nullable(z.int()),
 get "direction"(){
                 return direction2Schema
               },

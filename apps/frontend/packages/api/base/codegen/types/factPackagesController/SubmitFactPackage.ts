@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { CfoSelectionInput } from "../CfoSelectionInput";
 import type { ErrorResponse2 } from "../ErrorResponse2";
 import type { FactPackageDetail } from "../FactPackageDetail";
+import type { FactPackageSubmitInput } from "../FactPackageSubmitInput";
 
 export interface SubmitFactPackagePathParams {
     /**
@@ -24,7 +24,7 @@ export type SubmitFactPackage200 = FactPackageDetail;
 */
 export type SubmitFactPackage400 = ErrorResponse2;
 
-export type SubmitFactPackageMutationRequest = CfoSelectionInput;
+export type SubmitFactPackageMutationRequest = FactPackageSubmitInput;
 
 export type SubmitFactPackageMutationResponse = SubmitFactPackage200;
 

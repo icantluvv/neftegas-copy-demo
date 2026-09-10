@@ -13,10 +13,8 @@ import type { Filial } from "./Filial";
 import type { UserSummary } from "./UserSummary";
 
 export type FactPackageDetail = (FactPackage & {
-    /**
-     * @type object
-    */
-    filial: Filial;
+    filial: (Filial | null);
+    cfo: (Cfo | null);
     /**
      * @type object
     */
@@ -54,6 +52,11 @@ export type FactPackageDetail = (FactPackage & {
      * @type boolean
     */
     isFilialOwner: boolean;
+    /**
+     * @description Пакет создан этим ЦФО (свой, без проверки ЦФО)
+     * @type boolean
+    */
+    isCfoOwner: boolean;
     /**
      * @type boolean
     */

@@ -121,6 +121,15 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@keyframes wave-drift {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-160px);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

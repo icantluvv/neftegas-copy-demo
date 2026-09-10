@@ -20,7 +20,7 @@ export function CfoFactOverview() {
   const filials = useMemo(() => {
     const byId = new Map<number, string>();
     for (const item of allFactPackages) {
-      byId.set(item.filial.id, item.filial.name);
+      if (item.filial) byId.set(item.filial.id, item.filial.name);
     }
     return [...byId.entries()].map(([id, name]) => ({ id, name }));
   }, [allFactPackages]);

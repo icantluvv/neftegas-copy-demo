@@ -19,11 +19,12 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role, User } from '../users/entities/user.entity';
 import { CfoSelectionDto } from './dto/cfo-selection.dto';
+import { CreateFactPackageDto } from './dto/create-fact-package.dto';
 import { FinalDecisionDto } from './dto/final-decision.dto';
 import { FindFactPackagesQueryDto } from './dto/find-fact-packages-query.dto';
 import { RemarkCreateDto } from './dto/remark-create.dto';
 import { UploadFileDto } from './dto/upload-file.dto';
-import { Direction, FactFormCode } from './fact-form-catalog';
+import { FactFormCode } from './fact-form-catalog';
 import { FactPackagesService } from './fact-packages.service';
 
 @ApiTags('FactPackages')
@@ -36,13 +37,10 @@ export class FactPackagesController {
     return this.service.findAll(user, query);
   }
 
-  @Roles(Role.FILIAL)
-  @Get('by-direction/:direction')
-  getOrCreateByDirection(
-    @CurrentUser() user: User,
-    @Param('direction') direction: Direction,
-  ) {
-    return this.service.getOrCreateByDirection(user, direction);
+  @Roles(Role.FILIAL, Role.CFO)
+  @Post()
+  create(@CurrentUser() user: User, @Body() dto: CreateFactPackageDto) {
+    return this.service.create(user, dto.direction);
   }
 
   @Get('stats')
@@ -73,7 +71,7 @@ export class FactPackagesController {
     return this.service.findOne(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @UseInterceptors(FileInterceptor('file'))
   @Post(':humanId/forms/:formCode/versions')
   @HttpCode(HttpStatus.CREATED)
@@ -94,8 +92,9 @@ export class FactPackagesController {
     );
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/submit')
+  @HttpCode(HttpStatus.OK)
   submit(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -106,6 +105,7 @@ export class FactPackagesController {
 
   @Roles(Role.CFO)
   @Post(':humanId/cfo/:cfoId/approve')
+  @HttpCode(HttpStatus.OK)
   approveByCfo(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -116,6 +116,7 @@ export class FactPackagesController {
 
   @Roles(Role.CFO, Role.DTOE)
   @Post(':humanId/remarks')
+  @HttpCode(HttpStatus.OK)
   leaveRemark(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -124,8 +125,9 @@ export class FactPackagesController {
     return this.service.leaveRemark(user, humanId, dto);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/remarks/:remarkId/fix')
+  @HttpCode(HttpStatus.OK)
   fixRemark(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,
@@ -146,12 +148,14 @@ export class FactPackagesController {
 
   @Roles(Role.CFO)
   @Post(':humanId/send-to-dtoe')
+  @HttpCode(HttpStatus.OK)
   sendToDtoe(@CurrentUser() user: User, @Param('humanId') humanId: string) {
     return this.service.sendToDtoe(user, humanId);
   }
 
   @Roles(Role.DTOE)
   @Post(':humanId/final-decision')
+  @HttpCode(HttpStatus.OK)
   finalDecision(
     @CurrentUser() user: User,
     @Param('humanId') humanId: string,

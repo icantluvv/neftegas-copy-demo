@@ -4,6 +4,7 @@
 */
 
 import type { FactPackageListItem } from "../types/FactPackageListItem";
+import { createCfo } from "./createCfo";
 import { createFactCfoStatusValue2 } from "./createFactCfoStatusValue2";
 import { createFactPackage } from "./createFactPackage";
 import { createFilial } from "./createFilial";
@@ -13,7 +14,7 @@ import { faker } from "@faker-js/faker";
 export function createFactPackageListItem(data?: Partial<FactPackageListItem>): FactPackageListItem {
 
   return {
-    ...{...createFactPackage(), ...{get "filial"() { return createFilial() },get "author"() { return createUserSummary() },get "myCfoStatus"() { return faker.helpers.arrayElement<any>([createFactCfoStatusValue2(), null]) }}},
+    ...{...createFactPackage(), ...{get "filial"() { return faker.helpers.arrayElement<any>([createFilial(), null]) },get "cfo"() { return faker.helpers.arrayElement<any>([createCfo(), null]) },get "author"() { return createUserSummary() },get "myCfoStatus"() { return faker.helpers.arrayElement<any>([createFactCfoStatusValue2(), null]) }}},
     ...data || {}
   }
 }
