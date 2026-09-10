@@ -4,6 +4,7 @@ FactPackage:
     - id
     - humanId
     - filialId
+    - cfoId
     - direction
     - authorId
     - status
@@ -15,7 +16,12 @@ FactPackage:
   properties:
     id: { type: integer }
     humanId: { type: string, example: FCT-000123 }
-    filialId: { type: integer }
+    filialId:
+      type: [integer, 'null']
+      description: 'Владелец-Филиал — заполнено, если пакет создан Филиалом (идёт на проверку ЦФО)'
+    cfoId:
+      type: [integer, 'null']
+      description: 'Владелец-ЦФО — заполнено, если пакет создан ЦФО (свой, сразу в ДТОиР). Ровно одно из filialId/cfoId заполнено'
     direction: { $ref: './direction.yaml' }
     authorId: { type: integer }
     status: { $ref: './fact-package-status.yaml' }
@@ -31,15 +37,39 @@ FactPackageListItem:
   allOf:
     - $ref: './fact-package.yaml#/FactPackage'
     - type: object
-      required: [filial, author]
+      required: [filial, cfo, author]
       properties:
-        filial: { $ref: './filial.yaml#/Filial' }
+        filial:
+          oneOf:
+            - $ref: './filial.yaml#/Filial'
+            - type: 'null'
+        cfo:
+          oneOf:
+            - $ref: './cfo.yaml#/Cfo'
+            - type: 'null'
         author: { $ref: './user.yaml#/UserSummary' }
         myCfoStatus:
           oneOf:
             - $ref: './fact-cfo-status-value.yaml'
             - type: 'null'
           description: Заполняется только для роли CFO
+
+FactPackageCreateInput:
+  type: object
+  required: [direction]
+  properties:
+    direction: { $ref: './direction.yaml' }
+
+FactPackageSubmitInput:
+  type: object
+  description: >
+    Для пакета, созданного Филиалом, cfoIds обязателен (кому направить на
+    проверку). Для пакета, созданного ЦФО, cfoIds не нужен — пакет уходит
+    сразу в ДТОиР.
+  properties:
+    cfoIds:
+      type: array
+      items: { type: integer }
 
 PaginatedFactPackages:
   type: object

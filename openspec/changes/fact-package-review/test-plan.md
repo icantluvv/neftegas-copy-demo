@@ -30,6 +30,23 @@ refactor → verification, для каждой строки покрытия н�
 | ДТОиР видит факт-пакеты всех филиалов | `fact-packages.service.spec.ts` | — | [ ] |
 | История версий формы сохраняет все загрузки | `fact-packages.service.spec.ts` | `forms-table.component.test.tsx` (счётчик версий/история) | [ ] |
 
+## Дополнение: экран «Файлы», создание заново, факт-пакет ЦФО
+
+| Сценарий | Backend | Frontend | Готово |
+|---|---|---|---|
+| Экран «Файлы» всегда создаёт новый факт-пакет | `fact-packages.service.spec.ts` (`create` — CFO разрешён) + e2e | `direction-card.component.test.tsx` | [x] |
+| ЦФО создаёт свой факт-пакет и направляет сразу в ДТОиР | `fact-packages.service.spec.ts` (`submit` — владелец ЦФО, статус) + e2e (`fact-packages.e2e-spec.ts`, не запущен из-за окружения, см. ниже) | `fact-submit-panel.component.test.tsx`, `cfo-create-own-package-button.component.test.tsx` | [x] |
+| Чужой ЦФО не может загрузить форму / направить чужой пакет ЦФО | `fact-packages.service.spec.ts` (`uploadFormVersion`/`submit` — отклоняет несовпадающий cfoId) | — (защита на бэкенде) | [x] |
+| Экран «Файлы» у ЦФО — карточки направлений вместо таблицы | — | `cfo-fact-files.component.test.tsx` | [x] |
+
+Известное ограничение окружения: `bun run test:e2e` в `apps/backend` падает
+на первом импорте (`TypeError: callSite.getFileName is not a function`) для
+всех e2e-сьютов одинаково, включая не относящиеся к этой задаче
+(`auth.e2e-spec.ts`) — несовместимость Bun 1.4.0/Jest в контейнере, не баг в
+коде. Новый e2e-сценарий факт-пакета ЦФО скомпилирован (`tsc --noEmit` без
+ошибок) и проверен вручную через live HTTP-запросы к backend, но не прогнан
+автоматическим раннером.
+
 ## Тестовые данные
 
 Backend: фикстуры/factory-объекты по образцу `corrections.service.spec.ts`

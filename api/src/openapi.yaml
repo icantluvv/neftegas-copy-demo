@@ -129,8 +129,6 @@ paths:
 
   /fact-packages:
     $ref: './paths/fact-packages.yaml'
-  /fact-packages/by-direction/{direction}:
-    $ref: './paths/fact-packages-by-direction-direction.yaml'
   /fact-packages/stats:
     $ref: './paths/fact-packages-stats.yaml'
   /fact-packages/stats/filial:

@@ -22,6 +22,7 @@ function makeDetail(overrides: Partial<FactPackageDetail> = {}): FactPackageDeta
 		id: 1,
 		humanId: "FCT-000004",
 		filialId: 1,
+		cfoId: null,
 		direction: "DO",
 		authorId: 5,
 		status: "DRAFT",
@@ -33,6 +34,7 @@ function makeDetail(overrides: Partial<FactPackageDetail> = {}): FactPackageDeta
 		canSendToDtoe: false,
 		openRemarksCount: 0,
 		filial: { id: 1, code: "ЧФ", name: "Черноморнефтегаз", isActive: true },
+		cfo: null,
 		author: { id: 5, username: "author", fullName: "Автор Автор Автор" },
 		forms: [],
 		cfoStatuses: [],
@@ -43,6 +45,7 @@ function makeDetail(overrides: Partial<FactPackageDetail> = {}): FactPackageDeta
 		myCfoStatus: null,
 		myOpenRemarksCount: 0,
 		isFilialOwner: true,
+		isCfoOwner: false,
 		isCfoReviewer: false,
 		isDtoe: false,
 		availableCfos: [
@@ -126,5 +129,20 @@ describe("<FactSubmitPanel />", () => {
 		await view.getByRole("checkbox").first().click();
 
 		await expect.element(view.getByRole("button", { name: "Направить" })).toBeEnabled();
+	});
+
+	it("для пакета, созданного ЦФО, показывает кнопку «Направить в ДТОиР» без чекбоксов ЦФО", async () => {
+		const mutate = vi.fn();
+		useSubmitFactPackageMock.mockReturnValue({ mutate, isPending: false });
+		const view = await renderWithClient(
+			makeDetail({ isFilialOwner: false, isCfoOwner: true, filial: null, cfo: { id: 5, code: "ОГМ", name: "ОГМ", isActive: true } }),
+		);
+
+		await expect.element(view.getByText("Направить в ДТОиР")).toBeVisible();
+		await expect.element(view.getByRole("checkbox")).not.toBeInTheDocument();
+
+		await view.getByRole("button", { name: "Направить" }).click();
+
+		expect(mutate).toHaveBeenCalledWith({ humanId: "FCT-000004", data: {} });
 	});
 });

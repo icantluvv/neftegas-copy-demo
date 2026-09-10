@@ -3,16 +3,15 @@
 * Do not edit manually.
 */
 
+import type { Cfo } from "./Cfo";
 import type { FactCfoStatusValue2 } from "./FactCfoStatusValue2";
 import type { FactPackage } from "./FactPackage";
 import type { Filial } from "./Filial";
 import type { UserSummary } from "./UserSummary";
 
 export type FactPackageListItem = (FactPackage & {
-    /**
-     * @type object
-    */
-    filial: Filial;
+    filial: (Filial | null);
+    cfo: (Cfo | null);
     /**
      * @type object
     */

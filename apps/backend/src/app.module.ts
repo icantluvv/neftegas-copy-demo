@@ -11,6 +11,7 @@ import { CorrectionsModule } from './corrections/corrections.module';
 import { FactPackagesModule } from './fact-packages/fact-packages.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OrgModule } from './org/org.module';
+import { PlanningModule } from './planning/planning.module';
 import { RedisModule } from './redis/redis.module';
 import { UsersModule } from './users/users.module';
 
@@ -39,6 +40,7 @@ import { UsersModule } from './users/users.module';
     FactPackagesModule,
     NotificationsModule,
     OrgModule,
+    PlanningModule,
   ],
   controllers: [AppController],
   providers: [

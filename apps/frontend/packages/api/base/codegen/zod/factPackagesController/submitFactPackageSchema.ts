@@ -4,9 +4,9 @@
 */
 
 import * as z from "zod/mini";
-import { cfoSelectionInputSchema } from "../cfoSelectionInputSchema";
 import { errorResponse2Schema } from "../errorResponse2Schema";
 import { factPackageDetailSchema } from "../factPackageDetailSchema";
+import { factPackageSubmitInputSchema } from "../factPackageSubmitInputSchema";
 
 export const submitFactPackagePathParamsSchema = z.object({
     "humanId": z.string()
@@ -22,6 +22,6 @@ export const submitFactPackage200Schema = z.lazy(() => factPackageDetailSchema)
  */
 export const submitFactPackage400Schema = z.lazy(() => errorResponse2Schema)
 
-export const submitFactPackageMutationRequestSchema = z.lazy(() => cfoSelectionInputSchema)
+export const submitFactPackageMutationRequestSchema = z.lazy(() => factPackageSubmitInputSchema)
 
 export const submitFactPackageMutationResponseSchema = z.lazy(() => submitFactPackage200Schema)
