@@ -4,6 +4,7 @@ Correction:
     - id
     - humanId
     - filialId
+    - cfoId
     - correctionTypeId
     - authorId
     - status
@@ -16,7 +17,12 @@ Correction:
   properties:
     id: { type: integer }
     humanId: { type: string, example: COR-000123 }
-    filialId: { type: integer }
+    filialId:
+      type: [integer, 'null']
+      description: Заполнено, если корректировку создал Филиал; иначе null (создана ЦФО, см. cfoId).
+    cfoId:
+      type: [integer, 'null']
+      description: Заполнено, если корректировку создал сам ЦФО (направляется сразу в ДТОиР); иначе null.
     correctionTypeId: { type: integer }
     authorId: { type: integer }
     status: { $ref: './correction-status.yaml' }
@@ -33,9 +39,17 @@ CorrectionListItem:
   allOf:
     - $ref: './correction.yaml#/Correction'
     - type: object
-      required: [filial, correctionType, author]
+      required: [filial, cfo, correctionType, author]
       properties:
-        filial: { $ref: './filial.yaml#/Filial' }
+        filial:
+          oneOf:
+            - $ref: './filial.yaml#/Filial'
+            - type: 'null'
+        cfo:
+          description: Заполнено, если корректировку создал сам ЦФО.
+          oneOf:
+            - $ref: './cfo.yaml#/Cfo'
+            - type: 'null'
         correctionType: { $ref: './correction-type.yaml#/CorrectionType' }
         author: { $ref: './user.yaml#/UserSummary' }
         myCfoStatus:

@@ -4,6 +4,7 @@ CorrectionDetail:
     - type: object
       required:
         - filial
+        - cfo
         - correctionType
         - author
         - slots
@@ -13,12 +14,21 @@ CorrectionDetail:
         - packageComplete
         - missingRequirements
         - isFilialOwner
+        - isCfoOwner
         - isCfoReviewer
         - isDtoe
         - availableCfos
         - returnedCfos
       properties:
-        filial: { $ref: './filial.yaml#/Filial' }
+        filial:
+          oneOf:
+            - $ref: './filial.yaml#/Filial'
+            - type: 'null'
+        cfo:
+          description: Заполнено, если корректировку создал сам ЦФО.
+          oneOf:
+            - $ref: './cfo.yaml#/Cfo'
+            - type: 'null'
         correctionType: { $ref: './correction-type.yaml#/CorrectionType' }
         author: { $ref: './user.yaml#/UserSummary' }
         slots:
@@ -43,11 +53,14 @@ CorrectionDetail:
             - type: 'null'
         myOpenRemarksCount: { type: integer }
         isFilialOwner: { type: boolean }
+        isCfoOwner:
+          type: boolean
+          description: Пакет создан этим ЦФО (свой, направляется сразу в ДТОиР без проверки другими ЦФО).
         isCfoReviewer: { type: boolean }
         isDtoe: { type: boolean }
         availableCfos:
           type: array
-          description: ЦФО, доступные для отправки (linked_cfos), для формы «Направить»
+          description: ЦФО, доступные для отправки (linked_cfos), для формы «Направить». Пусто для пакета, созданного ЦФО (у него нет формы выбора — направление сразу в ДТОиР).
           items: { $ref: './cfo.yaml#/Cfo' }
         returnedCfos:
           type: array
