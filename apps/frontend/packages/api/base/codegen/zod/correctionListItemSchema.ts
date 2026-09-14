@@ -4,6 +4,7 @@
 */
 
 import * as z from "zod";
+import { cfoSchema } from "./cfoSchema";
 import { cfoStatusValue2Schema } from "./cfoStatusValue2Schema";
 import { correctionSchema } from "./correctionSchema";
 import { correctionTypeSchema } from "./correctionTypeSchema";
@@ -12,7 +13,10 @@ import { userSummarySchema } from "./userSummarySchema";
 
 export const correctionListItemSchema = z.lazy(() => correctionSchema).and(z.object({
     get "filial"(){
-                return filialSchema
+                return z.union([filialSchema, z.null()])
+              },
+get "cfo"(){
+                return z.union([cfoSchema, z.null()]).describe("Заполнено, если корректировку создал сам ЦФО.")
               },
 get "correctionType"(){
                 return correctionTypeSchema

@@ -14,7 +14,7 @@ import { faker } from "@faker-js/faker";
 export function createCorrectionListItem(data?: Partial<CorrectionListItem>): CorrectionListItem {
 
   return {
-    ...{...createCorrection(), ...{get "filial"() { return createFilial() },get "correctionType"() { return createCorrectionType() },get "author"() { return createUserSummary() },get "myCfoStatus"() { return faker.helpers.arrayElement<any>([createCfoStatusValue2(), null]) }}},
+    ...{...createCorrection(), ...{get "filial"() { return createFilial() },get "cfo"() { return null },get "correctionType"() { return createCorrectionType() },get "author"() { return createUserSummary() },get "myCfoStatus"() { return faker.helpers.arrayElement<any>([createCfoStatusValue2(), null]) }}},
     ...data || {}
   }
 }

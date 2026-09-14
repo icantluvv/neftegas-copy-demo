@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -8,6 +9,7 @@ import { useGetCorrections } from "@/packages/api/base/codegen";
 
 import { DonutChart, type DonutSegment } from "#/components/donut-chart";
 import { Badge } from "#/components/ui/badge";
+import { buttonVariants } from "#/components/ui/button";
 import { DataTable } from "#/components/ui/data-table";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "#/components/ui/select";
 import { formatNotificationDateTime } from "#/utils/format-notification-date-time";
@@ -18,13 +20,13 @@ import { OpenCorrectionLink } from "./open-correction-link";
 
 function correctionMatchesFilter(item: CorrectionListItem, statusFilter: string, filialFilter: string): boolean {
   if (statusFilter !== "all" && item.myCfoStatus !== statusFilter) return false;
-  if (filialFilter !== "all" && String(item.filial.id) !== filialFilter) return false;
+  if (filialFilter !== "all" && String(item.filial?.id) !== filialFilter) return false;
   return true;
 }
 
 const columns: ColumnDef<CorrectionListItem, unknown>[] = [
   { accessorKey: "humanId", header: "ID" },
-  { id: "filial", header: "Филиал", cell: ({ row }) => row.original.filial.name },
+  { id: "filial", header: "Филиал", cell: ({ row }) => row.original.filial?.name ?? "Собственный пакет" },
   { id: "type", header: "Тип", cell: ({ row }) => row.original.correctionType.name },
   {
     id: "status",
@@ -65,7 +67,7 @@ export function CfoCorrectionsOverview() {
   const filials = useMemo(() => {
     const byId = new Map<number, string>();
     for (const item of allCorrections) {
-      byId.set(item.filial.id, item.filial.name);
+      if (item.filial) byId.set(item.filial.id, item.filial.name);
     }
     return [...byId.entries()].map(([id, name]) => ({ id, name }));
   }, [allCorrections]);
@@ -103,6 +105,9 @@ export function CfoCorrectionsOverview() {
     return (
       <div className="flex flex-col items-center gap-4 rounded-lg border border-border py-16 text-center">
         <p className="text-sm text-muted-foreground">Пока нет корректировок, направленных этому подразделению</p>
+        <Link href="/corrections/create" className={buttonVariants()}>
+          + Создать корректировку
+        </Link>
       </div>
     );
   }
@@ -114,6 +119,12 @@ export function CfoCorrectionsOverview() {
       <div className="rounded-lg border border-border p-4">
         <h2 className="mb-4 text-base font-semibold">Распределение по статусам</h2>
         <DonutChart segments={segments} total={allCorrections.length} selectedKey={selectedGroupKey} onSegmentClick={handleSegmentClick} />
+      </div>
+
+      <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+        <Link href="/corrections/create" className={buttonVariants()}>
+          + Создать корректировку
+        </Link>
       </div>
 
       <div className="flex flex-col items-stretch gap-4 sm:flex-row">

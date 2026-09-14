@@ -50,6 +50,7 @@ function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail
 		id: 1,
 		humanId: "COR-000002",
 		filialId: 1,
+		cfoId: null,
 		correctionTypeId: 1,
 		authorId: 5,
 		status: "RETURNED_FOR_REVISION",
@@ -62,6 +63,7 @@ function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail
 		canSendToDtoe: false,
 		openRemarksCount: 1,
 		filial: { id: 1, code: "ЧФ", name: "Черноморнефтегаз", isActive: true },
+		cfo: null,
 		correctionType: { id: 1, code: "TYPE", name: "Тип", isActive: true },
 		author: { id: 5, username: "author", fullName: "Автор Автор Автор" },
 		slots: [
@@ -75,6 +77,7 @@ function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail
 		myCfoStatus: null,
 		myOpenRemarksCount: 0,
 		isFilialOwner: true,
+		isCfoOwner: false,
 		isCfoReviewer: false,
 		isDtoe: false,
 		availableCfos: [],

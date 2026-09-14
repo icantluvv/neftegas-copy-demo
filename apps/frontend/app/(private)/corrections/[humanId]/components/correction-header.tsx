@@ -30,8 +30,8 @@ export function CorrectionHeader({ detail }: { detail: CorrectionDetail }) {
       <p className="text-sm text-muted-foreground">{detail.stageNote}</p>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm md:grid-cols-4">
         <div>
-          <dt className="text-muted-foreground">Филиал</dt>
-          <dd>{detail.filial.name}</dd>
+          <dt className="text-muted-foreground">{detail.filial ? "Филиал" : "ЦФО"}</dt>
+          <dd>{detail.filial ? detail.filial.name : detail.cfo?.name}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Автор</dt>
