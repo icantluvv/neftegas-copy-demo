@@ -37,7 +37,7 @@ export class PlanningController {
     return this.service.findAll(user, query);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreatePlanDto) {
     return this.service.create(user, dto);
@@ -71,14 +71,14 @@ export class PlanningController {
     return this.service.findOne(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Delete(':humanId')
   @HttpCode(HttpStatus.NO_CONTENT)
   deletePlan(@CurrentUser() user: User, @Param('humanId') humanId: string) {
     return this.service.deletePlan(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/change-type')
   changeType(
     @CurrentUser() user: User,
@@ -88,7 +88,7 @@ export class PlanningController {
     return this.service.updatePlanType(user, humanId, dto);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @UseInterceptors(FileInterceptor('file'))
   @Post(':humanId/slots/:slotId/files')
   uploadFile(
@@ -180,7 +180,7 @@ export class PlanningController {
     return this.service.dtoeReturn(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/remarks/:remarkId/fix')
   markRemarkFixed(
     @CurrentUser() user: User,

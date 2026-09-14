@@ -49,6 +49,7 @@ import {
 
 const DETAIL_RELATIONS = [
   'filial',
+  'cfo',
   'planType',
   'planType.requirements',
   'author',
@@ -94,6 +95,7 @@ export class PlanningService {
     const qb = this.plans
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.filial', 'filial')
+      .leftJoinAndSelect('p.cfo', 'cfo')
       .leftJoinAndSelect('p.planType', 'planType')
       .leftJoinAndSelect('p.author', 'author')
       .leftJoinAndSelect('p.remarks', 'remarks');
@@ -101,9 +103,10 @@ export class PlanningService {
     if (user.role === Role.FILIAL) {
       qb.andWhere('p.filialId = :filialId', { filialId: user.filialId });
     } else if (user.role === Role.CFO) {
-      qb.innerJoin('p.cfoStatuses', 'myStatus', 'myStatus.cfoId = :myCfoId', {
-        myCfoId: user.cfoId ?? -1,
-      });
+      qb.andWhere(
+        '(p.cfoId = :myCfoId OR EXISTS (SELECT 1 FROM plan_cfo_statuses mcs WHERE mcs."planId" = p.id AND mcs."cfoId" = :myCfoId))',
+        { myCfoId: user.cfoId ?? -1 },
+      );
     }
 
     if (query.status)
@@ -228,8 +231,12 @@ export class PlanningService {
   }
 
   async create(user: User, dto: CreatePlanDto) {
-    if (user.role !== Role.FILIAL || user.filialId == null) {
-      throw new ForbiddenException('Создавать планы может только роль FILIAL');
+    const isFilial = user.role === Role.FILIAL && user.filialId != null;
+    const isCfo = user.role === Role.CFO && user.cfoId != null;
+    if (!isFilial && !isCfo) {
+      throw new ForbiddenException(
+        'Создавать планы могут только роли FILIAL и CFO',
+      );
     }
     const planType = await this.planTypes.findOne({
       where: { id: dto.planTypeId },
@@ -241,7 +248,8 @@ export class PlanningService {
       const humanId = await this.nextPlanHumanId(manager);
       const plan = await manager.getRepository(Plan).save({
         humanId,
-        filialId: user.filialId!,
+        filialId: isFilial ? user.filialId! : null,
+        cfoId: isCfo ? user.cfoId! : null,
         planTypeId: planType.id,
         authorId: user.id,
         status: PlanStatus.DRAFT,
@@ -266,7 +274,14 @@ export class PlanningService {
         });
       }
 
-      await this.log(manager, plan.id, user, `Филиал создал план ${humanId}.`);
+      await this.log(
+        manager,
+        plan.id,
+        user,
+        isFilial
+          ? `Филиал создал план ${humanId}.`
+          : `ЦФО создал план ${humanId}.`,
+      );
       return plan.id;
     });
 
@@ -285,7 +300,7 @@ export class PlanningService {
    */
   async updatePlanType(user: User, humanId: string, dto: UpdatePlanTypeDto) {
     const plan = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === plan.filialId)) {
+    if (!this.isPackageOwner(user, plan)) {
       throw new ForbiddenException();
     }
     if (plan.status !== PlanStatus.DRAFT) {
@@ -357,7 +372,7 @@ export class PlanningService {
    */
   async deletePlan(user: User, humanId: string) {
     const plan = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === plan.filialId)) {
+    if (!this.isPackageOwner(user, plan)) {
       throw new ForbiddenException();
     }
     if (plan.status !== PlanStatus.DRAFT) {
@@ -389,7 +404,7 @@ export class PlanningService {
     remarkId: number | undefined,
   ) {
     const plan = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === plan.filialId)) {
+    if (!this.isPackageOwner(user, plan)) {
       throw new ForbiddenException();
     }
     const slot = plan.slots.find((s) => s.id === slotId);
@@ -470,7 +485,7 @@ export class PlanningService {
     }
     const allowedIds = await this.linkedCfoIds(
       this.dataSource.manager,
-      plan.filialId,
+      plan.filialId!,
     );
     for (const cfoId of dto.cfoIds) {
       if (!allowedIds.includes(cfoId)) {
@@ -505,7 +520,7 @@ export class PlanningService {
           manager,
           cfoUsers,
           plan.id,
-          `Новый план от филиала «${plan.filial.code}». ID: ${plan.humanId}. Статус: На проверке.`,
+          `Новый план от филиала «${plan.filial!.code}». ID: ${plan.humanId}. Статус: На проверке.`,
         );
       }
       await manager.getRepository(Plan).update(plan.id, {
@@ -664,7 +679,7 @@ export class PlanningService {
       const cfoLabel =
         plan.cfoStatuses.find((s) => s.id === myStatus.id)?.cfo?.code ?? 'ЦФО';
       const remarksList = openRemarks.map((r) => r.humanId).join(', ');
-      const filialUsers = await this.filialUsers(manager, plan.filialId);
+      const filialUsers = await this.filialUsers(manager, plan.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
@@ -757,7 +772,7 @@ export class PlanningService {
           manager,
           cfoUsers,
           plan.id,
-          `Филиал «${plan.filial.code}» повторно направил ${plan.humanId}. Проверьте исправления.`,
+          `Филиал «${plan.filial!.code}» повторно направил ${plan.humanId}. Проверьте исправления.`,
         );
       }
       await manager
@@ -809,7 +824,7 @@ export class PlanningService {
       });
 
       const cfoLabel = remark.cfo?.code ?? 'ЦФО';
-      const filialUsers = await this.filialUsers(manager, plan.filialId);
+      const filialUsers = await this.filialUsers(manager, plan.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
@@ -831,7 +846,7 @@ export class PlanningService {
 
   async markRemarkFixed(user: User, humanId: string, remarkId: number) {
     const plan = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === plan.filialId)) {
+    if (!this.isPackageOwner(user, plan)) {
       throw new ForbiddenException();
     }
     const remark = plan.remarks.find((r) => r.id === remarkId);
@@ -882,6 +897,12 @@ export class PlanningService {
 
   async sendToDtoe(user: User, humanId: string) {
     const plan = await this.findByHumanIdOrThrow(humanId);
+    const isCfoOwner = user.role === Role.CFO && plan.cfoId === user.cfoId;
+
+    if (isCfoOwner) {
+      return this.sendToDtoeAsOwner(user, plan);
+    }
+
     if (!(
       user.role === Role.CFO &&
       plan.cfoStatuses.some((s) => s.cfoId === user.cfoId)
@@ -904,9 +925,44 @@ export class PlanningService {
         manager,
         dtoeUsers,
         plan.id,
-        `План ${plan.humanId} полностью проверен и согласован всеми ЦФО. Филиал: ${plan.filial.code}.`,
+        `План ${plan.humanId} полностью проверен и согласован всеми ЦФО. Филиал: ${plan.filial!.code}.`,
       );
       await this.log(manager, plan.id, user, 'Отправлено в ДТОиР.');
+    });
+
+    return this.toDetailDto(await this.loadDetail(plan.id), user);
+  }
+
+  /**
+   * ЦФО-владелец направляет собственный план сразу в ДТОиР, минуя цикл
+   * согласования другими ЦФО (Change: cfo-owned-plans).
+   */
+  private async sendToDtoeAsOwner(user: User, plan: Plan) {
+    if (!plan.canSendToDtoeAsOwner) {
+      throw new BadRequestException(
+        'Направить можно только из статуса «Черновик» или «Возвращено ДТОиР».',
+      );
+    }
+    const { complete, missing } = this.checkPackageComplete(plan);
+    if (!complete) {
+      throw new BadRequestException(
+        `Пакет не укомплектован: ${missing.join(', ')}`,
+      );
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(Plan).update(plan.id, {
+        status: PlanStatus.UNDER_DTOE_REVIEW,
+        sentToDtoeAt: new Date(),
+      });
+      const dtoeUsers = await this.dtoeUsers(manager);
+      await this.notifyUsers(
+        manager,
+        dtoeUsers,
+        plan.id,
+        `Новый план от ${this.ownerLabel(plan)}. ID: ${plan.humanId}. Статус: На проверке ДТОиР.`,
+      );
+      await this.log(manager, plan.id, user, 'ЦФО направил план в ДТОиР.');
     });
 
     return this.toDetailDto(await this.loadDetail(plan.id), user);
@@ -926,10 +982,10 @@ export class PlanningService {
         status: PlanStatus.APPROVED_BY_DTOE,
         decidedAt: new Date(),
       });
-      const filialUsers = await this.filialUsers(manager, plan.filialId);
+      const owners = await this.ownerUsers(manager, plan);
       await this.notifyUsers(
         manager,
-        filialUsers,
+        owners,
         plan.id,
         `ДТОиР согласовало план ${plan.humanId}.`,
       );
@@ -967,10 +1023,10 @@ export class PlanningService {
         .update(plan.id, { status: PlanStatus.RETURNED_BY_DTOE });
 
       const remarksList = openRemarks.map((r) => r.humanId).join(', ');
-      const filialUsers = await this.filialUsers(manager, plan.filialId);
+      const owners = await this.ownerUsers(manager, plan);
       await this.notifyUsers(
         manager,
-        filialUsers,
+        owners,
         plan.id,
         `ДТОиР вернуло план ${plan.humanId} на доработку. Замечания: ${remarksList}.`,
       );
@@ -1007,7 +1063,7 @@ export class PlanningService {
         manager,
         dtoeUsers,
         plan.id,
-        `Филиал «${plan.filial.code}» повторно направил ${plan.humanId} после замечаний ДТОиР.`,
+        `Филиал «${plan.filial!.code}» повторно направил ${plan.humanId} после замечаний ДТОиР.`,
       );
       await this.log(
         manager,
@@ -1077,6 +1133,28 @@ export class PlanningService {
       .find({ where: { role: Role.FILIAL, filialId, isActive: true } });
   }
 
+  /** Пользователи-владельцы плана — филиал или ЦФО, в зависимости от того, кто его создал. */
+  private ownerUsers(manager: EntityManager, plan: Plan) {
+    return plan.filialId != null
+      ? this.filialUsers(manager, plan.filialId)
+      : this.cfoUsers(manager, plan.cfoId!);
+  }
+
+  private ownerLabel(plan: Plan): string {
+    return plan.filial
+      ? `Филиал «${plan.filial.code}»`
+      : `ЦФО «${plan.cfo!.code}»`;
+  }
+
+  /** Автор плана — Филиал (filialId) либо ЦФО, создавший его сам (cfoId). */
+  private isPackageOwner(user: User, plan: Plan): boolean {
+    if (user.role === Role.FILIAL) return user.filialId === plan.filialId;
+    if (user.role === Role.CFO) {
+      return plan.cfoId != null && user.cfoId === plan.cfoId;
+    }
+    return false;
+  }
+
   private dtoeUsers(manager: EntityManager) {
     return manager
       .getRepository(User)
@@ -1097,6 +1175,7 @@ export class PlanningService {
     if (user.role === Role.FILIAL) return user.filialId === plan.filialId;
     if (user.role === Role.CFO) {
       if (user.cfoId == null) return false;
+      if (plan.cfoId === user.cfoId) return true;
       return this.cfoStatuses.exist({
         where: { planId: plan.id, cfoId: user.cfoId },
       });
@@ -1180,22 +1259,31 @@ export class PlanningService {
     const returnedCfoIds = plan.cfoStatuses
       .filter((s) => s.status === PlanCfoStatusValue.RETURNED)
       .map((s) => s.cfo);
-    const availableCfoIds = await this.linkedCfoIds(
-      this.dataSource.manager,
-      plan.filialId,
-    );
+    const availableCfoIds = plan.filialId
+      ? await this.linkedCfoIds(this.dataSource.manager, plan.filialId)
+      : [];
     const availableCfos = await this.cfos.find({
       where: { id: In(availableCfoIds.length ? availableCfoIds : [-1]) },
     });
 
     return {
       ...toPlanBaseDto(plan),
-      filial: {
-        id: plan.filial.id,
-        code: plan.filial.code,
-        name: plan.filial.name,
-        isActive: plan.filial.isActive,
-      },
+      filial: plan.filial
+        ? {
+            id: plan.filial.id,
+            code: plan.filial.code,
+            name: plan.filial.name,
+            isActive: plan.filial.isActive,
+          }
+        : null,
+      cfo: plan.cfo
+        ? {
+            id: plan.cfo.id,
+            code: plan.cfo.code,
+            name: plan.cfo.name,
+            isActive: plan.cfo.isActive,
+          }
+        : null,
       planType: {
         id: plan.planType.id,
         code: plan.planType.code,
@@ -1220,6 +1308,10 @@ export class PlanningService {
       myOpenRemarksCount,
       isFilialOwner:
         user.role === Role.FILIAL && user.filialId === plan.filialId,
+      isCfoOwner:
+        user.role === Role.CFO &&
+        plan.cfoId != null &&
+        user.cfoId === plan.cfoId,
       isCfoReviewer: user.role === Role.CFO && myCfoStatus != null,
       isDtoe: user.role === Role.DTOE,
       availableCfos: availableCfos.map(toCfoDto),
@@ -1253,7 +1345,7 @@ export class PlanningService {
       const plan = await manager
         .getRepository(Plan)
         .findOneOrFail({ where: { id: planId }, relations: ['filial'] });
-      const filialUsers = await this.filialUsers(manager, plan.filialId);
+      const filialUsers = await this.filialUsers(manager, plan.filialId!);
       await this.notifyUsers(
         manager,
         filialUsers,
