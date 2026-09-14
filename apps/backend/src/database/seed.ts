@@ -10,7 +10,6 @@ import {
   CfoStatusValue,
   CorrectionCfoStatus,
 } from '../corrections/entities/correction-cfo-status.entity';
-import { CorrectionFilialStatus } from '../corrections/entities/correction-filial-status.entity';
 import { CorrectionHistoryEntry } from '../corrections/entities/correction-history-entry.entity';
 import {
   Correction,
@@ -72,7 +71,6 @@ const dataSource = new DataSource({
     DocumentSlot,
     FileVersion,
     CorrectionCfoStatus,
-    CorrectionFilialStatus,
     Remark,
     CorrectionHistoryEntry,
     FactPackage,
@@ -823,6 +821,73 @@ async function main() {
     for (const status of DEMO_STATUSES) {
       await seedCorrection(filial, filialUsers[i], status);
     }
+  }
+
+  // Демо-корректировка, созданная самим ЦФО (Change: cfo-initiated-corrections) —
+  // направлена сразу в ДТОиР, минуя цикл согласования другими ЦФО.
+  {
+    const cfoOwner = cfoUsers[0];
+    const [humanIdRow] = await dataSource.query<{ nextval: string }[]>(
+      "SELECT nextval('correction_human_id_seq') as nextval",
+    );
+    const humanId = `COR-${String(humanIdRow.nextval).padStart(6, '0')}`;
+    const createdAt = daysAgo(3);
+    const correction = await correctionRepo.save({
+      humanId,
+      filialId: null,
+      cfoId: cfoOwner.cfoId,
+      correctionTypeId: correctionType.id,
+      authorId: cfoOwner.id,
+      status: CorrectionStatus.UNDER_DTOE_REVIEW,
+      createdAt,
+      sentToDtoeAt: daysAgo(2),
+    });
+    const mainSlot = await slotRepo.save({
+      correctionId: correction.id,
+      requirementId: null,
+      label: 'Excel корректировка',
+    });
+    await addFileVersion(
+      mainSlot,
+      1,
+      'excel-korrektirovka.xlsx',
+      cfoOwner,
+      createdAt,
+    );
+    for (const req of [reqNote, reqPackage, reqMtrList, reqLsr]) {
+      const slot = await slotRepo.save({
+        correctionId: correction.id,
+        requirementId: req.id,
+        label: req.name,
+      });
+      await addFileVersion(slot, 1, `${req.name}.pdf`, cfoOwner, createdAt);
+    }
+    await slotRepo.save({
+      correctionId: correction.id,
+      requirementId: reqTkp.id,
+      label: reqTkp.name,
+    });
+    await historyRepo.save([
+      {
+        correctionId: correction.id,
+        userId: cfoOwner.id,
+        timestamp: createdAt,
+        text: `ЦФО «${cfoOwner.lastName}» создал корректировку ${humanId}.`,
+      },
+      {
+        correctionId: correction.id,
+        userId: cfoOwner.id,
+        timestamp: daysAgo(2),
+        text: 'ЦФО направил корректировку в ДТОиР.',
+      },
+    ]);
+    await notificationRepo.save({
+      userId: dtoeUser.id,
+      correctionId: correction.id,
+      text: `Новая корректировка от ЦФО «${cfoOwner.lastName}». ID: ${humanId}. Статус: На проверке ДТОиР.`,
+      isRead: false,
+      createdAt: daysAgo(2),
+    });
   }
 
   console.log(

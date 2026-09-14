@@ -150,6 +150,7 @@ export function toCorrectionBaseDto(correction: Correction) {
     id: correction.id,
     humanId: correction.humanId,
     filialId: correction.filialId,
+    cfoId: correction.cfoId,
     correctionTypeId: correction.correctionTypeId,
     authorId: correction.authorId,
     status: correction.status,
@@ -172,7 +173,8 @@ export function toCorrectionListItemDto(
 ) {
   return {
     ...toCorrectionBaseDto(correction),
-    filial: toFilialDto(correction.filial!),
+    filial: correction.filial ? toFilialDto(correction.filial) : null,
+    cfo: correction.cfo ? toCfoDto(correction.cfo) : null,
     correctionType: toCorrectionTypeDto(correction.correctionType),
     author: toUserSummaryDto(correction.author),
     myCfoStatus: opts.myCfoStatus ?? null,

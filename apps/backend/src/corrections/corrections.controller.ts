@@ -37,7 +37,7 @@ export class CorrectionsController {
     return this.service.findAll(user, query);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateCorrectionDto) {
     return this.service.create(user, dto);
@@ -71,7 +71,7 @@ export class CorrectionsController {
     return this.service.findOne(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Delete(':humanId')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteCorrection(
@@ -81,7 +81,7 @@ export class CorrectionsController {
     return this.service.deleteCorrection(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/change-type')
   changeType(
     @CurrentUser() user: User,
@@ -91,7 +91,7 @@ export class CorrectionsController {
     return this.service.updateCorrectionType(user, humanId, dto);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @UseInterceptors(FileInterceptor('file'))
   @Post(':humanId/slots/:slotId/files')
   uploadFile(
@@ -183,7 +183,7 @@ export class CorrectionsController {
     return this.service.dtoeReturn(user, humanId);
   }
 
-  @Roles(Role.FILIAL)
+  @Roles(Role.FILIAL, Role.CFO)
   @Post(':humanId/remarks/:remarkId/fix')
   markRemarkFixed(
     @CurrentUser() user: User,
