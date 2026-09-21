@@ -13,7 +13,6 @@ import { User } from '../users/entities/user.entity';
 import { CorrectionsController } from './corrections.controller';
 import { CorrectionsService } from './corrections.service';
 import { CorrectionCfoStatus } from './entities/correction-cfo-status.entity';
-import { CorrectionFilialStatus } from './entities/correction-filial-status.entity';
 import { CorrectionHistoryEntry } from './entities/correction-history-entry.entity';
 import { Correction } from './entities/correction.entity';
 import { DocumentSlot } from './entities/document-slot.entity';
@@ -28,7 +27,6 @@ import { FilesController } from './files.controller';
       DocumentSlot,
       FileVersion,
       CorrectionCfoStatus,
-      CorrectionFilialStatus,
       Remark,
       CorrectionHistoryEntry,
       CorrectionType,

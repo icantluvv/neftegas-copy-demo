@@ -15,9 +15,13 @@ export interface Correction {
     */
     humanId: string;
     /**
-     * @type integer
+     * @type integer,null
     */
-    filialId: number;
+    filialId: number | null;
+    /**
+     * @type integer,null
+    */
+    cfoId: number | null;
     /**
      * @type integer
     */

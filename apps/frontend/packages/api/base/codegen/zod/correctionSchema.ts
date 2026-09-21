@@ -9,7 +9,8 @@ import { correctionStatus2Schema } from "./correctionStatus2Schema";
 export const correctionSchema = z.object({
     "id": z.int(),
 "humanId": z.string(),
-"filialId": z.int(),
+"filialId": z.nullable(z.int()),
+"cfoId": z.nullable(z.int()),
 "correctionTypeId": z.int(),
 "authorId": z.int(),
 get "status"(){

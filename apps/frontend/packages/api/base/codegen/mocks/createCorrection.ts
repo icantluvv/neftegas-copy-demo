@@ -9,5 +9,5 @@ import { faker } from "@faker-js/faker";
 
 export function createCorrection(data?: Partial<Correction>): Correction {
 
-  return { ...{"id": faker.number.int(),"humanId": faker.string.alpha(),"filialId": faker.number.int(),"correctionTypeId": faker.number.int(),"authorId": faker.number.int(),get "status"() { return createCorrectionStatus2() },"stageNote": faker.string.alpha(),"createdAt": faker.date.anytime().toISOString(),"updatedAt": faker.date.anytime().toISOString(),"sentToDtoeAt": faker.date.anytime().toISOString(),"decidedAt": faker.date.anytime().toISOString(),"canSend": faker.datatype.boolean(),"canSendToDtoe": faker.datatype.boolean(),"openRemarksCount": faker.number.int(),...(data || {})} }
+  return { ...{"id": faker.number.int(),"humanId": faker.string.alpha(),"filialId": faker.number.int(),"cfoId": null,"correctionTypeId": faker.number.int(),"authorId": faker.number.int(),get "status"() { return createCorrectionStatus2() },"stageNote": faker.string.alpha(),"createdAt": faker.date.anytime().toISOString(),"updatedAt": faker.date.anytime().toISOString(),"sentToDtoeAt": faker.date.anytime().toISOString(),"decidedAt": faker.date.anytime().toISOString(),"canSend": faker.datatype.boolean(),"canSendToDtoe": faker.datatype.boolean(),"openRemarksCount": faker.number.int(),...(data || {})} }
 }

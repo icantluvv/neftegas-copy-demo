@@ -2,6 +2,7 @@
 
 import { useGetCorrectionSuspense } from "@/packages/api/base/codegen";
 
+import { CfoOwnerSubmitPanel } from "./cfo-owner-submit-panel";
 import { CfoStatuses } from "./cfo-statuses";
 import { CorrectionHeader } from "./correction-header";
 import { HistoryLog } from "./history-log";
@@ -18,6 +19,7 @@ export function CorrectionDetailView({ humanId, currentUserId }: { humanId: stri
       <CorrectionHeader detail={detail} />
       <PackageCompleteness detail={detail} />
       <SendForReviewForm detail={detail} />
+      <CfoOwnerSubmitPanel detail={detail} />
       <CfoStatuses detail={detail} />
       <RemarksList detail={detail} currentUserId={currentUserId} />
       <ResubmitPanel detail={detail} />

@@ -15,6 +15,7 @@ import {
   canResubmitToDtoe,
   canSendForReview,
   canSendToDtoe,
+  canSendToDtoeAsOwner,
   canUploadSlotFile,
   showResubmitPanel,
 } from "./permissions";
@@ -47,6 +48,7 @@ function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail
     id: 1,
     humanId: "COR-000001",
     filialId: 1,
+    cfoId: null,
     correctionTypeId: 1,
     authorId: 5,
     status: "DRAFT",
@@ -59,6 +61,7 @@ function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail
     canSendToDtoe: false,
     openRemarksCount: 0,
     filial: { id: 1, code: "ФИЛИАЛ", name: "Филиал", isActive: true },
+    cfo: null,
     correctionType: { id: 1, code: "TYPE", name: "Тип", isActive: true },
     author: { id: 5, username: "author", fullName: "Автор Автор Автор" },
     slots: [],
@@ -70,6 +73,7 @@ function makeDetail(overrides: Partial<CorrectionDetail> = {}): CorrectionDetail
     myCfoStatus: null,
     myOpenRemarksCount: 0,
     isFilialOwner: false,
+    isCfoOwner: false,
     isCfoReviewer: false,
     isDtoe: false,
     availableCfos: [],
@@ -89,6 +93,38 @@ describe("canUploadSlotFile", () => {
 
   it("запрещает загрузку не филиалу-автору", () => {
     expect(canUploadSlotFile(makeDetail({ isFilialOwner: false, isCfoReviewer: true, status: "UNDER_CFO_REVIEW" }))).toBe(false);
+  });
+
+  it("разрешает загрузку владельцу-ЦФО до финального согласования", () => {
+    expect(canUploadSlotFile(makeDetail({ isFilialOwner: false, isCfoOwner: true, status: "DRAFT" }))).toBe(true);
+  });
+});
+
+describe("canSendToDtoeAsOwner", () => {
+  it("разрешает направление владельцу-ЦФО из DRAFT с укомплектованным пакетом", () => {
+    expect(canSendToDtoeAsOwner(makeDetail({ isCfoOwner: true, status: "DRAFT", missingRequirements: [] }))).toBe(true);
+  });
+
+  it("разрешает повторное направление из RETURNED_BY_DTOE", () => {
+    expect(
+      canSendToDtoeAsOwner(makeDetail({ isCfoOwner: true, status: "RETURNED_BY_DTOE", missingRequirements: [] })),
+    ).toBe(true);
+  });
+
+  it("запрещает направление при незаполненных обязательных слотах", () => {
+    expect(
+      canSendToDtoeAsOwner(makeDetail({ isCfoOwner: true, status: "DRAFT", missingRequirements: ["Служебная записка"] })),
+    ).toBe(false);
+  });
+
+  it("запрещает направление не владельцу пакета", () => {
+    expect(canSendToDtoeAsOwner(makeDetail({ isCfoOwner: false, status: "DRAFT", missingRequirements: [] }))).toBe(false);
+  });
+
+  it("запрещает направление из недопустимого статуса (UNDER_DTOE_REVIEW)", () => {
+    expect(
+      canSendToDtoeAsOwner(makeDetail({ isCfoOwner: true, status: "UNDER_DTOE_REVIEW", missingRequirements: [] })),
+    ).toBe(false);
   });
 });
 
@@ -306,6 +342,12 @@ describe("canResubmitToDtoe", () => {
 describe("canMarkRemarkFixed", () => {
   it("разрешает филиалу-автору отметить OPEN-замечание исправленным", () => {
     const detail = makeDetail({ isFilialOwner: true });
+
+    expect(canMarkRemarkFixed(detail, makeRemark({ status: "OPEN" }))).toBe(true);
+  });
+
+  it("разрешает владельцу-ЦФО отметить OPEN-замечание исправленным", () => {
+    const detail = makeDetail({ isFilialOwner: false, isCfoOwner: true });
 
     expect(canMarkRemarkFixed(detail, makeRemark({ status: "OPEN" }))).toBe(true);
   });

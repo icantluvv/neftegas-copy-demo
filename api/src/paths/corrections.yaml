@@ -4,7 +4,7 @@ get:
   tags: [Corrections]
   description: >
     Список автоматически ограничен ролью: FILIAL видит свои, CFO — направленные
-    его ЦФО, DTOE/ADMIN — все.
+    его ЦФО и созданные им самим, DTOE/ADMIN — все.
   parameters:
     - { name: status, in: query, schema: { $ref: '../components/schemas/correction-status.yaml' } }
     - { name: filialId, in: query, schema: { type: integer } }
@@ -24,7 +24,12 @@ post:
   summary: Создать корректировку
   operationId: createCorrection
   tags: [Corrections]
-  description: Доступно только роли FILIAL. Создаёт корректировку и ячейки пакета по типу.
+  description: >
+    Доступно ролям FILIAL и CFO. Создаёт корректировку и ячейки пакета по
+    типу. Для FILIAL — обычная корректировка (filialId), направляется
+    выбранным ЦФО (POST .../send). Для CFO — собственный пакет (cfoId),
+    направляется сразу в ДТОиР, минуя цикл согласования (POST
+    .../send-to-dtoe).
   requestBody:
     required: true
     content:

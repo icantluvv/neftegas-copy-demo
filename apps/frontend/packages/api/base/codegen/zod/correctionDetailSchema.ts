@@ -16,7 +16,10 @@ import { userSummarySchema } from "./userSummarySchema";
 
 export const correctionDetailSchema = z.lazy(() => correctionSchema).and(z.object({
     get "filial"(){
-                return filialSchema
+                return z.union([filialSchema, z.null()])
+              },
+get "cfo"(){
+                return z.union([cfoSchema, z.null()]).describe("Заполнено, если корректировку создал сам ЦФО.")
               },
 get "correctionType"(){
                 return correctionTypeSchema
@@ -43,6 +46,7 @@ get "myCfoStatus"(){
               },
 "myOpenRemarksCount": z.optional(z.int()),
 "isFilialOwner": z.boolean(),
+"isCfoOwner": z.boolean().describe("Пакет создан этим ЦФО (свой, направляется сразу в ДТОиР без проверки другими ЦФО)."),
 "isCfoReviewer": z.boolean(),
 "isDtoe": z.boolean(),
 get "availableCfos"(){

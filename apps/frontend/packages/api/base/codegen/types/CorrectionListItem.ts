@@ -3,6 +3,7 @@
 * Do not edit manually.
 */
 
+import type { Cfo } from "./Cfo";
 import type { CfoStatusValue2 } from "./CfoStatusValue2";
 import type { Correction } from "./Correction";
 import type { CorrectionType } from "./CorrectionType";
@@ -10,10 +11,11 @@ import type { Filial } from "./Filial";
 import type { UserSummary } from "./UserSummary";
 
 export type CorrectionListItem = (Correction & {
+    filial: (Filial | null);
     /**
-     * @type object
+     * @description Заполнено, если корректировку создал сам ЦФО.
     */
-    filial: Filial;
+    cfo: (Cfo | null);
     /**
      * @type object
     */

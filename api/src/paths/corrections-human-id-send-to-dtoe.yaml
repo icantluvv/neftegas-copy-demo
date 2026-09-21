@@ -4,7 +4,12 @@ post:
   summary: Отправить корректировку в ДТОиР
   operationId: sendCorrectionToDtoe
   tags: [Corrections]
-  description: Доступно, когда все обязательные ЦФО согласовали (canSendToDtoe).
+  description: >
+    Две ветки в зависимости от того, кто пакет создал. Обычный ЦФО-
+    проверяющий: доступно, когда все обязательные ЦФО согласовали
+    (canSendToDtoe, status ALL_CFO_APPROVED). Владелец-ЦФО (isCfoOwner,
+    пакет создан им самим): доступно сразу из DRAFT/RETURNED_BY_DTOE, минуя
+    цикл согласования другими ЦФО, если пакет укомплектован.
   responses:
     '200':
       description: Отправлено в ДТОиР
@@ -12,7 +17,7 @@ post:
         application/json:
           schema: { $ref: '../components/schemas/correction-detail.yaml#/CorrectionDetail' }
     '400':
-      description: Не все обязательные ЦФО согласовали пакет
+      description: Не все обязательные ЦФО согласовали пакет (обычный цикл) либо пакет не укомплектован (владелец-ЦФО)
       content:
         application/json:
           schema: { $ref: '../components/schemas/error-response.yaml' }

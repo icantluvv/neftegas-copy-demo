@@ -6,11 +6,20 @@ import type { CorrectionDetail, CorrectionStatus2, Remark } from "@/packages/api
  */
 
 export function canUploadSlotFile(detail: CorrectionDetail): boolean {
-  return detail.isFilialOwner && detail.status !== "APPROVED_BY_DTOE";
+  return (detail.isFilialOwner || detail.isCfoOwner) && detail.status !== "APPROVED_BY_DTOE";
 }
 
 export function canSendForReview(detail: CorrectionDetail): boolean {
   return detail.isFilialOwner && detail.status === "DRAFT" && detail.missingRequirements.length === 0;
+}
+
+/** Владелец-ЦФО направляет собственный пакет сразу в ДТОиР, минуя цикл согласования другими ЦФО. */
+export function canSendToDtoeAsOwner(detail: CorrectionDetail): boolean {
+  return (
+    detail.isCfoOwner &&
+    (detail.status === "DRAFT" || detail.status === "RETURNED_BY_DTOE") &&
+    detail.missingRequirements.length === 0
+  );
 }
 
 export function canApproveAsCfo(detail: CorrectionDetail): boolean {
@@ -94,7 +103,7 @@ export function canResubmitToDtoe(detail: CorrectionDetail): boolean {
 }
 
 export function canMarkRemarkFixed(detail: CorrectionDetail, remark: Remark): boolean {
-  return detail.isFilialOwner && remark.status === "OPEN";
+  return (detail.isFilialOwner || detail.isCfoOwner) && remark.status === "OPEN";
 }
 
 export function canDeleteRemark(remark: Remark, currentUserId: number): boolean {

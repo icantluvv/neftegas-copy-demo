@@ -55,7 +55,7 @@ export const modules: ModuleTab[] = [
         matchPrefixes: ["/corrections", "/notifications"],
         quickActions: [
             {href: "/dashboard", label: "Рабочий стол", icon: Home},
-            {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL"]},
+            {href: "/corrections/create", label: "Создать корректировку", icon: FilePlus, roles: ["FILIAL", "CFO"]},
             {href: "/notifications", label: "Уведомления", icon: Bell},
         ],
     },

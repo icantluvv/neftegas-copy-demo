@@ -49,6 +49,7 @@ import {
 
 const DETAIL_RELATIONS = [
   'filial',
+  'cfo',
   'correctionType',
   'correctionType.requirements',
   'author',
@@ -93,6 +94,7 @@ export class CorrectionsService {
     const qb = this.corrections
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.filial', 'filial')
+      .leftJoinAndSelect('c.cfo', 'cfo')
       .leftJoinAndSelect('c.correctionType', 'correctionType')
       .leftJoinAndSelect('c.author', 'author')
       .leftJoinAndSelect('c.remarks', 'remarks');
@@ -100,9 +102,10 @@ export class CorrectionsService {
     if (user.role === Role.FILIAL) {
       qb.andWhere('c.filialId = :filialId', { filialId: user.filialId });
     } else if (user.role === Role.CFO) {
-      qb.innerJoin('c.cfoStatuses', 'myStatus', 'myStatus.cfoId = :myCfoId', {
-        myCfoId: user.cfoId ?? -1,
-      });
+      qb.andWhere(
+        '(c.cfoId = :myCfoId OR EXISTS (SELECT 1 FROM correction_cfo_statuses mcs WHERE mcs."correctionId" = c.id AND mcs."cfoId" = :myCfoId))',
+        { myCfoId: user.cfoId ?? -1 },
+      );
     }
 
     if (query.status)
@@ -230,9 +233,11 @@ export class CorrectionsService {
   }
 
   async create(user: User, dto: CreateCorrectionDto) {
-    if (user.role !== Role.FILIAL || user.filialId == null) {
+    const isFilial = user.role === Role.FILIAL && user.filialId != null;
+    const isCfo = user.role === Role.CFO && user.cfoId != null;
+    if (!isFilial && !isCfo) {
       throw new ForbiddenException(
-        'Создавать корректировки может только роль FILIAL',
+        'Создавать корректировки могут только роли FILIAL и CFO',
       );
     }
     const correctionType = await this.correctionTypes.findOne({
@@ -246,7 +251,8 @@ export class CorrectionsService {
       const humanId = await this.nextCorrectionHumanId(manager);
       const correction = await manager.getRepository(Correction).save({
         humanId,
-        filialId: user.filialId!,
+        filialId: isFilial ? user.filialId! : null,
+        cfoId: isCfo ? user.cfoId! : null,
         correctionTypeId: correctionType.id,
         authorId: user.id,
         status: CorrectionStatus.DRAFT,
@@ -275,7 +281,9 @@ export class CorrectionsService {
         manager,
         correction.id,
         user,
-        `Филиал создал корректировку ${humanId}.`,
+        isFilial
+          ? `Филиал создал корректировку ${humanId}.`
+          : `ЦФО создал корректировку ${humanId}.`,
       );
       return correction.id;
     });
@@ -301,7 +309,7 @@ export class CorrectionsService {
     dto: UpdateCorrectionTypeDto,
   ) {
     const correction = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === correction.filialId)) {
+    if (!this.isPackageOwner(user, correction)) {
       throw new ForbiddenException();
     }
     if (correction.status !== CorrectionStatus.DRAFT) {
@@ -373,7 +381,7 @@ export class CorrectionsService {
    */
   async deleteCorrection(user: User, humanId: string) {
     const correction = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === correction.filialId)) {
+    if (!this.isPackageOwner(user, correction)) {
       throw new ForbiddenException();
     }
     if (correction.status !== CorrectionStatus.DRAFT) {
@@ -405,7 +413,7 @@ export class CorrectionsService {
     remarkId: number | undefined,
   ) {
     const correction = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === correction.filialId)) {
+    if (!this.isPackageOwner(user, correction)) {
       throw new ForbiddenException();
     }
     const slot = correction.slots.find((s) => s.id === slotId);
@@ -849,7 +857,7 @@ export class CorrectionsService {
 
   async markRemarkFixed(user: User, humanId: string, remarkId: number) {
     const correction = await this.findByHumanIdOrThrow(humanId);
-    if (!(user.role === Role.FILIAL && user.filialId === correction.filialId)) {
+    if (!this.isPackageOwner(user, correction)) {
       throw new ForbiddenException();
     }
     const remark = correction.remarks.find((r) => r.id === remarkId);
@@ -898,6 +906,13 @@ export class CorrectionsService {
 
   async sendToDtoe(user: User, humanId: string) {
     const correction = await this.findByHumanIdOrThrow(humanId);
+    const isCfoOwner =
+      user.role === Role.CFO && correction.cfoId === user.cfoId;
+
+    if (isCfoOwner) {
+      return this.sendToDtoeAsOwner(user, correction);
+    }
+
     if (!(
       user.role === Role.CFO &&
       correction.cfoStatuses.some((s) => s.cfoId === user.cfoId)
@@ -928,6 +943,46 @@ export class CorrectionsService {
     return this.toDetailDto(await this.loadDetail(correction.id), user);
   }
 
+  /**
+   * ЦФО-владелец направляет собственный пакет сразу в ДТОиР, минуя цикл
+   * согласования другими ЦФО (Change: cfo-initiated-corrections).
+   */
+  private async sendToDtoeAsOwner(user: User, correction: Correction) {
+    if (!correction.canSendToDtoeAsOwner) {
+      throw new BadRequestException(
+        'Направить можно только из статуса «Черновик» или «Возвращено ДТОиР».',
+      );
+    }
+    const { complete, missing } = this.checkPackageComplete(correction);
+    if (!complete) {
+      throw new BadRequestException(
+        `Пакет не укомплектован: ${missing.join(', ')}`,
+      );
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(Correction).update(correction.id, {
+        status: CorrectionStatus.UNDER_DTOE_REVIEW,
+        sentToDtoeAt: new Date(),
+      });
+      const dtoeUsers = await this.dtoeUsers(manager);
+      await this.notifyUsers(
+        manager,
+        dtoeUsers,
+        correction.id,
+        `Новая корректировка от ${this.ownerLabel(correction)}. ID: ${correction.humanId}. Статус: На проверке ДТОиР.`,
+      );
+      await this.log(
+        manager,
+        correction.id,
+        user,
+        'ЦФО направил корректировку в ДТОиР.',
+      );
+    });
+
+    return this.toDetailDto(await this.loadDetail(correction.id), user);
+  }
+
   async dtoeApprove(user: User, humanId: string) {
     const correction = await this.findByHumanIdOrThrow(humanId);
     if (user.role !== Role.DTOE) throw new ForbiddenException();
@@ -937,10 +992,10 @@ export class CorrectionsService {
         status: CorrectionStatus.APPROVED_BY_DTOE,
         decidedAt: new Date(),
       });
-      const filialUsers = await this.filialUsers(manager, correction.filialId!);
+      const owners = await this.ownerUsers(manager, correction);
       await this.notifyUsers(
         manager,
-        filialUsers,
+        owners,
         correction.id,
         `ДТОиР согласовало корректировку ${correction.humanId}.`,
       );
@@ -978,10 +1033,10 @@ export class CorrectionsService {
         .update(correction.id, { status: CorrectionStatus.RETURNED_BY_DTOE });
 
       const remarksList = openRemarks.map((r) => r.humanId).join(', ');
-      const filialUsers = await this.filialUsers(manager, correction.filialId!);
+      const owners = await this.ownerUsers(manager, correction);
       await this.notifyUsers(
         manager,
-        filialUsers,
+        owners,
         correction.id,
         `ДТОиР вернуло корректировку ${correction.humanId} на доработку. Замечания: ${remarksList}.`,
       );
@@ -1083,6 +1138,19 @@ export class CorrectionsService {
       .find({ where: { role: Role.FILIAL, filialId, isActive: true } });
   }
 
+  /** Пользователи-владельцы пакета — филиал или ЦФО, в зависимости от того, кто его создал. */
+  private ownerUsers(manager: EntityManager, correction: Correction) {
+    return correction.filialId != null
+      ? this.filialUsers(manager, correction.filialId)
+      : this.cfoUsers(manager, correction.cfoId!);
+  }
+
+  private ownerLabel(correction: Correction): string {
+    return correction.filial
+      ? `Филиал «${correction.filial.code}»`
+      : `ЦФО «${correction.cfo!.code}»`;
+  }
+
   private dtoeUsers(manager: EntityManager) {
     return manager
       .getRepository(User)
@@ -1099,6 +1167,15 @@ export class CorrectionsService {
     return links.filter((l) => l.cfo.isActive).map((l) => l.cfoId);
   }
 
+  /** Автор пакета — Филиал (filialId) либо ЦФО, создавший его сам (cfoId). */
+  private isPackageOwner(user: User, correction: Correction): boolean {
+    if (user.role === Role.FILIAL) return user.filialId === correction.filialId;
+    if (user.role === Role.CFO) {
+      return correction.cfoId != null && user.cfoId === correction.cfoId;
+    }
+    return false;
+  }
+
   private async checkAccess(
     user: User,
     correction: Correction,
@@ -1106,6 +1183,7 @@ export class CorrectionsService {
     if (user.role === Role.FILIAL) return user.filialId === correction.filialId;
     if (user.role === Role.CFO) {
       if (user.cfoId == null) return false;
+      if (correction.cfoId === user.cfoId) return true;
       return this.cfoStatuses.exist({
         where: { correctionId: correction.id, cfoId: user.cfoId },
       });
@@ -1188,22 +1266,31 @@ export class CorrectionsService {
     const returnedCfoIds = correction.cfoStatuses
       .filter((s) => s.status === CfoStatusValue.RETURNED)
       .map((s) => s.cfo);
-    const availableCfoIds = await this.linkedCfoIds(
-      this.dataSource.manager,
-      correction.filialId!,
-    );
+    const availableCfoIds = correction.filialId
+      ? await this.linkedCfoIds(this.dataSource.manager, correction.filialId)
+      : [];
     const availableCfos = await this.cfos.find({
       where: { id: In(availableCfoIds.length ? availableCfoIds : [-1]) },
     });
 
     return {
       ...toCorrectionBaseDto(correction),
-      filial: {
-        id: correction.filial!.id,
-        code: correction.filial!.code,
-        name: correction.filial!.name,
-        isActive: correction.filial!.isActive,
-      },
+      filial: correction.filial
+        ? {
+            id: correction.filial.id,
+            code: correction.filial.code,
+            name: correction.filial.name,
+            isActive: correction.filial.isActive,
+          }
+        : null,
+      cfo: correction.cfo
+        ? {
+            id: correction.cfo.id,
+            code: correction.cfo.code,
+            name: correction.cfo.name,
+            isActive: correction.cfo.isActive,
+          }
+        : null,
       correctionType: {
         id: correction.correctionType.id,
         code: correction.correctionType.code,
@@ -1230,6 +1317,10 @@ export class CorrectionsService {
       myOpenRemarksCount,
       isFilialOwner:
         user.role === Role.FILIAL && user.filialId === correction.filialId,
+      isCfoOwner:
+        user.role === Role.CFO &&
+        correction.cfoId != null &&
+        user.cfoId === correction.cfoId,
       isCfoReviewer: user.role === Role.CFO && myCfoStatus != null,
       isDtoe: user.role === Role.DTOE,
       availableCfos: availableCfos.map(toCfoDto),

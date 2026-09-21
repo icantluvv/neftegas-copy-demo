@@ -14,10 +14,11 @@ import type { Remark } from "./Remark";
 import type { UserSummary } from "./UserSummary";
 
 export type CorrectionDetail = (Correction & {
+    filial: (Filial | null);
     /**
-     * @type object
+     * @description Заполнено, если корректировку создал сам ЦФО.
     */
-    filial: Filial;
+    cfo: (Cfo | null);
     /**
      * @type object
     */
@@ -59,6 +60,11 @@ export type CorrectionDetail = (Correction & {
      * @type boolean
     */
     isFilialOwner: boolean;
+    /**
+     * @description Пакет создан этим ЦФО (свой, направляется сразу в ДТОиР без проверки другими ЦФО).
+     * @type boolean
+    */
+    isCfoOwner: boolean;
     /**
      * @type boolean
     */

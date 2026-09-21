@@ -5,7 +5,7 @@ import {CreateCorrectionForm} from "./components/create-correction-form";
 
 export default async function CreateCorrectionPage() {
   const user = await getMe();
-  if (user.role !== "FILIAL") {
+  if (user.role !== "FILIAL" && user.role !== "CFO") {
     return <AccessDeniedScreen />;
   }
   return <CreateCorrectionForm />;
