@@ -1,17 +1,15 @@
 ## Риск
 
-P0 — новая продуктовая capability, новая модель данных, расширение прав
-доступа (`POST /corrections` открывается роли `CFO`), новый статус-цикл.
+P1 — новая capability, узкая (переиспользует существующий эндпоинт
+`send-to-dtoe` и существующий финальный цикл ДТОиР, без нового статус-цикла).
 
 ## TDD workflow
 
-Backend: failing unit-тест в `corrections.service.spec.ts` (по образцу уже
-существующих describe-блоков для `cfoApprove`/`cfoReturn`/`sendToDtoe`) →
-минимальная реализация → green → refactor; ключевые HTTP-маршруты — отдельным
-`*.e2e-spec.ts`. Frontend: failing unit/component/E2E по риску → компоненты/
-хуки/API-интеграция → green → refactor. Порядок задач в `tasks.md` соблюдает
-test-first (тестовая задача предшествует задаче реализации в рамках одного
-пункта).
+Backend: failing unit-тест в `corrections.service.spec.ts` (зеркалить
+существующие describe-блоки для `submit`/`isCfoOwner` из
+`fact-packages.service.spec.ts`) → минимальная реализация → green → refactor.
+Frontend: failing unit/component по риску → компоненты/хуки → green →
+refactor. Порядок задач в `tasks.md` соблюдает test-first.
 
 ## Покрытие сценариев
 
@@ -19,88 +17,62 @@ test-first (тестовая задача предшествует задаче 
 |---|---|---|---|---|---|
 | Создание корректировки ролью ЦФО | ЦФО создаёт корректировку | P0 | Unit | `corrections.service.spec.ts` | Planned |
 | Создание корректировки ролью ЦФО | Роль без организационной привязки не может создать | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Направление филиалу(ам)/ДТОиР ролью ЦФО | ЦФО направляет нескольким филиалам | P0 | Unit + E2E | `corrections.service.spec.ts`, `cfo-initiated-correction.e2e.spec.ts` | Planned |
-| Направление филиалу(ам)/ДТОиР ролью ЦФО | ЦФО направляет напрямую в ДТОиР | P0 | Unit + E2E | `corrections.service.spec.ts`, `cfo-initiated-correction.e2e.spec.ts` | Planned |
-| Направление филиалу(ам)/ДТОиР ролью ЦФО | Блокировка при неукомплектованном пакете | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Направление филиалу(ам)/ДТОиР ролью ЦФО | Не-автор не может направить | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Согласование филиалом-проверяющим | Филиал согласовывает | P0 | Unit + Component | `corrections.service.spec.ts`, `remarks-action-bar.component.test.tsx` | Planned |
-| Согласование филиалом-проверяющим | Второй раз согласовать нельзя | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Возврат филиалом-проверяющим с замечанием | Филиал оставляет замечание и возвращает | P0 | Unit + Component | `corrections.service.spec.ts`, `remarks-action-bar.component.test.tsx` | Planned |
-| Возврат филиалом-проверяющим с замечанием | Нельзя вернуть без замечаний | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Отмена решения филиала-проверяющего | Филиал отменяет собственное решение | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Отмена решения филиала-проверяющего | Нельзя отменить после передачи в ДТОиР | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Повторное направление филиалам после доработки | ЦФО повторно направляет после исправления | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Видимость ЦФО-инициированных корректировок | ЦФО видит созданные им корректировки | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| Видимость ЦФО-инициированных корректировок | Филиал видит корректировки, где он проверяющий | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| ДТОиР как строка справочника ЦФО | ДТОиР не в обычном списке ЦФО филиала | P1 | Unit | `corrections.service.spec.ts` | Planned |
-| ДТОиР как строка справочника ЦФО | Финальное решение ДТОиР не меняется | P0 | Unit + E2E | `corrections.service.spec.ts`, `cfo-initiated-correction.e2e.spec.ts` | Planned |
-| Доступ к созданию корректировки в интерфейсе | Пункт меню виден ЦФО | P2 | Component | `sidebar-nav` существующий набор тестов (расширить фикстуру ролей) | Planned |
+| Направление собственного пакета ЦФО сразу в ДТОиР | ЦФО направляет напрямую в ДТОиР | P0 | Unit + manual smoke | `corrections.service.spec.ts` | Planned |
+| Направление собственного пакета ЦФО сразу в ДТОиР | Блокировка при неукомплектованном пакете | P1 | Unit | `corrections.service.spec.ts` | Planned |
+| Направление собственного пакета ЦФО сразу в ДТОиР | Не-владелец не может направить этим способом | P1 | Unit | `corrections.service.spec.ts` | Planned |
+| Видимость и удаление собственных корректировок ЦФО | ЦФО видит созданные им корректировки | P1 | Unit | `corrections.service.spec.ts` | Planned |
+| Видимость и удаление собственных корректировок ЦФО | ЦФО удаляет собственный черновик | P2 | Unit | `corrections.service.spec.ts` | Planned |
+| Доступ к созданию корректировки в интерфейсе | Пункт меню виден ЦФО | P2 | Component | `permissions.unit.test.ts`/`create-correction-form.component.test.tsx` | Planned |
 
 ## Backend Unit/Feature
 
-Все Unit-сценарии — `apps/backend/src/corrections/corrections.service.spec.ts`,
-новые describe-блоки: `create (CFO)`, `sendAsCfo`, `filialApprove`,
-`filialReturn`, `cancelFilialDecision`, `resubmitToFilials`, `findAll (видимость)`,
-`checkAccess`, `getStats`, `toDetailDto (initiator/filialStatuses)`,
-`deleteCorrection (CFO owner)`. Backend e2e —
-`apps/backend/test/*.e2e-spec.ts` (по существующему паттерну, файл под задачу
-2.5.3 из `tasks.md`).
+`apps/backend/src/corrections/corrections.service.spec.ts`, новые
+describe-блоки: `create (CFO)`, `sendToDtoe (CFO owner)`, `findAll
+(видимость владельца)`, `checkAccess (владелец)`, `toDetailDto (isCfoOwner)`,
+`deleteCorrection (CFO owner)`. Backend e2e-раннер в этом окружении не
+запускается (известный баг Bun/Jest) — вместо e2e-файла: `bunx tsc --noEmit`
+по проекту + ручной `bun -e` HTTP smoke-test внутри `infra-backend-1`
+(создать → направить в ДТОиР → согласовать), см. `tasks.md` 2.3.3.
 
-## Frontend Unit/Component/E2E
+## Frontend Unit/Component
 
-Unit: `permissions.unit.test.ts` (новые guard-функции филиала-проверяющего).
-Component: `create-correction-form.component.test.tsx` (выбор направления),
-`remarks-action-bar.component.test.tsx` (блок действий филиала),
-`dtoe-corrections-overview.component.test.tsx` (новый файл),
-`filial-corrections-overview.component.test.tsx` (раздел «на согласовании от
-ЦФО»). E2E: один сквозной `cfo-initiated-correction.e2e.spec.ts` — happy path
-ЦФО→Филиал(ы)→(опц.)→ДТОиР и отдельно ЦФО→ДТОиР напрямую (можно в одном файле
-двумя тестами). Моки/фикстуры — переиспользовать паттерны
-`apps/frontend/app/(private)/corrections/[humanId]/components/remarks-list/remarks-list.component.test.tsx`
-и `filial-corrections-overview.tsx` существующих тестов (typed fixtures на
-основе Kubb-типов, без ручных `any`).
+Unit: `permissions.unit.test.ts` (`canSendToDtoeAsOwner`, расширение
+`canUploadSlotFile`). Component: `create-correction-form.component.test.tsx`
+(доступ роли CFO к странице создания — если существующий тест уже покрывает
+рендер формы, достаточно добавить кейс доступа в `page`-уровневый тест или
+`permissions.unit.test.ts`), submit-панель — новый компонент-тест на ветку
+`isCfoOwner`.
 
 ## Test data
 
-`apps/backend/src/database/seed.ts`: 18-я строка `cfos` («ДТОиР»), минимум
-одна демо-корректировка `initiatorKind = CFO` в статусе `UNDER_FILIAL_REVIEW`
-(создана `cfo.angnks@demo.local`, направлена `filial.donbassgaz@demo.local`).
-Роли для ручных/E2E проверок — существующие демо-аккаунты (`Password123`):
-`cfo.angnks@demo.local`, `filial.donbassgaz@demo.local`, `dtoe@demo.local`.
+`apps/backend/src/database/seed.ts`: одна демо-корректировка с `cfoId`
+заполненным (создана `cfo.angnks@demo.local`, статус `DRAFT` или
+`UNDER_DTOE_REVIEW`). Роли для ручных проверок — существующие демо-аккаунты
+(`Password123`): `cfo.angnks@demo.local`, `dtoe@demo.local`.
 
 ## Manual checks
 
-- [ ] Гонка состояний «два филиала согласуют/возвращают параллельно» — по
-      аналогии с уже принятым для ЦФО waiver'ом в `correction-detail-page/test-plan.md`
-      (сценарий гарантирован атомарной транзакцией `dataSource.transaction`,
-      автотест на реальную гонку сетевых запросов непропорционально дорог для
-      P1). Обоснование переносится на этот change без повторного
-      автотестирования гонки на уровне БД.
-- [ ] Визуальная сверка новых экранов (пикер направления, блок действий
-      филиала, `DtoeCorrectionsOverview`) с дизайн-указаниями пользователя —
-      **заблокировано** до получения макетов/уточнений, см. `design.md` →
-      «Дизайн (UI)», раздел «Открыто». Этот пункт обновляется, как только
-      пользователь передаст конкретные визуальные требования.
+- [ ] Ручная проверка полного цикла в браузере: `cfo.angnks@demo.local`
+      создаёт корректировку → загружает файлы во все слоты → «Направить в
+      ДТОиР» → `dtoe@demo.local` видит её в кабинете, согласовывает.
 
 ## Verification gates
 
 - API: `npm run lint` из `api/`, при необходимости `npm run bundle`.
-- Backend: `bun run lint`, `bun run test`, `bun run test:e2e` (из
-  `apps/backend`).
-- Frontend: `bun run typecheck`, `bun run lint`, `bun run test`, `bun run
-  build` (из `apps/frontend`).
+- Backend: `bun run lint`, `bun run test` (из `apps/backend`).
+- Frontend: `bun run typecheck`, `bun run lint`, `bun run test` (из
+  `apps/frontend`).
 - OpenSpec: `openspec validate cfo-initiated-corrections --strict
   --no-interactive`, если CLI доступен в окружении выполнения.
 
 ## Журнал уточнений
 
-Раздел ведётся по ходу работы над change — каждое новое указание
-пользователя (включая дизайн) фиксируется здесь с датой и ссылкой на
-изменённый раздел `proposal.md`/`design.md`/`spec.md`/`tasks.md`.
-
-- 2026-08-24 — создание change: пользователь подтвердил три решения через
-  `AskUserQuestion` (симметричное согласование филиалом; направление сразу
-  нескольким филиалам; ДТОиР — 18-я строка `cfos`; направление в ДТОиР — тот
-  же финальный статус). Зафиксировано в `proposal.md`/`design.md`/`spec.md`.
-  Дизайн UI не передан — раздел `design.md` → «Дизайн (UI)» содержит решения
-  по умолчанию, ждёт подтверждения/замены.
+- 2026-08-24 — создание change (первая, широкая версия: направление филиалам
+  ИЛИ ДТОиР, симметричный цикл согласования филиалом).
+- 2026-09-14 — пользователь сузил scope: ЦФО ни в одном модуле никому, кроме
+  ДТОиР, ничего не направляет. Ветка «направить филиалам» отложена (не
+  реализуется в рамках этого change). `proposal.md`/`design.md`/`spec.md`/
+  `tasks.md` переписаны под узкий scope — переиспользование существующего
+  `send-to-dtoe` вместо нового `send-as-cfo`, `cfoId` вместо
+  `initiatorKind`/`targetKind`/`CorrectionFilialStatus`. Та же фича вводится
+  в модуль «План на 2027» отдельным change [[cfo-owned-plans]].
