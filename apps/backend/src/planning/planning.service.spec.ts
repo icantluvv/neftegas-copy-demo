@@ -23,18 +23,23 @@ function buildPlan(
     myStatus?: { id: number; cfoId: number; status: PlanCfoStatusValue };
     status?: PlanStatus;
     remarks?: { cfoId: number | null; status: PlanRemarkStatus }[];
-    filialId?: number;
+    filialId?: number | null;
+    cfoId?: number | null;
     slots?: { versions?: { storagePath: string }[] }[];
   } = {},
 ): Plan {
+  const status = overrides.status ?? PlanStatus.UNDER_CFO_REVIEW;
   return {
     id: 1,
     humanId: 'PLN-000001',
-    status: overrides.status ?? PlanStatus.UNDER_CFO_REVIEW,
+    status,
     cfoStatuses: overrides.myStatus ? [overrides.myStatus] : [],
     remarks: overrides.remarks ?? [],
-    filialId: overrides.filialId ?? 1,
+    filialId: overrides.filialId === undefined ? 1 : overrides.filialId,
+    cfoId: overrides.cfoId ?? null,
     slots: overrides.slots ?? [],
+    canSendToDtoeAsOwner:
+      status === PlanStatus.DRAFT || status === PlanStatus.RETURNED_BY_DTOE,
   } as unknown as Plan;
 }
 
@@ -65,6 +70,210 @@ function buildService(plan: Plan) {
 
   return { service, dataSource };
 }
+
+describe('PlanningService — создание плана ролью ЦФО', () => {
+  function buildServiceForCreate() {
+    const plansRepo = { findOne: jest.fn() };
+    const planTypesRepo = {
+      findOne: jest.fn().mockResolvedValue({ id: 1, requirements: [] }),
+    };
+    const dataSource = { transaction: jest.fn() };
+    const noop = {} as never;
+
+    const service = new PlanningService(
+      dataSource as never,
+      plansRepo as never,
+      noop,
+      noop,
+      noop,
+      noop,
+      noop,
+      planTypesRepo as never,
+      noop,
+      noop,
+      noop,
+      noop,
+    );
+
+    return { service, dataSource, planTypesRepo };
+  }
+
+  it('ЦФО с заполненным cfoId проходит guard и доходит до транзакции', async () => {
+    const { service, dataSource } = buildServiceForCreate();
+    dataSource.transaction.mockResolvedValue(undefined);
+
+    await service
+      .create(buildCfoUser(5), { planTypeId: 1 })
+      .catch(() => undefined);
+
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('отклоняет ЦФО без organizational привязки (cfoId не заполнен)', async () => {
+    const { service, dataSource } = buildServiceForCreate();
+
+    await expect(
+      service.create(buildUser(Role.CFO), { planTypeId: 1 }),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('роль DTOE не может создать план', async () => {
+    const { service, dataSource } = buildServiceForCreate();
+
+    await expect(
+      service.create(buildUser(Role.DTOE), { planTypeId: 1 }),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+});
+
+/** Пакет с укомплектованным основным слотом и без дополнительных обязательных требований. */
+function buildCompleteOwnerPlan(overrides: {
+  status: PlanStatus;
+  cfoId?: number | null;
+  myStatus?: { id: number; cfoId: number; status: PlanCfoStatusValue };
+}): Plan {
+  const plan = buildPlan({
+    status: overrides.status,
+    filialId: null,
+    cfoId: overrides.cfoId ?? 5,
+    myStatus: overrides.myStatus,
+  });
+  (plan as unknown as { slots: unknown[] }).slots = [
+    { requirementId: null, versions: [{ id: 1 }] },
+  ];
+  (plan as unknown as { planType: unknown }).planType = {
+    requirements: [],
+  };
+  return plan;
+}
+
+describe('PlanningService — ЦФО направляет собственный план сразу в ДТОиР (sendToDtoe, owner)', () => {
+  it('направляет из DRAFT — доходит до транзакции', async () => {
+    const plan = buildCompleteOwnerPlan({ status: PlanStatus.DRAFT });
+    const { service, dataSource } = buildService(plan);
+    dataSource.transaction.mockResolvedValue(undefined);
+
+    await service
+      .sendToDtoe(buildCfoUser(5), 'PLN-000001')
+      .catch(() => undefined);
+
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('направляет из RETURNED_BY_DTOE (повторно, после доработки) — доходит до транзакции', async () => {
+    const plan = buildCompleteOwnerPlan({
+      status: PlanStatus.RETURNED_BY_DTOE,
+    });
+    const { service, dataSource } = buildService(plan);
+    dataSource.transaction.mockResolvedValue(undefined);
+
+    await service
+      .sendToDtoe(buildCfoUser(5), 'PLN-000001')
+      .catch(() => undefined);
+
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('отклоняет направление из недопустимого статуса (UNDER_CFO_REVIEW)', async () => {
+    const plan = buildCompleteOwnerPlan({
+      status: PlanStatus.UNDER_CFO_REVIEW,
+    });
+    const { service, dataSource } = buildService(plan);
+
+    await expect(
+      service.sendToDtoe(buildCfoUser(5), 'PLN-000001'),
+    ).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет направление неукомплектованного пакета', async () => {
+    const plan = buildPlan({
+      status: PlanStatus.DRAFT,
+      filialId: null,
+      cfoId: 5,
+    });
+    (plan as unknown as { planType: unknown }).planType = {
+      requirements: [
+        {
+          id: 1,
+          name: 'Служебная записка',
+          isRequired: true,
+          choiceGroupKey: null,
+        },
+      ],
+    };
+    const { service, dataSource } = buildService(plan);
+
+    await expect(
+      service.sendToDtoe(buildCfoUser(5), 'PLN-000001'),
+    ).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('отклоняет не-владельца, не назначенного проверяющим (403)', async () => {
+    const plan = buildCompleteOwnerPlan({ status: PlanStatus.DRAFT, cfoId: 5 });
+    const { service, dataSource } = buildService(plan);
+
+    await expect(
+      service.sendToDtoe(buildCfoUser(999), 'PLN-000001'),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+
+  it('обычный цикл (не владелец, проверяющий по cfoStatuses) продолжает требовать ALL_CFO_APPROVED', async () => {
+    const plan = buildPlan({
+      status: PlanStatus.PARTIALLY_APPROVED,
+      myStatus: { id: 10, cfoId: 5, status: PlanCfoStatusValue.APPROVED },
+    });
+    const { service, dataSource } = buildService(plan);
+
+    await expect(
+      service.sendToDtoe(buildCfoUser(5), 'PLN-000001'),
+    ).rejects.toThrow(BadRequestException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+});
+
+describe('PlanningService — удаление собственного черновика ЦФО-владельцем', () => {
+  it('удаляет DRAFT-план, созданный самим ЦФО', async () => {
+    const plan = buildPlan({
+      status: PlanStatus.DRAFT,
+      filialId: null,
+      cfoId: 5,
+    });
+    const { service, dataSource } = buildService(plan);
+    const deleteFn = jest.fn().mockResolvedValue(undefined);
+    dataSource.transaction.mockImplementation(
+      async (fn: (manager: unknown) => Promise<void>) => {
+        const planRepo = { delete: deleteFn };
+        const manager = {
+          getRepository: jest.fn().mockReturnValue(planRepo),
+        };
+        await fn(manager);
+      },
+    );
+
+    await service.deletePlan(buildCfoUser(5), 'PLN-000001');
+
+    expect(deleteFn).toHaveBeenCalledWith(1);
+  });
+
+  it('отклоняет удаление плана чужого ЦФО-владельца (403)', async () => {
+    const plan = buildPlan({
+      status: PlanStatus.DRAFT,
+      filialId: null,
+      cfoId: 5,
+    });
+    const { service, dataSource } = buildService(plan);
+
+    await expect(
+      service.deletePlan(buildCfoUser(999), 'PLN-000001'),
+    ).rejects.toThrow(ForbiddenException);
+    expect(dataSource.transaction).not.toHaveBeenCalled();
+  });
+});
 
 describe('PlanningService — guard PENDING для cfoApprove/cfoReturn', () => {
   it('cfoApprove отклоняет повторное согласование, если статус ЦФО уже APPROVED', async () => {

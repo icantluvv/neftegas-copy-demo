@@ -151,6 +151,7 @@ export function toPlanBaseDto(plan: Plan) {
     id: plan.id,
     humanId: plan.humanId,
     filialId: plan.filialId,
+    cfoId: plan.cfoId,
     planTypeId: plan.planTypeId,
     authorId: plan.authorId,
     status: plan.status,
@@ -173,7 +174,8 @@ export function toPlanListItemDto(
 ) {
   return {
     ...toPlanBaseDto(plan),
-    filial: toFilialDto(plan.filial),
+    filial: plan.filial ? toFilialDto(plan.filial) : null,
+    cfo: plan.cfo ? toCfoDto(plan.cfo) : null,
     planType: toPlanTypeDto(plan.planType),
     author: toUserSummaryDto(plan.author),
     myCfoStatus: opts.myCfoStatus ?? null,

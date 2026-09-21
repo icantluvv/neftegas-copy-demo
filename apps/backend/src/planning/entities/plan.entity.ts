@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Cfo } from '../../org/entities/cfo.entity';
 import { Filial } from '../../org/entities/filial.entity';
 import { User } from '../../users/entities/user.entity';
 import { PlanCfoStatus } from './plan-cfo-status.entity';
@@ -35,6 +36,10 @@ export enum PlanStatus {
  * План — пообъектный план ДТОиР на планируемый год (модуль «План на 2027»).
  * Независимый домен от Correction — собственные таблицы, без внешних
  * ключей на corrections (openspec/changes/planning-2027-package-review).
+ *
+ * Ровно одно из `filialId`/`cfoId` заполнено — план либо создан филиалом
+ * (обычный цикл FILIAL→CFO→ДТОиР), либо создан ЦФО для себя и направляется
+ * сразу в ДТОиР, минуя цикл согласования ЦФО (openspec/changes/cfo-owned-plans).
  */
 @Entity('plans')
 export class Plan {
@@ -45,12 +50,19 @@ export class Plan {
   @Column()
   humanId: string;
 
-  @ManyToOne(() => Filial, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => Filial, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'filialId' })
-  filial: Relation<Filial>;
+  filial: Relation<Filial> | null;
 
-  @Column()
-  filialId: number;
+  @Column({ type: 'int', nullable: true })
+  filialId: number | null;
+
+  @ManyToOne(() => Cfo, { nullable: true, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'cfoId' })
+  cfo: Relation<Cfo> | null;
+
+  @Column({ type: 'int', nullable: true })
+  cfoId: number | null;
 
   @ManyToOne(() => PlanType, (type) => type.plans, {
     onDelete: 'RESTRICT',
@@ -108,5 +120,13 @@ export class Plan {
 
   get canSendToDtoe(): boolean {
     return this.status === PlanStatus.ALL_CFO_APPROVED;
+  }
+
+  /** Владелец-ЦФО может направить план сразу в ДТОиР из этих статусов. */
+  get canSendToDtoeAsOwner(): boolean {
+    return (
+      this.status === PlanStatus.DRAFT ||
+      this.status === PlanStatus.RETURNED_BY_DTOE
+    );
   }
 }
