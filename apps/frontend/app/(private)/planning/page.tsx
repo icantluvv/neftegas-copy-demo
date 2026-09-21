@@ -1,18 +1,25 @@
-import {CalendarRange} from "lucide-react";
+import {getMe} from "@repo/api/base/codegen/clients/authController/getMe";
 
-import {SectionPlaceholder} from "#/components/section-placeholder";
+import {AccessDeniedScreen} from "../components/access-denied-screen";
+import {CfoPlanDashboard} from "./components/cfo-plan-dashboard";
+import {DtoePlanDashboard} from "./components/dtoe-plan-dashboard";
+import {FilialPlanDashboard} from "./components/filial-plan-dashboard";
+import {getDashboardKind} from "#/utils/get-dashboard-kind";
 
-export default function PlanningPage() {
-    return (
-        <SectionPlaceholder
-            icon={CalendarRange}
-            title="План на 2027"
-            description="Сводный пообъектный план ДТОиР на планируемый год: капитальный ремонт, техническое обслуживание и текущий ремонт, диагностическое обследование."
-            documents={[
-                {name: "Форма пообъектного плана ДТОиР (КР / ТОиТР / ДО)", reference: "Приложение Б.4"},
-                {name: "Технические требования на проектирование", reference: "Приложение Б.5"},
-                {name: "Акт обследования объекта основных фондов", reference: "Приложение Б.1"},
-            ]}
-        />
-    );
+export const dynamic = "force-dynamic";
+
+export default async function PlanningPage() {
+    const user = await getMe();
+    const kind = getDashboardKind(user.role);
+
+    switch (kind) {
+        case "filial":
+            return <FilialPlanDashboard/>;
+        case "cfo":
+            return <CfoPlanDashboard/>;
+        case "dtoe":
+            return <DtoePlanDashboard/>;
+        default:
+            return <AccessDeniedScreen/>;
+    }
 }
