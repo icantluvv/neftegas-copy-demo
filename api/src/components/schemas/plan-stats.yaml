@@ -1,0 +1,9 @@
+type: object
+required: [total, inReview, returned, approved]
+properties:
+  total: { type: integer }
+  inReview: { type: integer }
+  returned: { type: integer }
+  approved: { type: integer }
+  underReview: { type: integer, description: Только для DTOE/ADMIN }
+  openRemarks: { type: integer, description: Только для DTOE/ADMIN }

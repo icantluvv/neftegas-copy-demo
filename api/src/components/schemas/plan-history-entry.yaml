@@ -1,0 +1,12 @@
+type: object
+required: [id, planId, timestamp, text]
+properties:
+  id: { type: integer }
+  planId: { type: integer }
+  timestamp: { type: string, format: date-time }
+  userId: { type: [integer, 'null'] }
+  user:
+    oneOf:
+      - $ref: './user.yaml#/UserSummary'
+      - type: 'null'
+  text: { type: string }

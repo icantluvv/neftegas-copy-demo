@@ -1,0 +1,68 @@
+Plan:
+  type: object
+  required:
+    - id
+    - humanId
+    - filialId
+    - planTypeId
+    - authorId
+    - status
+    - stageNote
+    - createdAt
+    - updatedAt
+    - canSend
+    - canSendToDtoe
+    - openRemarksCount
+  properties:
+    id: { type: integer }
+    humanId: { type: string, example: PLN-000123 }
+    filialId: { type: integer }
+    planTypeId: { type: integer }
+    authorId: { type: integer }
+    status: { $ref: './plan-status.yaml' }
+    stageNote: { type: string }
+    createdAt: { type: string, format: date-time }
+    updatedAt: { type: string, format: date-time }
+    sentToDtoeAt: { type: [string, 'null'], format: date-time }
+    decidedAt: { type: [string, 'null'], format: date-time }
+    canSend: { type: boolean, description: 'status === DRAFT' }
+    canSendToDtoe: { type: boolean, description: 'status === ALL_CFO_APPROVED' }
+    openRemarksCount: { type: integer }
+
+PlanListItem:
+  allOf:
+    - $ref: './plan.yaml#/Plan'
+    - type: object
+      required: [filial, planType, author]
+      properties:
+        filial: { $ref: './filial.yaml#/Filial' }
+        planType: { $ref: './plan-type.yaml#/PlanType' }
+        author: { $ref: './user.yaml#/UserSummary' }
+        myCfoStatus:
+          oneOf:
+            - $ref: './plan-cfo-status-value.yaml'
+            - type: 'null'
+          description: Заполняется только для роли CFO
+
+PaginatedPlans:
+  type: object
+  required: [items, total, page, pageSize]
+  properties:
+    items:
+      type: array
+      items: { $ref: './plan.yaml#/PlanListItem' }
+    total: { type: integer }
+    page: { type: integer }
+    pageSize: { type: integer }
+
+PlanCreateInput:
+  type: object
+  required: [planTypeId]
+  properties:
+    planTypeId: { type: integer }
+
+PlanTypeChangeInput:
+  type: object
+  required: [planTypeId]
+  properties:
+    planTypeId: { type: integer }

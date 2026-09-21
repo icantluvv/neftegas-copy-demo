@@ -1,0 +1,38 @@
+get:
+  summary: Список планов (в рамках видимости роли)
+  operationId: getPlans
+  tags: [Plans]
+  description: >
+    Список автоматически ограничен ролью: FILIAL видит свои, CFO — направленные
+    его ЦФО, DTOE/ADMIN — все.
+  parameters:
+    - { name: status, in: query, schema: { $ref: '../components/schemas/plan-status.yaml' } }
+    - { name: filialId, in: query, schema: { type: integer } }
+    - { name: cfoId, in: query, schema: { type: integer } }
+    - { name: planTypeId, in: query, schema: { type: integer } }
+    - { name: q, in: query, description: Поиск по ID плана, schema: { type: string } }
+    - { name: onlyWithRemarks, in: query, schema: { type: boolean } }
+    - { name: page, in: query, schema: { type: integer, default: 1 } }
+    - { name: pageSize, in: query, schema: { type: integer, default: 20 } }
+  responses:
+    '200':
+      description: Страница планов
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan.yaml#/PaginatedPlans' }
+post:
+  summary: Создать план
+  operationId: createPlan
+  tags: [Plans]
+  description: Доступно только роли FILIAL. Создаёт план и ячейки пакета по типу.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan.yaml#/PlanCreateInput' }
+  responses:
+    '201':
+      description: План создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }

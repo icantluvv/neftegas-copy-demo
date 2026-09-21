@@ -1,0 +1,24 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+post:
+  summary: Отменить собственное решение ЦФО по плану
+  operationId: cancelPlanCfoDecision
+  tags: [Plans]
+  description: |
+    Роль CFO. Возвращает статус этого ЦФО (APPROVED или RETURNED) обратно в
+    PENDING — страховка от случайного клика по «Согласовать»/«Вернуть на
+    доработку». Оставленные замечания не удаляются и не меняются, это часть
+    истории — откатывается только статус ЦФО. Недоступно, если план уже
+    передан в ДТОиР (`UNDER_DTOE_REVIEW`/`RETURNED_BY_DTOE`/`APPROVED_BY_DTOE`)
+    — тогда `400`.
+  responses:
+    '200':
+      description: Решение ЦФО отменено, статус возвращён в PENDING
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-detail.yaml#/PlanDetail' }
+    '400':
+      description: Нечего отменять или план уже вне зоны ответственности ЦФО
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/error-response.yaml' }

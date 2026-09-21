@@ -1,0 +1,29 @@
+get:
+  summary: Список типов планов
+  operationId: getPlanTypes
+  tags: [Org]
+  parameters:
+    - { name: isActive, in: query, schema: { type: boolean } }
+  responses:
+    '200':
+      description: Типы планов
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '../components/schemas/plan-type.yaml#/PlanType' }
+post:
+  summary: Создать тип плана
+  operationId: createPlanType
+  tags: [Org]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { $ref: '../components/schemas/plan-type.yaml#/PlanTypeInput' }
+  responses:
+    '201':
+      description: Тип создан
+      content:
+        application/json:
+          schema: { $ref: '../components/schemas/plan-type.yaml#/PlanType' }

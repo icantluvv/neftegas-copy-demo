@@ -28,6 +28,11 @@ tags:
       Модуль «Факт» — экран «Файлы»: факт-пакеты по направлениям работ (ДО,
       ТОиР, КР ПД, КР ХС), загрузка форм, маршрут согласования ЦФО/ДТОиР,
       замечания
+  - name: Plans
+    description: >
+      Модуль «План на 2027» — пообъектный план ДТОиР на планируемый год:
+      создание, пакет документов по типу плана, маршрут согласования
+      ЦФО/ДТОиР, замечания. Независимый домен, не связан с Corrections.
   - name: Notifications
     description: Уведомления пользователя
 
@@ -64,6 +69,12 @@ paths:
     $ref: './paths/org-correction-types-id-requirements.yaml'
   /org/requirements/{id}:
     $ref: './paths/org-requirements-id.yaml'
+  /org/plan-types:
+    $ref: './paths/org-plan-types.yaml'
+  /org/plan-types/{id}:
+    $ref: './paths/org-plan-types-id.yaml'
+  /org/plan-types/{id}/requirements:
+    $ref: './paths/org-plan-types-id-requirements.yaml'
 
   /users:
     $ref: './paths/users.yaml'
@@ -148,6 +159,52 @@ paths:
   /fact-files/{id}/download:
     $ref: './paths/fact-files-id-download.yaml'
 
+  /plans:
+    $ref: './paths/plans.yaml'
+  /plans/stats:
+    $ref: './paths/plans-stats.yaml'
+  /plans/stats/filial:
+    $ref: './paths/plans-stats-filial.yaml'
+  /plans/stats/cfo:
+    $ref: './paths/plans-stats-cfo.yaml'
+  /plans/stats/dtoe:
+    $ref: './paths/plans-stats-dtoe.yaml'
+  /plans/{humanId}:
+    $ref: './paths/plans-human-id.yaml'
+  /plans/{humanId}/change-type:
+    $ref: './paths/plans-human-id-change-type.yaml'
+  /plans/{humanId}/slots/{slotId}/files:
+    $ref: './paths/plans-human-id-slots-slot-id-files.yaml'
+  /plans/{humanId}/send:
+    $ref: './paths/plans-human-id-send.yaml'
+  /plans/{humanId}/resubmit:
+    $ref: './paths/plans-human-id-resubmit.yaml'
+  /plans/{humanId}/send-to-dtoe:
+    $ref: './paths/plans-human-id-send-to-dtoe.yaml'
+  /plans/{humanId}/resubmit-to-dtoe:
+    $ref: './paths/plans-human-id-resubmit-to-dtoe.yaml'
+  /plans/{humanId}/cfo-approve:
+    $ref: './paths/plans-human-id-cfo-approve.yaml'
+  /plans/{humanId}/cfo-return:
+    $ref: './paths/plans-human-id-cfo-return.yaml'
+  /plans/{humanId}/cfo-cancel:
+    $ref: './paths/plans-human-id-cfo-cancel.yaml'
+  /plans/{humanId}/dtoe-approve:
+    $ref: './paths/plans-human-id-dtoe-approve.yaml'
+  /plans/{humanId}/dtoe-return:
+    $ref: './paths/plans-human-id-dtoe-return.yaml'
+  /plans/{humanId}/remarks:
+    $ref: './paths/plans-human-id-remarks.yaml'
+  /plans/{humanId}/remarks/{remarkId}/fix:
+    $ref: './paths/plans-human-id-remarks-remark-id-fix.yaml'
+  /plans/{humanId}/remarks/{remarkId}/reopen:
+    $ref: './paths/plans-human-id-remarks-remark-id-reopen.yaml'
+  /plans/{humanId}/remarks/{remarkId}:
+    $ref: './paths/plans-human-id-remarks-remark-id.yaml'
+
+  /plan-files/{id}/download:
+    $ref: './paths/plan-files-id-download.yaml'
+
   /notifications:
     $ref: './paths/notifications.yaml'
   /notifications/{id}/open:
@@ -158,6 +215,8 @@ paths:
     $ref: './paths/notifications-by-correction-correction-id-read.yaml'
   /notifications/by-fact-package/{factPackageId}/read:
     $ref: './paths/notifications-by-fact-package-fact-package-id-read.yaml'
+  /notifications/by-plan/{planId}/read:
+    $ref: './paths/notifications-by-plan-plan-id-read.yaml'
 
 components:
   securitySchemes:
@@ -282,3 +341,54 @@ components:
       $ref: './components/schemas/fact-package-history-entry.yaml'
     FactFinalDecisionInput:
       $ref: './components/schemas/fact-final-decision.yaml'
+
+    PlanStatus:
+      $ref: './components/schemas/plan-status.yaml'
+    PlanCfoStatusValue:
+      $ref: './components/schemas/plan-cfo-status-value.yaml'
+    PlanRemarkStatus:
+      $ref: './components/schemas/plan-remark-status.yaml'
+    PlanPackageRequirementKind:
+      $ref: './components/schemas/plan-package-requirement-kind.yaml'
+
+    PlanType:
+      $ref: './components/schemas/plan-type.yaml#/PlanType'
+    PlanTypeInput:
+      $ref: './components/schemas/plan-type.yaml#/PlanTypeInput'
+    PlanTypeDetail:
+      $ref: './components/schemas/plan-type.yaml#/PlanTypeDetail'
+    PlanPackageRequirement:
+      $ref: './components/schemas/plan-package-requirement.yaml#/PlanPackageRequirement'
+    PlanPackageRequirementInput:
+      $ref: './components/schemas/plan-package-requirement.yaml#/PlanPackageRequirementInput'
+
+    Plan:
+      $ref: './components/schemas/plan.yaml#/Plan'
+    PlanListItem:
+      $ref: './components/schemas/plan.yaml#/PlanListItem'
+    PaginatedPlans:
+      $ref: './components/schemas/plan.yaml#/PaginatedPlans'
+    PlanCreateInput:
+      $ref: './components/schemas/plan.yaml#/PlanCreateInput'
+    PlanTypeChangeInput:
+      $ref: './components/schemas/plan.yaml#/PlanTypeChangeInput'
+    PlanStats:
+      $ref: './components/schemas/plan-stats.yaml'
+    PlanDocumentSlot:
+      $ref: './components/schemas/plan-document-slot.yaml'
+    PlanFileVersion:
+      $ref: './components/schemas/plan-file-version.yaml'
+    PlanCfoStatus:
+      $ref: './components/schemas/plan-cfo-status.yaml'
+    PlanRemark:
+      $ref: './components/schemas/plan-remark.yaml#/PlanRemark'
+    PlanRemarkCreateInput:
+      $ref: './components/schemas/plan-remark.yaml#/PlanRemarkCreateInput'
+    PlanRemarkReopenInput:
+      $ref: './components/schemas/plan-remark.yaml#/PlanRemarkReopenInput'
+    PlanHistoryEntry:
+      $ref: './components/schemas/plan-history-entry.yaml'
+    PlanDetail:
+      $ref: './components/schemas/plan-detail.yaml#/PlanDetail'
+    PlanCfoSelectionInput:
+      $ref: './components/schemas/plan-detail.yaml#/PlanCfoSelectionInput'

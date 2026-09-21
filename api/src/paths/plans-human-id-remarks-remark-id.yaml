@@ -1,0 +1,10 @@
+parameters:
+  - { name: humanId, in: path, required: true, schema: { type: string } }
+  - { name: remarkId, in: path, required: true, schema: { type: integer } }
+delete:
+  summary: Удалить замечание плана (только автор, только пока OPEN)
+  operationId: deletePlanRemark
+  tags: [Plans]
+  description: Только автор замечания и только пока оно в статусе OPEN.
+  responses:
+    '204': { description: Замечание удалено }
