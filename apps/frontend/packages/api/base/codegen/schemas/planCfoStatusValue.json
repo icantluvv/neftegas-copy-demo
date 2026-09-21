@@ -1,0 +1,1 @@
+{"x-readme-ref-name":"PlanCfoStatusValue","type":"string","enum":["PENDING","APPROVED","RETURNED"]}

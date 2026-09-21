@@ -1,0 +1,1 @@
+{"x-readme-ref-name":"PlanRemarkStatus","type":"string","enum":["OPEN","FIXED_BY_FILIAL","REOPENED","CLOSED"]}

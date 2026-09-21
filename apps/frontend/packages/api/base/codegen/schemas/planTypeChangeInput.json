@@ -1,0 +1,1 @@
+{"type":"object","required":["planTypeId"],"properties":{"planTypeId":{"type":"integer"}},"x-readme-ref-name":"PlanTypeChangeInput"}

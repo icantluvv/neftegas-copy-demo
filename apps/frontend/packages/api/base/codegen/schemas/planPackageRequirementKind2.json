@@ -1,0 +1,1 @@
+{"type":"string","enum":["MAIN_EXCEL","EXCEL_SHEET","DOCUMENT"],"x-readme-ref-name":"plan-package-requirement-kind"}

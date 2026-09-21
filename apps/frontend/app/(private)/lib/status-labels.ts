@@ -5,6 +5,9 @@ import type {
   FactCfoStatusValue2,
   FactPackageStatus2,
   FactRemarkStatus2,
+  PlanCfoStatusValue2,
+  PlanRemarkStatus2,
+  PlanStatus2,
   RemarkStatus2,
 } from "@/packages/api/base/codegen";
 
@@ -109,4 +112,41 @@ export function getDirectionLabel(direction: Direction2): string {
 
 export function getDirectionShortLabel(direction: Direction2): string {
   return DIRECTION_SHORT_LABELS[direction];
+}
+
+const PLAN_STATUS_LABELS: Record<PlanStatus2, StatusLabel> = {
+  DRAFT: { text: "Черновик", tone: "neutral" },
+  UNDER_CFO_REVIEW: { text: "На проверке ЦФО", tone: "info" },
+  PARTIALLY_APPROVED: { text: "Частично согласовано", tone: "info" },
+  RETURNED_FOR_REVISION: { text: "Возвращён на доработку", tone: "warning" },
+  RESUBMITTED: { text: "Направлено повторно", tone: "info" },
+  ALL_CFO_APPROVED: { text: "Согласовано всеми ЦФО", tone: "success" },
+  UNDER_DTOE_REVIEW: { text: "На проверке ДТОиР", tone: "info" },
+  RETURNED_BY_DTOE: { text: "Возвращён ДТОиР", tone: "danger" },
+  APPROVED_BY_DTOE: { text: "Согласован ДТОиР", tone: "success" },
+};
+
+export function getPlanStatusLabel(status: PlanStatus2): StatusLabel {
+  return PLAN_STATUS_LABELS[status];
+}
+
+const PLAN_CFO_STATUS_LABELS: Record<PlanCfoStatusValue2, StatusLabel> = {
+  PENDING: { text: "Ожидает", tone: "neutral" },
+  APPROVED: { text: "Согласовано", tone: "success" },
+  RETURNED: { text: "Возвращено", tone: "danger" },
+};
+
+export function getPlanCfoStatusLabel(status: PlanCfoStatusValue2): StatusLabel {
+  return PLAN_CFO_STATUS_LABELS[status];
+}
+
+const PLAN_REMARK_STATUS_LABELS: Record<PlanRemarkStatus2, StatusLabel> = {
+  OPEN: { text: "Открыто", tone: "danger" },
+  FIXED_BY_FILIAL: { text: "Исправлено филиалом", tone: "warning" },
+  REOPENED: { text: "Возвращено на доработку повторно", tone: "danger" },
+  CLOSED: { text: "Закрыто", tone: "neutral" },
+};
+
+export function getPlanRemarkStatusLabel(status: PlanRemarkStatus2): StatusLabel {
+  return PLAN_REMARK_STATUS_LABELS[status];
 }
